@@ -8,4 +8,6 @@
     android:background="@drawable/app_background"
     android:theme="@android:style/Theme.NoTitleBar">
 
+
+
 </RelativeLayout>
