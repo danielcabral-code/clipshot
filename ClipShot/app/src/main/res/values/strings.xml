@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ClipShot</string>
     <string name="clipshot">ClipShot</string>
+
+    <string name="teste">teste</string>
     <string name="awd">awwwwwd</string>
 </resources>
