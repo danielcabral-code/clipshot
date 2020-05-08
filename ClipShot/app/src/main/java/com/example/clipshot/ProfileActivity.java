@@ -10,6 +10,8 @@ import android.transition.Fade;
 import android.transition.Transition;
 import android.view.View;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
+
 import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -23,8 +25,14 @@ public class ProfileActivity extends AppCompatActivity {
         // Call TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_layout);
+
+        // Set Elevation to TopBar and NavBar
+        getSupportActionBar().setElevation(50f); // Float == px
+        BottomAppBar bottomAppBar = findViewById(R.id.navigation);
+        bottomAppBar.setElevation(50f); // Float == px
     }
 
+    // Go To Feed (NavBar Button)
     public void goToFeed(View v) {
         Intent accessFeed = new Intent(this, FeedActivity.class);
         startActivity(accessFeed);

@@ -8,6 +8,8 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
+
 import java.util.Objects;
 
 public class FeedActivity extends AppCompatActivity {
@@ -21,9 +23,14 @@ public class FeedActivity extends AppCompatActivity {
         // Call TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_layout);
-        getSupportActionBar().setElevation(40f); // Float == px
+
+        // Set Elevation to TopBar and NavBar
+        getSupportActionBar().setElevation(50f); // Float == px
+        BottomAppBar bottomAppBar = findViewById(R.id.navigation);
+        bottomAppBar.setElevation(50f); // Float == px
     }
 
+    // Go To Profile (NavBar Button)
     public void goToProfile(View v) {
         Intent accessProfile = new Intent(this, ProfileActivity.class);
         startActivity(accessProfile);

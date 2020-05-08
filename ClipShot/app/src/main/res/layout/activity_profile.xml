@@ -28,6 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- Home Button -->
                 <RelativeLayout
                     android:id="@+id/homePage"
                     android:layout_width="0dp"
@@ -40,6 +41,7 @@
                     android:onClick="goToFeed"
                     tools:ignore="OnClick">
 
+                    <!-- Home Button Icon -->
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -50,6 +52,7 @@
 
                 </RelativeLayout>
 
+                <!-- Profile Button -->
                 <RelativeLayout
                     android:id="@+id/profile"
                     android:layout_width="0dp"
@@ -60,6 +63,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.4">
 
+                    <!-- Profile Button Icon -->
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -74,6 +78,7 @@
 
         </com.google.android.material.bottomappbar.BottomAppBar>
 
+        <!-- Add Video Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/categories"
             android:layout_width="wrap_content"
