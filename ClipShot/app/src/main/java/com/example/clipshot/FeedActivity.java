@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.Fade;
-import android.transition.Transition;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,12 +21,7 @@ public class FeedActivity extends AppCompatActivity {
         // Call TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_layout);
-
-        Transition fade = new Fade();
-        fade.excludeTarget(R.layout.action_bar_layout, true);
-        fade.excludeTarget(R.id.navBar, true);
-        getWindow().setExitTransition(fade);
-        getWindow().setEnterTransition(fade);
+        getSupportActionBar().setElevation(40f); // Float == px
     }
 
     public void goToProfile(View v) {

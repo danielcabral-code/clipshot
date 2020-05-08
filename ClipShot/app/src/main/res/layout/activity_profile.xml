@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".FeedActivity"
+    tools:context=".ProfileActivity"
     android:background="@drawable/app_background"
     android:theme="@android:style/Theme.NoTitleBar">
 
@@ -12,8 +12,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/navBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:transitionName="navBarTransition">
+        android:layout_height="match_parent">
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/navigation"
@@ -22,7 +21,8 @@
             android:layout_gravity="bottom"
             app:backgroundTint="@color/colorPrimary"
             app:fabCradleMargin="-5dp"
-            android:gravity="center">
+            android:gravity="center"
+            android:transitionName="navBarTransition">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -36,7 +36,9 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
-                    app:layout_constraintWidth_percent="0.4">
+                    app:layout_constraintWidth_percent="0.4"
+                    android:onClick="goToFeed"
+                    tools:ignore="OnClick">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="wrap_content"
