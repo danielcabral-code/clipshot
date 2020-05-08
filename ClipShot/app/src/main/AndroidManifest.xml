@@ -12,9 +12,9 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".LoginActivity"/>
+        <activity android:name=".FeedActivity"/>
         <activity android:name=".WelcomeActivity" />
-        <activity android:name=".FeedActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
