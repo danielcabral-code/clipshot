@@ -4,14 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity"
+    tools:context=".FeedActivity"
     android:background="@drawable/app_background"
     android:theme="@android:style/Theme.NoTitleBar">
 
     <!-- NavBar -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/navBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:transitionName="navBarTransition">
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/navigation"
@@ -53,7 +55,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.4">
+                    app:layout_constraintWidth_percent="0.4"
+                    android:onClick="goToProfile">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="wrap_content"
@@ -61,7 +64,8 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginEnd="200dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_person"/>
+                        android:src="@drawable/ic_person"
+                        android:alpha="0.65"/>
 
                 </RelativeLayout>
 
