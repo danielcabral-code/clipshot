@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ProfileActivity"
+    tools:context=".MainActivity"
     android:background="@drawable/app_background"
     android:theme="@android:style/Theme.NoTitleBar">
 
@@ -21,8 +21,7 @@
             android:layout_gravity="bottom"
             app:backgroundTint="@color/colorPrimary"
             app:fabCradleMargin="-5dp"
-            android:gravity="center"
-            android:transitionName="navBarTransition">
+            android:gravity="center">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -38,8 +37,8 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
                     app:layout_constraintWidth_percent="0.4"
-                    android:onClick="goToFeed"
-                    tools:ignore="OnClick">
+                    android:onClick="goToFeed">
+
 
                     <!-- Home Button Icon -->
                     <androidx.appcompat.widget.AppCompatImageView
@@ -47,8 +46,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:padding="10dp"
-                        android:src="@drawable/ic_home"
-                        android:alpha="0.65"/>
+                        android:src="@drawable/ic_home"/>
 
                 </RelativeLayout>
 
@@ -61,7 +59,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.4">
+                    app:layout_constraintWidth_percent="0.4"
+                    android:onClick="goToProfile">
 
                     <!-- Profile Button Icon -->
                     <androidx.appcompat.widget.AppCompatImageView
@@ -70,7 +69,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginEnd="200dp"
                         android:padding="10dp"
-                        android:src="@drawable/ic_person"/>
+                        android:src="@drawable/ic_person" />
 
                 </RelativeLayout>
 
