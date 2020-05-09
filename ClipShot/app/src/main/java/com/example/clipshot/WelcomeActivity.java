@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,7 +32,7 @@ public class WelcomeActivity extends AppCompatActivity {
         TextView name = findViewById(R.id.name);
         TextView email = findViewById(R.id.mail);
         TextView id = findViewById(R.id.id);
-        Button btn = findViewById(R.id.sign_in_button);
+        Button btn = findViewById(R.id.signOut);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -40,17 +41,17 @@ public class WelcomeActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
-       /* btn.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
                     // ...
-                    case R.id.sign_in_button:
+                    case R.id.signOut:
                         signOut();
                         break;
                 }
             }
-        });*/
+        });
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
@@ -68,14 +69,16 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-   /* private void signOut() {
+    private void signOut() {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        Log.d("TAG", "onComplete: disconnected");
                         finish();
+
                     }
                 });
-    }*/
+    }
 }
 
