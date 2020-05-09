@@ -3,6 +3,8 @@ package com.example.clipshot;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,14 +21,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.Objects;
+
 public class WelcomeActivity extends AppCompatActivity {
 
     GoogleSignInClient mGoogleSignInClient;
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        // Call TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.welcome_action_bar);
 
         ImageView img = findViewById(R.id.image);
         TextView name = findViewById(R.id.name);
