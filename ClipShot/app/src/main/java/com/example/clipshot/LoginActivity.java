@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                 }else{
 
                     Log.d("TAG", "welcome back ");
-                    Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
 
