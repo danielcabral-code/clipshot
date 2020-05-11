@@ -29,45 +29,43 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN =0 ;
+    private static final int RC_SIGN_IN =0;
     FirebaseAuth mAuth;
-    SignInButton sigin;
+    SignInButton signin;
     GoogleSignInClient mGoogleSignInClient;
     ProgressBar progressBar;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        sigin = findViewById(R.id.sign_in_button);
+        signin = findViewById(R.id.sign_in_button);
         mAuth=FirebaseAuth.getInstance();
         progressBar=findViewById(R.id.progress_circular);
 
-
-
+        // Choose account popup request
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        // Build a GoogleSignInClient with the options specified by gso.
+
+        // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        sigin.setOnClickListener(v -> signIn());
+        signin.setOnClickListener(v -> signIn());
+
         if (mAuth.getCurrentUser() != null){
             FirebaseUser user = mAuth.getCurrentUser();
             //updateUI(user);
         }
-
     }
+
+    // Go to Welcome / Feed after sign in
     private void signIn() {
         progressBar.setVisibility(View.VISIBLE);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
-
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -75,14 +73,12 @@ public class LoginActivity extends AppCompatActivity {
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-                // The Task returned from this call is always completed, no need to attach
-                // a listener.
+                // The Task returned from this call is always completed, no need to attach a listener
                 Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);;
-            try {
 
+            try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 if (account != null) firebaseAuthWithGoogle(account);
-
             }
             catch (ApiException e){
                 e.printStackTrace();
@@ -90,55 +86,49 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // Firebase Google Authentication
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
         Log.d("TAG", "firebaseAuthWithGoogle: " + account.getId());
+
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
         mAuth.signInWithCredential(credential).addOnCompleteListener(this,task -> {
+
             if (task.isSuccessful()){
                 progressBar.setVisibility(View.INVISIBLE);
-                Log.d("TAG", "SignIn sucess");
 
-                boolean newuser = task.getResult().getAdditionalUserInfo().isNewUser();
+                Log.d("TAG", "SignIn sucess");
+                boolean newuser = Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getAdditionalUserInfo()).isNewUser();
                 
                 if(newuser){
-
-                    Log.d("TAG", "new ");
+                    Log.d("TAG", "new");
                     Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
                     startActivity(intent);
 
                 }else{
-
-                    Log.d("TAG", "welcome back ");
+                    Log.d("TAG", "welcome back");
                     FirebaseUser user = mAuth.getCurrentUser();
                     updateUI(user);
-
                 }
-
-
             }
             else{
                 progressBar.setVisibility(View.INVISIBLE);
-                Log.w("TAG", "failure ", task.getException() );
+                Log.w("TAG", "failure ", task.getException());
                 Toast.makeText(this, "SignIn Failed!", Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
-
         });
     }
 
+    // Goes to Feed page
     private void updateUI(FirebaseUser user) {
+
         if (user != null){
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-
         }
         else{
-
-            Log.d("TAG", "updateUI: ");
+            Log.d("TAG", "updateUI:");
         }
-
     }
-
-
 }
