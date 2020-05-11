@@ -43,8 +43,6 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText username = findViewById(R.id.displayName);
         AppCompatImageView iconHome = findViewById(R.id.iconDone);
 
-
-
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
