@@ -27,6 +27,7 @@
         android:layout_toEndOf="@+id/appBarTitle"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-       android:onClick="goToFeeed"/>
+        android:visibility="invisible"
+        android:onClick="goToFeeed"/>
 
 </RelativeLayout>
