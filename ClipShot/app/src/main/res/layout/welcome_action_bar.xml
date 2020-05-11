@@ -16,4 +16,18 @@
         android:textColor="@color/colorWhite"
         android:textSize="28sp" />
 
+
+   <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iconDone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="100dp"
+        android:src="@drawable/ic_done"
+        android:layout_toEndOf="@+id/appBarTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+       android:onClick="goToFeeed"/>
+
+
 </RelativeLayout>

@@ -3,4 +3,11 @@
     <string name="clipshot">ClipShot</string>
     <string name="welcome">Welcome</string>
     <string name="testprofilename">testProfileName</string>
+    <string name="username">Username</string>
+    <string name="real_name">Real Name</string>
+    <string name="bio">Bio</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="platforms">Platforms</string>
 </resources>

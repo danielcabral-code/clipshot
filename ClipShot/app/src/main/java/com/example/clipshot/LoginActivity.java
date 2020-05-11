@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         sigin.setOnClickListener(v -> signIn());
         if (mAuth.getCurrentUser() != null){
             FirebaseUser user = mAuth.getCurrentUser();
-            updateUI(user);
+            //updateUI(user);
         }
 
     }
@@ -104,14 +104,15 @@ public class LoginActivity extends AppCompatActivity {
                 if(newuser){
 
                     Log.d("TAG", "new ");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
+                    startActivity(intent);
 
                 }else{
 
                     Log.d("TAG", "welcome back ");
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    updateUI(user);
+
                 }
 
 
@@ -128,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if (user != null){
-            Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
 
         }
