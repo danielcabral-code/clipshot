@@ -3,14 +3,18 @@ package com.example.clipshot;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -36,7 +40,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         ImageView img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
-        //Button btn = findViewById(R.id.btn);
+        EditText username = findViewById(R.id.username);
+        AppCompatImageView iconHome = findViewById(R.id.iconDone);
+
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -45,20 +51,6 @@ public class WelcomeActivity extends AppCompatActivity {
         // Build a GoogleSignInClient with the options specified by gso.
         Object mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-
-        //Listener do botao signOut que vai ser transferido para outra página
-        /*btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    // ...
-                    case R.id.signOut:
-                        signOut();
-                        break;
-                }
-            }
-        });*/
-        
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
@@ -72,6 +64,44 @@ public class WelcomeActivity extends AppCompatActivity {
 
             Glide.with(this).load(String.valueOf(personPhoto)).into(img);
         }
+
+        username.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("TAG", "onTextChanged: mudou");
+
+                if (s.toString().trim().length()==0){
+
+                    iconHome.setVisibility(View.INVISIBLE);
+                }
+                else iconHome.setVisibility(View.VISIBLE);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        });
+
+        //Listener do botao signOut que vai ser transferido para outra página
+        /*btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    // ...
+                    case R.id.signOut:
+                        signOut();
+                        break;
+                }
+            }
+        });*/
     }
 
     public void goToFeeed(View v){
@@ -80,6 +110,8 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivity(goToFeed);
 
     }
+
+
 
 
 
