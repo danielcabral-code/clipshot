@@ -40,7 +40,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         ImageView img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
-        EditText username = findViewById(R.id.username);
+        EditText username = findViewById(R.id.displayName);
         AppCompatImageView iconHome = findViewById(R.id.iconDone);
 
 
