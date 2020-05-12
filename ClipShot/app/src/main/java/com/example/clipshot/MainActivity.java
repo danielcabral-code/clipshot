@@ -72,6 +72,23 @@ public class MainActivity extends AppCompatActivity {
         iconHome.setAlpha((float) 0.45);
     }
 
+    // Go To Profile (NavBar Button)
+    @SuppressLint("WrongConstant")
+    public void goToSettings(View v) {
+
+        // Call Profile TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.profile_action_bar_layout);
+
+        openFragment(SettingsFragment.newInstance("",""));
+        // Opacity changes on Bottom Bar Icon depending on what page is selected
+        AppCompatImageView iconProfile = findViewById(R.id.iconProfile);
+        iconProfile.setAlpha((float) 1.0);
+        AppCompatImageView iconHome = findViewById(R.id.iconHome);
+        iconHome.setAlpha((float) 0.45);
+    }
+
+
     // Utilitary method for opening fragments
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

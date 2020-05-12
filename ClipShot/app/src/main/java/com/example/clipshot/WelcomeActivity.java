@@ -3,7 +3,6 @@ package com.example.clipshot;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,13 +19,12 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    GoogleSignInClient mGoogleSignInClient;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -40,18 +38,19 @@ public class WelcomeActivity extends AppCompatActivity {
         // Set Elevation to Top Bar
         getSupportActionBar().setElevation(50f); // Float == px
 
+        //Declaring interface components
         ImageView img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
         EditText username = findViewById(R.id.displayName);
+        EditText bio = findViewById(R.id.bio);
+        EditText steamInput = findViewById(R.id.steamInput);
+        EditText originInput = findViewById(R.id.originInput);
+        EditText psnInput = findViewById(R.id.psnInput);
+        EditText xboxInput = findViewById(R.id.xboxInput);
+        EditText nintendoInput = findViewById(R.id.switchInput);
         AppCompatImageView iconHome = findViewById(R.id.iconDone);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        // Build a GoogleSignInClient with the options specified by gso.
-        Object mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-
+        //Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
 
@@ -65,6 +64,7 @@ public class WelcomeActivity extends AppCompatActivity {
             Glide.with(this).load(String.valueOf(personPhoto)).into(img);
         }
 
+        //Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
         username.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -73,7 +73,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().length()==0){
 
@@ -90,44 +89,17 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-        //Listener do botao signOut que vai ser transferido para outra página
-        /*btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    // ...
-                    case R.id.signOut:
-                        signOut();
-                        break;
-                }
-            }
-        });*/
     }
 
-    public void goToFeeed(View v){
+    //Method to go to main feed
+    public void goToMainFeed(View v){
 
         Intent goToFeed = new Intent(this,MainActivity.class);
         startActivity(goToFeed);
 
     }
 
-
-
-
-
-    //função signOut para ser transferida para outra página
-   /* private void signOut() {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Log.d("TAG", "onComplete: disconnected");
-                        finish();
-
-                    }
-                });
-*/
-    }
+}
 
 
 

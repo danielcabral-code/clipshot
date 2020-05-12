@@ -13,4 +13,5 @@
     <string name="displayName">Display Name</string>
     <string name="realName">Real Name</string>
     <string name="userimage">userImage</string>
+    <string name="logout">Logout</string>
 </resources>
