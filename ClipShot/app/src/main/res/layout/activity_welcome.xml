@@ -282,7 +282,6 @@
         tools:ignore="LabelFor"
         android:singleLine="true"/>
 
-
     </RelativeLayout>
 
 </ScrollView>

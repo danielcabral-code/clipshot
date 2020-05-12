@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         iconHome.setAlpha((float) 0.45);
     }
 
-    // Go To Profile (NavBar Button)
+    // Go To Settings (TopBar Button)
     @SuppressLint("WrongConstant")
     public void goToSettings(View v) {
 
@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         AppCompatImageView iconHome = findViewById(R.id.iconHome);
         iconHome.setAlpha((float) 0.45);
     }
-
 
     // Utilitary method for opening fragments
     public void openFragment(Fragment fragment) {

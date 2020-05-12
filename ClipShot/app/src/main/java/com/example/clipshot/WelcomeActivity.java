@@ -25,7 +25,6 @@ import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +37,12 @@ public class WelcomeActivity extends AppCompatActivity {
         // Set Elevation to Top Bar
         getSupportActionBar().setElevation(50f); // Float == px
 
-        //Declaring interface components
+        // Declaring interface components
         ImageView img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
         EditText username = findViewById(R.id.displayName);
+
+        // (Yet to be used)
         EditText bio = findViewById(R.id.bio);
         EditText steamInput = findViewById(R.id.steamInput);
         EditText originInput = findViewById(R.id.originInput);
@@ -50,7 +51,7 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText nintendoInput = findViewById(R.id.switchInput);
         AppCompatImageView iconHome = findViewById(R.id.iconDone);
 
-        //Automatically fill avatar with Google Account Image and real name
+        // Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
 
@@ -60,15 +61,13 @@ public class WelcomeActivity extends AppCompatActivity {
 
             name.setText(personName);
 
-
             Glide.with(this).load(String.valueOf(personPhoto)).into(img);
         }
 
-        //Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+        // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
         username.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -84,26 +83,14 @@ public class WelcomeActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
-
             }
         });
-
     }
 
-    //Method to go to main feed
+    // Method to go to Main Feed
     public void goToMainFeed(View v){
 
         Intent goToFeed = new Intent(this,MainActivity.class);
         startActivity(goToFeed);
-
     }
-
 }
-
-
-
-
-
-
-

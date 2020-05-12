@@ -28,7 +28,7 @@ import java.util.Objects;
 public class LoginActivity extends AppCompatActivity implements
         View.OnClickListener {
 
-    //Declaring variables from Firebase and Google SignIn and progess bar
+    // Declaring variables from Firebase and Google SignIn and progress bar
     private static final int RC_SIGN_IN = 123;
     FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
@@ -52,28 +52,25 @@ public class LoginActivity extends AppCompatActivity implements
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        //Applying Button SingIn style
+        // Applying Button SignIn style
         SignInButton signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_WIDE);
         signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
 
-        //If an account is logged in Firebase the user will skip the Login Page and will go to the Feed Page (Main Activity/Feed Fragment)
+        // If an account is logged in with Firebase the user will skip the Login Page and go to the Feed Page (Main Activity/Feed Fragment)
         if (mAuth.getCurrentUser() != null) {
             FirebaseUser user = mAuth.getCurrentUser();
             updateUI(user);
         }
-
     }
 
-
-    //SignIn function that will open dialog to choose account
+    // SignIn function that will open dialog to choose account
     private void signIn() {
         progressBar.setVisibility(View.VISIBLE);
         signOut();
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
 
    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -82,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+
             try {
                 //Firebase Authentication with Google Account
                 GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -98,7 +96,6 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-
     // Firebase Google Authentication Method
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
@@ -107,26 +104,26 @@ public class LoginActivity extends AppCompatActivity implements
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
         mAuth.signInWithCredential(credential).addOnCompleteListener(this,task -> {
 
-            if (task.isSuccessful()){
+            if (task.isSuccessful()) {
                 progressBar.setVisibility(View.INVISIBLE);
 
                 Log.d("TAG", "SignIn sucess");
                 boolean newuser = Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getAdditionalUserInfo()).isNewUser();
 
-                if(newuser){
+                if (newuser) {
                     //If it is a new user it will appear the Welcome Page
                     Log.d("TAG", "new");
                     Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
                     startActivity(intent);
 
-                }else{
+                }else {
                     //If it is an existing user it will appear the Feed Page
                     Log.d("TAG", "welcome back");
                     FirebaseUser user = mAuth.getCurrentUser();
                     updateUI(user);
                 }
             }
-            else{
+            else {
                 //If Login fails it will appear an toast
                 progressBar.setVisibility(View.INVISIBLE);
                 Log.w("TAG", "failure ", task.getException());
@@ -136,20 +133,20 @@ public class LoginActivity extends AppCompatActivity implements
         });
     }
 
-    // Goes to Feed page method
+    // Method to go to Feed Page
     private void updateUI(FirebaseUser user) {
 
-        if (user != null){
+        if (user != null) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
         }
-        else{
+        else {
             Log.d("TAG", "updateUI:");
         }
     }
 
     @Override
-    //Sign In Button on click method
+    // Sign In Button onClick Method
     public void onClick(View v) {
 
         if (v.getId() == R.id.sign_in_button) {
@@ -157,8 +154,9 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    //Sign Out method
+    // Sign Out Method
     public void signOut() {
+
         // Firebase sign out
         mAuth.signOut();
         mGoogleSignInClient.signOut().addOnCompleteListener(this,
