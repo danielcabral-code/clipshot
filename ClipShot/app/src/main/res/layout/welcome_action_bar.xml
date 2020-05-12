@@ -23,7 +23,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="20dp"
-        android:onClick="goToFeeed"
+        android:onClick="goToMainFeed"
         android:src="@drawable/ic_done"
         android:visibility="invisible" />
 

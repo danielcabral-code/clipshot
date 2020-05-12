@@ -12,4 +12,5 @@
     <string name="platforms">Platforms</string>
     <string name="displayName">Display Name</string>
     <string name="realName">Real Name</string>
+    <string name="logout">Logout</string>
 </resources>
