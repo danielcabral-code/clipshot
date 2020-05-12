@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +7,16 @@
     android:background="@color/colorPrimary"
     tools:context=".WelcomeActivity">
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
     <!-- Placeholder for profile image -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/imageCard"
-        android:layout_marginTop="20dp"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_marginTop="18dp"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
         app:cardCornerRadius="50dp"
         app:strokeWidth="1dp"
         app:strokeColor="@color/colorWhite"
@@ -22,7 +26,8 @@
             android:id="@+id/image"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/userimage" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -31,51 +36,56 @@
         android:id="@+id/labelDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0.6"
         android:text="@string/displayName"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/imageCard"
-        android:layout_marginStart="100dp"
+        android:layout_marginHorizontal="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 
+    <!-- Display Name Text -->
     <EditText
         android:id="@+id/displayName"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
+        android:layout_width="500dp"
+        android:layout_height="44dp"
         android:layout_below="@+id/labelDisplayName"
-        android:layout_marginStart="100dp"
-        android:alpha="0.6"
+        android:layout_marginHorizontal="40dp"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="@color/colorWhite"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:autofillHints=""
+        android:inputType=""
+        tools:ignore="LabelFor" />
 
     <!-- Real Name Label -->
     <TextView
         android:id="@+id/labelRealName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0.6"
         android:text="@string/realName"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/displayName"
-        android:layout_marginStart="100dp"
+        android:layout_marginHorizontal="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="10sp"/>
+        android:textSize="12sp"/>
 
+    <!-- Real Name Text -->
     <EditText
         android:id="@+id/realName"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
+        android:layout_width="500dp"
+        android:layout_height="44dp"
         android:layout_below="@+id/labelRealName"
-        android:layout_marginStart="100dp"
-        android:alpha="0.6"
+        android:layout_marginHorizontal="40dp"
         android:backgroundTint="@color/colorWhite"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
@@ -86,29 +96,29 @@
         android:id="@+id/labelBio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0.6"
         android:text="@string/bio"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/realName"
-        android:layout_marginStart="100dp"
+        android:layout_marginHorizontal="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="10sp"/>
+        android:textSize="12sp"/>
 
+    <!-- Bio Text -->
     <EditText
         android:id="@+id/bio"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_height="44dp"
+        android:maxHeight="135dp"
         android:layout_below="@+id/labelBio"
-        android:layout_marginStart="100dp"
-        android:alpha="0.6"
+        android:layout_marginHorizontal="40dp"
         android:backgroundTint="@color/colorWhite"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="14sp"
-        android:minLines="1"
+        android:textSize="16sp"
         android:maxLines="3"
         android:scrollbars="vertical"
-        android:maxLength="40"
         android:inputType="textMultiLine"
         android:autofillHints=""
         tools:ignore="LabelFor" />
@@ -118,13 +128,14 @@
         android:id="@+id/labelPlatforms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0.6"
         android:text="@string/platforms"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/bio"
-        android:layout_marginStart="100dp"
+        android:layout_marginHorizontal="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
-        android:textSize="10sp"/>
+        android:textSize="12sp"/>
 
     <!-- Steam Icon -->
     <androidx.appcompat.widget.AppCompatImageView
@@ -134,21 +145,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_below="@+id/labelPlatforms"
-        android:layout_marginStart="100dp"/>
+        android:layout_marginStart="43dp"/>
 
     <!-- Steam Name Text -->
     <EditText
         android:id="@+id/steamInput"
-        android:layout_width="155dp"
+        android:layout_width="400dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="40dp"
         android:layout_height="40dp"
         android:layout_below="@+id/labelPlatforms"
-        android:alpha="0.6"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
         android:layout_toEndOf="@+id/iconSteam"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="14dp"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
@@ -161,22 +173,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iconSteam"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="43dp"
         android:src="@drawable/ic_origin" />
 
     <!-- Origin Name Text -->
     <EditText
         android:id="@+id/originInput"
-        android:layout_width="155dp"
+        android:layout_width="400dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="4dp"
         android:layout_height="40dp"
         android:layout_below="@+id/steamInput"
-        android:alpha="0.6"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
-        android:layout_toEndOf="@+id/iconSteam"
-
+        android:layout_toEndOf="@+id/iconOrigin"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
@@ -189,21 +202,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iconOrigin"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="43dp"
         android:src="@drawable/ic_psn" />
 
     <!-- PSN Name Text -->
     <EditText
         android:id="@+id/psnInput"
-        android:layout_width="155dp"
+        android:layout_width="400dp"
         android:layout_height="40dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="4dp"
         android:layout_below="@+id/originInput"
-        android:alpha="0.6"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
-        android:layout_toEndOf="@+id/iconSteam"
+        android:layout_toEndOf="@+id/iconPsn"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
@@ -216,21 +231,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iconPsn"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="43dp"
         android:src="@drawable/ic_xbox" />
 
     <!-- Xbox Name Text -->
     <EditText
         android:id="@+id/xboxInput"
-        android:layout_width="155dp"
+        android:layout_width="400dp"
         android:layout_height="40dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="4dp"
         android:layout_below="@+id/psnInput"
-        android:alpha="0.6"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
-        android:layout_toEndOf="@+id/iconSteam"
+        android:layout_toEndOf="@+id/iconXbox"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
@@ -243,24 +260,28 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iconXbox"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="43dp"
         android:src="@drawable/ic_switch" />
 
     <!-- Nintendo Switch Name Text -->
     <EditText
         android:id="@+id/switchInput"
-        android:layout_width="155dp"
+        android:layout_width="400dp"
         android:layout_height="40dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="4dp"
         android:layout_below="@+id/xboxInput"
-        android:alpha="0.6"
         android:backgroundTint="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
-        android:layout_toEndOf="@+id/iconSteam"
+        android:layout_toEndOf="@+id/iconNintendo"
         android:autofillHints=""
         android:inputType=""
         tools:ignore="LabelFor"
         android:singleLine="true"/>
 
-</RelativeLayout>
+    </RelativeLayout>
+
+</ScrollView>

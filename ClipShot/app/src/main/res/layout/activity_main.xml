@@ -6,7 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:background="@drawable/app_background"
-    android:theme="@android:style/Theme.NoTitleBar">
+    android:theme="@android:style/Theme.NoTitleBar"
+    android:fitsSystemWindows="true">
 
     <!-- NavBar -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout

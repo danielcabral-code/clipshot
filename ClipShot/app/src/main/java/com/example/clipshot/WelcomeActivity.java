@@ -37,6 +37,8 @@ public class WelcomeActivity extends AppCompatActivity {
         // Call TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.welcome_action_bar);
+        // Set Elevation to Top Bar
+        getSupportActionBar().setElevation(50f); // Float == px
 
         ImageView img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
