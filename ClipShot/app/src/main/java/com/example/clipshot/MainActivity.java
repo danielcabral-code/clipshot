@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     // Utilitary method for opening fragments
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.navBar, fragment);
+        transaction.replace(R.id.container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }

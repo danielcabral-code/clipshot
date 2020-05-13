@@ -9,11 +9,21 @@
     android:theme="@android:style/Theme.NoTitleBar"
     android:fitsSystemWindows="true">
 
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="58dp">
+
+    </RelativeLayout>
+
     <!-- NavBar -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/navBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/navigation"
