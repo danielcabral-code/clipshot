@@ -3,27 +3,35 @@ package com.example.clipshot;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
+
+    private static final int PICK_IMAGE =1;
+    private static final int PERMISSION_CODE =2;
+
+    Uri imageUri;
+    ImageView img;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -31,14 +39,8 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        // Call TopBar
-        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.welcome_action_bar);
-        // Set Elevation to Top Bar
-        getSupportActionBar().setElevation(50f); // Float == px
-
         // Declaring interface components
-        ImageView img = findViewById(R.id.image);
+        img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
         EditText username = findViewById(R.id.displayName);
 
@@ -50,6 +52,14 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText xboxInput = findViewById(R.id.xboxInput);
         EditText nintendoInput = findViewById(R.id.switchInput);
         AppCompatImageView iconHome = findViewById(R.id.iconDone);
+
+        // Call TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.welcome_action_bar);
+        // Set Elevation to Top Bar
+        getSupportActionBar().setElevation(50f); // Float == px
+
+
 
         // Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
@@ -85,7 +95,46 @@ public class WelcomeActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+
+                    pickImageFromGallery();
+                }
+            }
+        });
+
     }
+
+
+     private void pickImageFromGallery(){
+
+        Intent gallery = new Intent(Intent.ACTION_PICK);
+        gallery.setType("image/*");
+        startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+
+            imageUri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                img.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     // Method to go to Main Feed
     public void goToMainFeed(View v){
