@@ -5,16 +5,18 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -22,8 +24,11 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -34,8 +39,10 @@ public class WelcomeActivity extends AppCompatActivity {
 
     Uri imageUri;
     ImageView img;
-    DatabaseReference ref;
-    Userdata userdata;
+    EditText name;
+    EditText username ;
+    EditText bio;
+
 
     @SuppressLint("WrongConstant")
     @Override
@@ -63,8 +70,8 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText xboxInput = findViewById(R.id.xboxInput);
         EditText nintendoInput = findViewById(R.id.switchInput);
 
-        userdata= new Userdata();
-        ref= FirebaseDatabase.getInstance().getReference().child("email");
+        //Button btn = findViewById(R.id.btnteste);
+
 
         // Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
@@ -137,7 +144,31 @@ public class WelcomeActivity extends AppCompatActivity {
     // Method to go to Main Feed
     public void goToMainFeed(View v){
 
+
         Intent goToFeed = new Intent(this,MainActivity.class);
         startActivity(goToFeed);
     }
+
+    /*public void insertData(View view){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userData = db.collection("teste").document();
+
+        Userdata userdata = new Userdata();
+        userdata.setUsername(username.getText().toString());
+        userdata.setRealName(name.getText().toString());
+        userdata.setBio(bio.getText().toString());
+
+        userData.set(userdata).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()){
+
+                    Log.d("TAG", "onComplete: ok");
+                }
+            }
+        });
+
+    }*/
 }
