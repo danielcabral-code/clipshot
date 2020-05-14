@@ -76,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("WrongConstant")
     public void goToSettings(View v) {
 
-        // Call Profile TopBar
+        // Call Settings TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.profile_action_bar_layout);
+        getSupportActionBar().setCustomView(R.layout.settings_action_bar_layout);
 
         openFragment(SettingsFragment.newInstance("",""));
         // Opacity changes on Bottom Bar Icon depending on what page is selected

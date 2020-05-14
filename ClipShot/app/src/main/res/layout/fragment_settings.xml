@@ -282,6 +282,7 @@
           tools:ignore="LabelFor"
           android:singleLine="true"/>
 
+            <!-- Logout Button -->
       <Button
           style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
           android:id="@+id/button_sign_out"

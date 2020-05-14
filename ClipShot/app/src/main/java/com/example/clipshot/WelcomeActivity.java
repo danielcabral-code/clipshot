@@ -49,7 +49,6 @@ public class WelcomeActivity extends AppCompatActivity {
         // Set Elevation to Top Bar
         getSupportActionBar().setElevation(50f); // Float == px
 
-
         // Declaring interface components
         img = findViewById(R.id.image);
         EditText name = findViewById(R.id.realName);
@@ -95,17 +94,12 @@ public class WelcomeActivity extends AppCompatActivity {
                     iconDone.setVisibility(View.INVISIBLE);
                 }
                 else iconDone.setVisibility(View.VISIBLE);
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
-
             }
         });
-
-
 
         img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,22 +108,18 @@ public class WelcomeActivity extends AppCompatActivity {
                 pickImageFromGallery();
             }
         });
-
     }
-
 
      private void pickImageFromGallery(){
 
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("image/*");
         startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
 
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
 
@@ -143,7 +133,6 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         }
     }
-
 
     // Method to go to Main Feed
     public void goToMainFeed(View v){
