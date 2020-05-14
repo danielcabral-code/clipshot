@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,6 +22,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -28,30 +31,17 @@ import java.util.Objects;
 public class WelcomeActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE =1;
-    private static final int PERMISSION_CODE =2;
 
     Uri imageUri;
     ImageView img;
+    DatabaseReference ref;
+    Userdata userdata;
 
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-
-        // Declaring interface components
-        img = findViewById(R.id.image);
-        EditText name = findViewById(R.id.realName);
-        EditText username = findViewById(R.id.displayName);
-
-        // (Yet to be used)
-        EditText bio = findViewById(R.id.bio);
-        EditText steamInput = findViewById(R.id.steamInput);
-        EditText originInput = findViewById(R.id.originInput);
-        EditText psnInput = findViewById(R.id.psnInput);
-        EditText xboxInput = findViewById(R.id.xboxInput);
-        EditText nintendoInput = findViewById(R.id.switchInput);
-        AppCompatImageView iconHome = findViewById(R.id.iconDone);
 
         // Call TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -60,6 +50,22 @@ public class WelcomeActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(50f); // Float == px
 
 
+        // Declaring interface components
+        img = findViewById(R.id.image);
+        EditText name = findViewById(R.id.realName);
+        EditText username = findViewById(R.id.displayName);
+        AppCompatImageView iconDone = findViewById(R.id.iconDone);
+
+        // (Yet to be used)
+        EditText bio = findViewById(R.id.bio);
+        EditText steamInput = findViewById(R.id.steamInput);
+        EditText originInput = findViewById(R.id.originInput);
+        EditText psnInput = findViewById(R.id.psnInput);
+        EditText xboxInput = findViewById(R.id.xboxInput);
+        EditText nintendoInput = findViewById(R.id.switchInput);
+
+        userdata= new Userdata();
+        ref= FirebaseDatabase.getInstance().getReference().child("email");
 
         // Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
@@ -82,27 +88,30 @@ public class WelcomeActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().length()==0){
 
-                    iconHome.setVisibility(View.INVISIBLE);
+                    iconDone.setVisibility(View.INVISIBLE);
                 }
-                else iconHome.setVisibility(View.VISIBLE);
+                else iconDone.setVisibility(View.VISIBLE);
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+
+
             }
         });
+
+
 
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
 
-                    pickImageFromGallery();
-                }
+                pickImageFromGallery();
             }
         });
 

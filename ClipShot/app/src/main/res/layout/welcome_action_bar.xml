@@ -25,6 +25,6 @@
         android:layout_marginTop="20dp"
         android:onClick="goToMainFeed"
         android:src="@drawable/ic_done"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 
 </RelativeLayout>
