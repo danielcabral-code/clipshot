@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -23,14 +24,20 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -38,6 +45,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
     Uri imageUri;
     ImageView img;
+    FirebaseStorage imageStorage;
+    StorageReference storageReference;
+
 
     @SuppressLint("WrongConstant")
     @Override
@@ -117,11 +127,14 @@ public class WelcomeActivity extends AppCompatActivity {
                 String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,email;
                 FirebaseFirestore db;
 
+
                 //email get the user google email that will create a collection with that email
                 email= acct.getEmail().toString();
 
                 //Firestore instance
                 db = FirebaseFirestore.getInstance();
+                imageStorage = FirebaseStorage.getInstance();
+                storageReference = imageStorage.getReference();
 
                 //Declaring variables that will be inserted in Firestore
                 dataUsername = username.getText().toString();
@@ -143,6 +156,9 @@ public class WelcomeActivity extends AppCompatActivity {
                 Userdata.put("Psn", dataPsn);
                 Userdata.put("Xbox", dataXbox);
                 Userdata.put("Nintendo", dataNintendo);
+
+                //Call the method to upload image
+                uploadImage(email);
 
                 //On sucess data is inserted in database and user go to MainActivity
                 db.collection(email).add(Userdata).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -178,9 +194,27 @@ public class WelcomeActivity extends AppCompatActivity {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                 img.setImageBitmap(bitmap);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+    }
+
+    //Create a folder in Firebase Storage with the user email and upload the image from gallery
+    public void uploadImage(String email){
+
+        if (imageUri != null){
+            StorageReference ref = storageReference.child(email+"/" + UUID.randomUUID().toString());
+            ref.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Toast.makeText(WelcomeActivity.this, "Uploaded",Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
         }
     }
 
