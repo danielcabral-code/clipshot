@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -24,13 +23,13 @@ import androidx.appcompat.widget.AppCompatImageView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -39,10 +38,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
     Uri imageUri;
     ImageView img;
-    EditText name;
-    EditText username ;
-    EditText bio;
-
 
     @SuppressLint("WrongConstant")
     @Override
@@ -61,16 +56,12 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText name = findViewById(R.id.realName);
         EditText username = findViewById(R.id.displayName);
         AppCompatImageView iconDone = findViewById(R.id.iconDone);
-
-        // (Yet to be used)
         EditText bio = findViewById(R.id.bio);
         EditText steamInput = findViewById(R.id.steamInput);
         EditText originInput = findViewById(R.id.originInput);
         EditText psnInput = findViewById(R.id.psnInput);
         EditText xboxInput = findViewById(R.id.xboxInput);
         EditText nintendoInput = findViewById(R.id.switchInput);
-
-        //Button btn = findViewById(R.id.btnteste);
 
 
         // Automatically fill avatar with Google Account Image and real name
@@ -108,6 +99,7 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
+        //Listener to call method to pick an image from gallery
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,8 +107,58 @@ public class WelcomeActivity extends AppCompatActivity {
                 pickImageFromGallery();
             }
         });
+
+        //Listener that insert data into database and change to the Main Activity
+        iconDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Declaring variables
+                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,email;
+                FirebaseFirestore db;
+
+                //email get the user google email that will create a collection with that email
+                email= acct.getEmail().toString();
+
+                //Firestore instance
+                db = FirebaseFirestore.getInstance();
+
+                //Declaring variables that will be inserted in Firestore
+                dataUsername = username.getText().toString();
+                dataName = name.getText().toString();
+                dataBio = bio.getText().toString();
+                dataSteam = steamInput.getText().toString();
+                dataOrigin = originInput.getText().toString();
+                dataPsn =psnInput.getText().toString();
+                dataXbox = xboxInput.getText().toString();
+                dataNintendo = nintendoInput.getText().toString();
+
+                //Map that will fill our database with values
+                Map<String,String> Userdata = new HashMap<>();
+                Userdata.put("Username",dataUsername);
+                Userdata.put("Name", dataName);
+                Userdata.put("Bio", dataBio);
+                Userdata.put("Steam", dataSteam);
+                Userdata.put("Origin", dataOrigin);
+                Userdata.put("Psn", dataPsn);
+                Userdata.put("Xbox", dataXbox);
+                Userdata.put("Nintendo", dataNintendo);
+
+                //On sucess data is inserted in database and user go to MainActivity
+                db.collection(email).add(Userdata).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Intent goToFeed = new Intent(WelcomeActivity.this,MainActivity.class);
+                        startActivity(goToFeed);
+                    }
+                });
+
+
+            }
+        });
     }
 
+    //Method to go to gallery
      private void pickImageFromGallery(){
 
         Intent gallery = new Intent(Intent.ACTION_PICK);
@@ -124,6 +166,7 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
     }
 
+    //Fill welcome avatar image with another from gallery
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -141,34 +184,4 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-    // Method to go to Main Feed
-    public void goToMainFeed(View v){
-
-
-        Intent goToFeed = new Intent(this,MainActivity.class);
-        startActivity(goToFeed);
-    }
-
-    /*public void insertData(View view){
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference userData = db.collection("teste").document();
-
-        Userdata userdata = new Userdata();
-        userdata.setUsername(username.getText().toString());
-        userdata.setRealName(name.getText().toString());
-        userdata.setBio(bio.getText().toString());
-
-        userData.set(userdata).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-                if (task.isSuccessful()){
-
-                    Log.d("TAG", "onComplete: ok");
-                }
-            }
-        });
-
-    }*/
 }
