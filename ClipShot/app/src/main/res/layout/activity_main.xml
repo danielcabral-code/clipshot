@@ -97,7 +97,8 @@
             android:layout_height="wrap_content"
             app:backgroundTint="@color/colorPurple"
             app:layout_anchor="@id/navigation"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            android:src="@drawable/ic_add"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     <!-- NavBar -->

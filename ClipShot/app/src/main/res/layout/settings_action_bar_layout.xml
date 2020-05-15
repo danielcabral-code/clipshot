@@ -14,7 +14,7 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="20dp"
         android:src="@drawable/ic_back"
-        android:onClick="goBack"/>
+        android:onClick="goToProfile"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appBarTitle"
@@ -36,6 +36,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:visibility="invisible"
-        android:src="@drawable/ic_done" />
+        android:src="@drawable/ic_done"
+        android:onClick="goToProfile"/>
 
 </RelativeLayout>
