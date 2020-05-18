@@ -10,9 +10,14 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
+
+import static android.app.PendingIntent.getActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,6 +91,17 @@ public class MainActivity extends AppCompatActivity {
         iconProfile.setAlpha((float) 1.0);
         AppCompatImageView iconHome = findViewById(R.id.iconHome);
         iconHome.setAlpha((float) 0.45);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+
+        if (acct!= null) {
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            String email = acct.getEmail().toString();
+
+            db.collection(email).document(Userdata)
+        }
     }
 
     // Utilitary method for opening fragments
