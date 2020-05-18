@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,7 +48,7 @@ public class WelcomeActivity extends AppCompatActivity {
     ImageView img;
     FirebaseStorage imageStorage;
     StorageReference storageReference;
-
+    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     @SuppressLint("WrongConstant")
     @Override
@@ -124,7 +125,7 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 //Declaring variables
-                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,email;
+                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
                 FirebaseFirestore db;
 
 
@@ -145,6 +146,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 dataPsn =psnInput.getText().toString();
                 dataXbox = xboxInput.getText().toString();
                 dataNintendo = nintendoInput.getText().toString();
+                dataGamifyTitle ="";
 
                 //Map that will fill our database with values
                 Map<String,String> Userdata = new HashMap<>();
@@ -156,14 +158,16 @@ public class WelcomeActivity extends AppCompatActivity {
                 Userdata.put("Psn", dataPsn);
                 Userdata.put("Xbox", dataXbox);
                 Userdata.put("Nintendo", dataNintendo);
+                Userdata.put("GamifyTitle",dataGamifyTitle);
 
                 //Call the method to upload image
                 uploadImage(email);
 
                 //On sucess data is inserted in database and user go to MainActivity
-                db.collection(email).add(Userdata).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+
+                db.collection(email).document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
+                    public void onSuccess(Void aVoid) {
                         Intent goToFeed = new Intent(WelcomeActivity.this,MainActivity.class);
                         startActivity(goToFeed);
                     }
@@ -205,8 +209,9 @@ public class WelcomeActivity extends AppCompatActivity {
     //Create a folder in Firebase Storage with the user email and upload the image from gallery
     public void uploadImage(String email){
 
+
         if (imageUri != null){
-            StorageReference ref = storageReference.child(email+"/" + UUID.randomUUID().toString());
+            StorageReference ref = storageReference.child(email+"/" + userUid);
             ref.putFile(imageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
