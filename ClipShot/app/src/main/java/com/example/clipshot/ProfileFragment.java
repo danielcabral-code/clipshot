@@ -1,47 +1,31 @@
 package com.example.clipshot;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.cloud.datastore.core.number.IndexNumberDecoder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 public class ProfileFragment extends Fragment {
 
-    Uri imageUri;
-    ImageView img;
-    FirebaseStorage imageStorage;
-    StorageReference storageReference;
-    FirebaseFirestore db;
-    DocumentReference documentReference;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -56,47 +40,126 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        img = Objects.requireNonNull(getView()).findViewById(R.id.image);
-        TextView realName = getActivity().findViewById(R.id.realName);
-        TextView bio = getActivity().findViewById(R.id.bio);
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
-    }
 
-    public void loadData(View view){
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getActivity());
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference documentReference;
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
+
+        View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
+        TextView realName = (TextView) returnView.findViewById(R.id.realName);
+        TextView bio = (TextView) returnView.findViewById(R.id.bio);
+        TextView title = (TextView) returnView.findViewById(R.id.gamifyTitle);
+        AppCompatImageView steamIcon = (AppCompatImageView) returnView.findViewById(R.id.iconSteam);
+        AppCompatImageView xboxIcon = (AppCompatImageView) returnView.findViewById(R.id.iconXbox);
+        AppCompatImageView originIcon = (AppCompatImageView) returnView.findViewById(R.id.iconOrigin);
+        AppCompatImageView psnIcon = (AppCompatImageView) returnView.findViewById(R.id.iconPsn);
+        AppCompatImageView nintendoIcon = (AppCompatImageView) returnView.findViewById(R.id.iconNintendo);
+
         String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        documentReference=db.collection(email).document(userUid);
+        StorageReference storageReference = null;
+
+        documentReference = db.collection(email).document(userUid);
 
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()){
+                        if (documentSnapshot.exists()) {
                             String dataName = documentSnapshot.getString("Name");
                             String dataBio = documentSnapshot.getString("Bio");
+                            String dataTitle = documentSnapshot.getString("GamifyTitle");
+                            String steamName = documentSnapshot.getString("Steam");
+                            String originName = documentSnapshot.getString("Origin");
+                            String psnName = documentSnapshot.getString("Psn");
+                            String xBoxName = documentSnapshot.getString("Xbox");
+                            String nintendoName = documentSnapshot.getString("Nintendo");
+                            realName.setText(dataName);
+                            bio.setText(dataBio);
+                            title.setText(dataTitle);
 
+                            if (!documentSnapshot.getString("Steam").equals("")) {
 
+                                steamIcon.setAlpha((float) 1.0);
+                            }
+                            if (!documentSnapshot.getString("Origin").equals("")) {
 
-                        }
-                        else{
+                                originIcon.setAlpha((float) 1.0);
+                            }
+                            if (!documentSnapshot.getString("Psn").equals("")) {
 
+                                psnIcon.setAlpha((float) 1.0);
+                            }
+                            if (!documentSnapshot.getString("Xbox").equals("")) {
+
+                                xboxIcon.setAlpha((float) 1.0);
+                            }
+                            if (!documentSnapshot.getString("Nintendo").equals("")) {
+
+                                nintendoIcon.setAlpha((float) 1.0);
+                            }
+
+                            steamIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getContext(), steamName, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            originIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getContext(), originName, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            psnIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getContext(), psnName, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            xboxIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getContext(), xBoxName, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            nintendoIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Toast.makeText(getContext(), nintendoName, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        } else {
+                            Log.d("TAG", "doesnt exist");
                         }
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("TAG", "onFailure:" + e);
 
-                    }
-                });
+            }
+        });
+
+        StorageReference ref = storageReference.child(email+"/" + userUid);
+        
+
+
+        // Inflate the layout for this fragment
+        return returnView;
 
     }
+
+
 }
+
+
