@@ -37,6 +37,16 @@ import java.util.concurrent.Executor;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
+    private String dataUsername;
+    String dataName;
+    String dataBio;
+    String steamName;
+    String originName;
+    String psnName;
+    String xBoxName;
+    String nintendoName;
+
+
     public SettingsFragment() {
         // Required empty public constructor
     }
@@ -55,19 +65,27 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Calling Firebase Instances
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference;
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
+        // Calling XML variables
         View returnView = inflater.inflate(R.layout.fragment_settings, container, false);
+        EditText displayName = returnView.findViewById(R.id.displayName);
         EditText realName = returnView.findViewById(R.id.realName);
         EditText bio = returnView.findViewById(R.id.bio);
-        EditText title = returnView.findViewById(R.id.gamifyTitle);
+        EditText steam = returnView.findViewById(R.id.steamInput);
+        EditText origin = returnView.findViewById(R.id.originInput);
+        EditText psn = returnView.findViewById(R.id.psnInput);
+        EditText xbox = returnView.findViewById(R.id.xboxInput);
+        EditText nintendo = returnView.findViewById(R.id.switchInput);
 
-        String email = acct.getEmail().toString();
+        // Retrieving Firebase FireStore data
+        // String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        documentReference = db.collection(email).document(userUid);
+        documentReference = db.collection("users").document(userUid);
 
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -75,18 +93,23 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
 
-                            String dataName = documentSnapshot.getString("Name");
-                            String dataBio = documentSnapshot.getString("Bio");
-                            String dataTitle = documentSnapshot.getString("GamifyTitle");
-                            String steamName = documentSnapshot.getString("Steam");
-                            String originName = documentSnapshot.getString("Origin");
-                            String psnName = documentSnapshot.getString("Psn");
-                            String xBoxName = documentSnapshot.getString("Xbox");
-                            String nintendoName = documentSnapshot.getString("Nintendo");
+                            dataUsername = documentSnapshot.getString("Username");
+                            dataName = documentSnapshot.getString("Name");
+                            dataBio = documentSnapshot.getString("Bio");
+                            steamName = documentSnapshot.getString("Steam");
+                            originName = documentSnapshot.getString("Origin");
+                            psnName = documentSnapshot.getString("Psn");
+                            xBoxName = documentSnapshot.getString("Xbox");
+                            nintendoName = documentSnapshot.getString("Nintendo");
 
+                            displayName.setText(dataUsername);
                             realName.setText(dataName);
                             bio.setText(dataBio);
-                            title.setText(dataTitle);
+                            steam.setText(steamName);
+                            origin.setText(originName);
+                            psn.setText(psnName);
+                            xbox.setText(xBoxName);
+                            nintendo.setText(nintendoName);
 
                         } else {
                             Log.d("TAG", "doesnt exist");
@@ -104,12 +127,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // Declaring variables to later check if they are altered in settings page
         // (Yet to find a way to check an image alteration)
-        ImageView profileImage = Objects.requireNonNull(getView()).findViewById(R.id.image);
+        // ImageView profileImage = Objects.requireNonNull(getView()).findViewById(R.id.image);
 
         EditText displayName = Objects.requireNonNull(getActivity()).findViewById(R.id.displayName);
         EditText realName = getActivity().findViewById(R.id.realName);
@@ -132,7 +155,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(dataUsername)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -153,7 +176,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(dataName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -174,7 +197,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(dataBio)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -195,7 +218,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(steamName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -216,7 +239,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(originName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -237,7 +260,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(psnName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -258,7 +281,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(xBoxName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);
@@ -279,7 +302,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.d("TAG", "onTextChanged: mudou");
 
-                if (s.toString().trim().length()==0){
+                if (s.toString().trim().equals(nintendoName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else iconDoneSettings.setVisibility(View.VISIBLE);

@@ -1,10 +1,14 @@
 package com.example.clipshot;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -20,6 +25,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
 
@@ -42,11 +51,12 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db;
         DocumentReference documentReference;
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
         View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
+        ImageView img = returnView.findViewById(R.id.image);
         TextView realName = returnView.findViewById(R.id.realName);
         TextView bio = returnView.findViewById(R.id.bio);
         TextView title = returnView.findViewById(R.id.gamifyTitle);
@@ -60,7 +70,12 @@ public class ProfileFragment extends Fragment {
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         // StorageReference storageReference = null;
 
-        documentReference = db.collection(email).document(userUid);
+        FirebaseStorage imageStorage;
+        StorageReference storageReference;
+
+        db = FirebaseFirestore.getInstance();
+
+        documentReference = db.collection("users").document(userUid);
 
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -144,7 +159,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Inflate the layout for this fragment
+    // Inflate the layout for this fragment
         return returnView;
     }
 }

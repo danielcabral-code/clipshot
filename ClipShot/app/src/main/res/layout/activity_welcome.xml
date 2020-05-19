@@ -40,10 +40,22 @@
         android:text="@string/displayName"
         android:layout_marginTop="16dp"
         android:layout_below="@+id/imageCard"
-        android:layout_marginHorizontal="43dp"
+        android:layout_marginStart="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
         android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/labelDisplayNameMandatory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageCard"
+            android:layout_marginTop="16dp"
+            android:layout_toEndOf="@+id/labelDisplayName"
+            android:text="@string/mandatoryInput"
+            android:layout_marginStart="4dp"
+            android:textSize="12sp"
+            android:textColor="#FF0000"/>
 
     <!-- Display Name Text -->
     <EditText
