@@ -110,7 +110,7 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-        //Listener to call method to pick an image from gallery
+        // Listener to call method to pick an image from gallery
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,11 +160,10 @@ public class WelcomeActivity extends AppCompatActivity {
                 Userdata.put("Nintendo", dataNintendo);
                 Userdata.put("GamifyTitle",dataGamifyTitle);
 
-                //Call the method to upload image
+                // Call the method to upload image
                 uploadImage(email);
 
-                //On sucess data is inserted in database and user go to MainActivity
-
+                // On sucess data is inserted in database and user go to MainActivity
                 db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -172,13 +171,11 @@ public class WelcomeActivity extends AppCompatActivity {
                         startActivity(goToFeed);
                     }
                 });
-
-
             }
         });
     }
 
-    //Method to go to gallery
+    // Method to go to gallery
      private void pickImageFromGallery(){
 
         Intent gallery = new Intent(Intent.ACTION_PICK);
@@ -186,7 +183,7 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
     }
 
-    //Fill welcome avatar image with another from gallery
+    // Fill welcome avatar image with another from gallery
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -203,12 +200,10 @@ public class WelcomeActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
     }
 
-    //Create a folder in Firebase Storage with the user email and upload the image from gallery
+    // Create a folder in Firebase Storage with the user email and upload the image from gallery
     public void uploadImage(String email){
-
 
         if (imageUri != null){
             StorageReference ref = storageReference.child(email+"/" + userUid);
@@ -216,11 +211,8 @@ public class WelcomeActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(WelcomeActivity.this, "Uploaded",Toast.LENGTH_SHORT).show();
-
                         }
                     });
         }
     }
-
 }

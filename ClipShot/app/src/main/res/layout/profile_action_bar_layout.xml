@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:fontFamily="@font/open_sans_semibold"
-        android:text="@string/testprofilename"
         android:textSize="26sp"
         android:textColor="@color/colorWhite" />
 

@@ -1,12 +1,16 @@
 package com.example.clipshot;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,21 +36,36 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
+import static android.app.Activity.RESULT_OK;
+
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
-    private String dataUsername;
-    String dataName;
-    String dataBio;
-    String steamName;
-    String originName;
-    String psnName;
-    String xBoxName;
-    String nintendoName;
+    private static final int PICK_IMAGE =1;
 
+    Uri imageUri;
+    FirebaseStorage imageStorage;
+    StorageReference storageReference;
+    GoogleSignInAccount acct;
+    String email;
+    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    ImageView profileImage;
+    private String dataUsername;
+    private String dataName;
+    private String dataBio;
+    private String steamName;
+    private String originName;
+    private String psnName;
+    private String xBoxName;
+    private String nintendoName;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -68,10 +88,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         // Calling Firebase Instances
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference;
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
+        acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
         // Calling XML variables
         View returnView = inflater.inflate(R.layout.fragment_settings, container, false);
+        ImageView img = returnView.findViewById(R.id.image);
         EditText displayName = returnView.findViewById(R.id.displayName);
         EditText realName = returnView.findViewById(R.id.realName);
         EditText bio = returnView.findViewById(R.id.bio);
@@ -82,8 +103,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText nintendo = returnView.findViewById(R.id.switchInput);
 
         // Retrieving Firebase FireStore data
-        // String email = acct.getEmail().toString();
+        String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Storage reference to the user avatar image
+        StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(email+"/"+userUid);
 
         documentReference = db.collection("users").document(userUid);
 
@@ -122,6 +146,22 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        // Download uri from user image folder using the storageReference inicialized at top of document
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                // Load the image using Glide
+                Glide.with(container).load(uri).into(img);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.d("TAG", "onFailure: error "+ exception);
+            }
+        });
+
         // Inflate the layout for this fragment
         return returnView;
     }
@@ -131,9 +171,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         // Declaring variables to later check if they are altered in settings page
-        // (Yet to find a way to check an image alteration)
-        // ImageView profileImage = Objects.requireNonNull(getView()).findViewById(R.id.image);
-
+        profileImage = Objects.requireNonNull(getView()).findViewById(R.id.image);
         EditText displayName = Objects.requireNonNull(getActivity()).findViewById(R.id.displayName);
         EditText realName = getActivity().findViewById(R.id.realName);
         EditText bio = getActivity().findViewById(R.id.bio);
@@ -144,6 +182,37 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText switchInput = getActivity().findViewById(R.id.switchInput);
 
         AppCompatImageView iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
+
+        // Listener to call method to pick an image from gallery
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                pickImageFromGallery();
+            }
+        });
+
+        iconDoneSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String email;
+                // FirebaseFirestore db;
+
+                // Email get the user google email that will create a collection with that email
+                email = acct.getEmail().toString();
+
+                // Firestore instance
+                // db = FirebaseFirestore.getInstance();
+                imageStorage = FirebaseStorage.getInstance();
+                storageReference = imageStorage.getReference();
+
+                // Call the method to upload image
+                uploadImage(email);
+
+                ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+            }
+        });
 
         // Listener that will check if displayName has been altered, and make check icon visible is so
         displayName.addTextChangedListener(new TextWatcher() {
@@ -328,6 +397,47 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             Intent goToLogin = new Intent(getActivity(), LoginActivity.class);
             startActivity(goToLogin);
+        }
+    }
+
+    // Method to go to gallery
+    private void pickImageFromGallery(){
+
+        Intent gallery = new Intent(Intent.ACTION_PICK);
+        gallery.setType("image/*");
+        startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
+    }
+
+    // Fill welcome avatar image with another from gallery
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+
+            imageUri = data.getData();
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), imageUri);
+                profileImage.setImageBitmap(bitmap);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Create a folder in Firebase Storage with the user email and upload the image from gallery
+    public void uploadImage(String email){
+
+        if (imageUri != null){
+            StorageReference ref = storageReference.child(email+"/" + userUid);
+            ref.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        }
+                    });
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.example.clipshot;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
-
 public class ProfileFragment extends Fragment {
 
     public ProfileFragment() {
@@ -44,17 +40,27 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        FirebaseFirestore db;
+        // Firebase variables
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference;
+
+        // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
+        // Variables that will get the email and userId value from the user google account
+        String email = acct.getEmail().toString();
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Storage reference to the user avatar image
+        StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(email+"/"+userUid);
+
+        // Interface variables
         View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
         ImageView img = returnView.findViewById(R.id.image);
         TextView realName = returnView.findViewById(R.id.realName);
@@ -66,17 +72,14 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
 
-        String email = acct.getEmail().toString();
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        // StorageReference storageReference = null;
-
         FirebaseStorage imageStorage;
-        StorageReference storageReference;
 
         db = FirebaseFirestore.getInstance();
 
+        // Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
 
+        // Load of data
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -94,6 +97,7 @@ public class ProfileFragment extends Fragment {
                             bio.setText(dataBio);
                             title.setText(dataTitle);
 
+                            //If user has some nickname in some platform the opacity of that platform will be 1
                             if (!documentSnapshot.getString("Steam").equals("")) {
 
                                 steamIcon.setAlpha((float) 1.0);
@@ -115,38 +119,48 @@ public class ProfileFragment extends Fragment {
                                 nintendoIcon.setAlpha((float) 1.0);
                             }
 
+                            //Listeners to show toast with platform id if user has some nickname introduced in database for that platform
                             steamIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), steamName, Toast.LENGTH_SHORT).show();
+                                    if (!steamName.equals("")) {
+                                        Toast.makeText(getContext(),"Steam ID: "+ steamName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
 
                             originIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), originName, Toast.LENGTH_SHORT).show();
+                                    if (!originName.equals("")) {
+                                        Toast.makeText(getContext(),"Origin ID: "+ originName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                             psnIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), psnName, Toast.LENGTH_SHORT).show();
+                                    if (!psnName.equals("")) {
+                                        Toast.makeText(getContext(),"PSN ID: " + psnName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                             xboxIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), xBoxName, Toast.LENGTH_SHORT).show();
+                                    if (!xBoxName.equals("")) {
+                                        Toast.makeText(getContext(),"Xbox ID: "+ xBoxName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                             nintendoIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), nintendoName, Toast.LENGTH_SHORT).show();
+                                    if (!nintendoName.equals("")) {
+                                        Toast.makeText(getContext(),"Switch ID: "+ nintendoName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
-
                         } else {
                             Log.d("TAG", "doesnt exist");
                         }
@@ -155,11 +169,26 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d("TAG", "onFailure:" + e);
-
             }
         });
 
-    // Inflate the layout for this fragment
+        // Download uri from user image folder using the storageReference inicialized at top of document
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                // Load the image using Glide
+                Glide.with(container).load(uri).into(img);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.d("TAG", "onFailure: error "+ exception);
+            }
+        });
+
+        // Inflate the layout for this fragment
         return returnView;
     }
 }
