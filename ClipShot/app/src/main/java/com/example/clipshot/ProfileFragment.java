@@ -1,10 +1,14 @@
 package com.example.clipshot;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,10 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.cloud.datastore.core.number.IndexNumberDecoder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -23,6 +29,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
 
@@ -48,25 +56,36 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db;
         DocumentReference documentReference;
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
         View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
-        TextView realName = (TextView) returnView.findViewById(R.id.realName);
-        TextView bio = (TextView) returnView.findViewById(R.id.bio);
-        TextView title = (TextView) returnView.findViewById(R.id.gamifyTitle);
-        AppCompatImageView steamIcon = (AppCompatImageView) returnView.findViewById(R.id.iconSteam);
-        AppCompatImageView xboxIcon = (AppCompatImageView) returnView.findViewById(R.id.iconXbox);
-        AppCompatImageView originIcon = (AppCompatImageView) returnView.findViewById(R.id.iconOrigin);
-        AppCompatImageView psnIcon = (AppCompatImageView) returnView.findViewById(R.id.iconPsn);
-        AppCompatImageView nintendoIcon = (AppCompatImageView) returnView.findViewById(R.id.iconNintendo);
-
+        ImageView img = returnView.findViewById(R.id.image);
+        TextView realName = returnView.findViewById(R.id.realName);
+        TextView bio = returnView.findViewById(R.id.bio);
+        TextView title = returnView.findViewById(R.id.gamifyTitle);
+        AppCompatImageView steamIcon = returnView.findViewById(R.id.iconSteam);
+        AppCompatImageView xboxIcon = returnView.findViewById(R.id.iconXbox);
+        AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
+        AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
+        AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
         String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        StorageReference storageReference = null;
+        FirebaseStorage imageStorage;
+        StorageReference storageReference;
 
-        documentReference = db.collection(email).document(userUid);
+        db = FirebaseFirestore.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference().child("gal4tic@gmail.com/jHEkwFbTPkXeInkI0ZY82Zb35rC2.png");
+
+        // Download directly from StorageReference using Glide
+        // (See MyAppGlideModule for Loader registration)
+        Glide.with(this)
+                .load(storageReference)
+                .into(img);
+
+
+        documentReference = db.collection("users").document(userUid);
 
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -150,11 +169,9 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        StorageReference ref = storageReference.child(email+"/" + userUid);
-        
 
 
-        // Inflate the layout for this fragment
+    // Inflate the layout for this fragment
         return returnView;
 
     }

@@ -165,7 +165,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                 //On sucess data is inserted in database and user go to MainActivity
 
-                db.collection(email).document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Intent goToFeed = new Intent(WelcomeActivity.this,MainActivity.class);
