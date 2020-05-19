@@ -91,17 +91,6 @@ public class MainActivity extends AppCompatActivity {
         iconProfile.setAlpha((float) 1.0);
         AppCompatImageView iconHome = findViewById(R.id.iconHome);
         iconHome.setAlpha((float) 0.45);
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-
-        if (acct!= null) {
-
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            String email = acct.getEmail().toString();
-
-            db.collection(email).document(Userdata)
-        }
     }
 
     // Utilitary method for opening fragments

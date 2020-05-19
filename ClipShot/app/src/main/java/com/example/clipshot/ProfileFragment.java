@@ -16,16 +16,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.cloud.datastore.core.number.IndexNumberDecoder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 public class ProfileFragment extends Fragment {
-
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -40,9 +36,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,18 +47,18 @@ public class ProfileFragment extends Fragment {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
         View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
-        TextView realName = (TextView) returnView.findViewById(R.id.realName);
-        TextView bio = (TextView) returnView.findViewById(R.id.bio);
-        TextView title = (TextView) returnView.findViewById(R.id.gamifyTitle);
-        AppCompatImageView steamIcon = (AppCompatImageView) returnView.findViewById(R.id.iconSteam);
-        AppCompatImageView xboxIcon = (AppCompatImageView) returnView.findViewById(R.id.iconXbox);
-        AppCompatImageView originIcon = (AppCompatImageView) returnView.findViewById(R.id.iconOrigin);
-        AppCompatImageView psnIcon = (AppCompatImageView) returnView.findViewById(R.id.iconPsn);
-        AppCompatImageView nintendoIcon = (AppCompatImageView) returnView.findViewById(R.id.iconNintendo);
+        TextView realName = returnView.findViewById(R.id.realName);
+        TextView bio = returnView.findViewById(R.id.bio);
+        TextView title = returnView.findViewById(R.id.gamifyTitle);
+        AppCompatImageView steamIcon = returnView.findViewById(R.id.iconSteam);
+        AppCompatImageView xboxIcon = returnView.findViewById(R.id.iconXbox);
+        AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
+        AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
+        AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
 
         String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        StorageReference storageReference = null;
+        // StorageReference storageReference = null;
 
         documentReference = db.collection(email).document(userUid);
 
@@ -150,16 +144,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        StorageReference ref = storageReference.child(email+"/" + userUid);
-        
-
-
         // Inflate the layout for this fragment
         return returnView;
-
     }
-
-
 }
-
-
