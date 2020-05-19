@@ -1,9 +1,7 @@
 package com.example.clipshot;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,16 +19,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.cloud.datastore.core.number.IndexNumberDecoder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
 
@@ -48,7 +42,6 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
     }
 
 
@@ -56,10 +49,21 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        FirebaseFirestore db;
+        //Firebase variables
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference documentReference;
+
+        //Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
+        //variables that will get the email and userId value from the user google account
+        String email = acct.getEmail().toString();
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        //Storage reference to the user avatar image
+        StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(email+"/"+userUid);
+
+        //Interface variables
         View returnView = inflater.inflate(R.layout.fragment_profile, container, false);
         ImageView img = returnView.findViewById(R.id.image);
         TextView realName = returnView.findViewById(R.id.realName);
@@ -70,23 +74,12 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
         AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
-        String email = acct.getEmail().toString();
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseStorage imageStorage;
-        StorageReference storageReference;
-
-        db = FirebaseFirestore.getInstance();
-        storageReference = FirebaseStorage.getInstance().getReference().child("gal4tic@gmail.com/jHEkwFbTPkXeInkI0ZY82Zb35rC2.png");
-
-        // Download directly from StorageReference using Glide
-        // (See MyAppGlideModule for Loader registration)
-        Glide.with(this)
-                .load(storageReference)
-                .into(img);
 
 
+        //Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
 
+        //Load of data
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -104,6 +97,7 @@ public class ProfileFragment extends Fragment {
                             bio.setText(dataBio);
                             title.setText(dataTitle);
 
+                            //If user has some nickname in some platform the opacity of that platform will be 1
                             if (!documentSnapshot.getString("Steam").equals("")) {
 
                                 steamIcon.setAlpha((float) 1.0);
@@ -125,35 +119,47 @@ public class ProfileFragment extends Fragment {
                                 nintendoIcon.setAlpha((float) 1.0);
                             }
 
+                            //Listeners to show toast with platform id if user has some nickname introduced in database for that platform
                             steamIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), steamName, Toast.LENGTH_SHORT).show();
+                                    if (!steamName.equals("")) {
+                                        Toast.makeText(getContext(),"Steam id: "+ steamName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
 
                             originIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), originName, Toast.LENGTH_SHORT).show();
+                                    if (!originName.equals("")) {
+                                        Toast.makeText(getContext(),"Origin id: "+ originName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                             psnIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), psnName, Toast.LENGTH_SHORT).show();
+                                    if (!psnName.equals("")) {
+                                        Toast.makeText(getContext(),"Psn id:" + psnName, Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
                             });
                             xboxIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), xBoxName, Toast.LENGTH_SHORT).show();
+                                    if (!xBoxName.equals("")) {
+                                        Toast.makeText(getContext(),"Xbox id: "+ xBoxName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                             nintendoIcon.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Toast.makeText(getContext(), nintendoName, Toast.LENGTH_SHORT).show();
+                                    if (!nintendoName.equals("")) {
+                                        Toast.makeText(getContext(),"Nintendo id: "+ nintendoName, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
 
@@ -169,13 +175,27 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        //Download uri from user image folder using the storageReference inicialized at top of document
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                // Load the image using Glide
+                Glide.with(container).load(uri).into(img);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.d("TAG", "onFailure: error "+ exception);
+            }
+        });
 
 
-    // Inflate the layout for this fragment
+        // Inflate the layout for this fragment
         return returnView;
 
     }
-
 
 }
 

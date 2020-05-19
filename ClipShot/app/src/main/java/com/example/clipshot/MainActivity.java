@@ -3,14 +3,26 @@ package com.example.clipshot;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
@@ -60,9 +72,23 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("WrongConstant")
     public void goToProfile(View v) {
 
+        //Google variable to detect the user that is signed
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        //Firebase variables
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference documentReference;
+
+        //variables that will get the userId value from the user google account
+        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        //Document reference of user data that will read user data
+        documentReference = db.collection("users").document(userUid);
+
+
         // Call Profile TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.profile_action_bar_layout);
+
 
         openFragment(ProfileFragment.newInstance("",""));
         // Opacity changes on Bottom Bar Icon depending on what page is selected
@@ -70,6 +96,20 @@ public class MainActivity extends AppCompatActivity {
         iconProfile.setAlpha((float) 1.0);
         AppCompatImageView iconHome = findViewById(R.id.iconHome);
         iconHome.setAlpha((float) 0.45);
+        AppCompatTextView profileNameBar = findViewById(R.id.appBarTitle);
+
+        //Access user document and if it exists set the topbar name with the user nickname
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()){
+                            String userName  =documentSnapshot.getString("Username");
+                            profileNameBar.setText(userName);
+                        }
+                    }
+                });
+
     }
 
     // Go To Settings (TopBar Button)
