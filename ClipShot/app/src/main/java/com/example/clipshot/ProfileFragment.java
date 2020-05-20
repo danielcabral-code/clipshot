@@ -79,6 +79,7 @@ public class ProfileFragment extends Fragment {
         // Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
 
+        long tStart = System.currentTimeMillis();
         // Load of data
         documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -96,6 +97,11 @@ public class ProfileFragment extends Fragment {
                             realName.setText(dataName);
                             bio.setText(dataBio);
                             title.setText(dataTitle);
+
+                            long tEnd = System.currentTimeMillis();
+                            long tDelta = tEnd - tStart;
+                            double elapsedSeconds = tDelta / 1000.0;
+                            Log.d("TAG", String.valueOf(elapsedSeconds));
 
                             //If user has some nickname in some platform the opacity of that platform will be 1
                             if (!documentSnapshot.getString("Steam").equals("")) {
@@ -184,6 +190,8 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
+                Uri personPhoto = acct.getPhotoUrl();
+                Glide.with(container).load(String.valueOf(personPhoto)).into(img);
                 Log.d("TAG", "onFailure: error "+ exception);
             }
         });

@@ -180,7 +180,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("image/*");
-        startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
+        startActivityForResult(Intent.createChooser(gallery, "Select Video"), PICK_IMAGE);
     }
 
     // Fill welcome avatar image with another from gallery

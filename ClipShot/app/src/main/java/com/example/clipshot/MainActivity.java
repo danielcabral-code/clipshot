@@ -2,12 +2,15 @@ package com.example.clipshot;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -20,6 +23,8 @@ import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.youtube.player.YouTubeIntents;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -30,6 +35,10 @@ import java.util.Objects;
 import static android.app.PendingIntent.getActivity;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int PICK_VIDEO =2;
+    private static final String ID_CHANNEL ="UCCKfMX_dyqpseLDAoi5Y2ug";
+
+
 
     @SuppressLint("WrongConstant")
     @Override
@@ -53,7 +62,20 @@ public class MainActivity extends AppCompatActivity {
         iconHome.setAlpha((float) 1.0);
         AppCompatImageView iconProfile = findViewById(R.id.iconProfile);
         iconProfile.setAlpha((float) 0.45);
+
+        //Button to add video
+        FloatingActionButton addVideo = findViewById(R.id.addClipButton);
+        addVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickVideo();
+            }
+        });
+
+
+
     }
+
 
     // Go To Feed (NavBar Button)
     @SuppressLint("WrongConstant")
@@ -136,4 +158,24 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+
+    //Method to pick video from smartphone
+    private void pickVideo(){
+        Intent gallery = new Intent(Intent.ACTION_PICK);
+        if (YouTubeIntents.canResolveUploadIntent(this))
+        gallery.setType("video/*");
+        startActivityForResult(gallery, PICK_VIDEO);
+
+    }
+
+   @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+       super.onActivityResult(requestCode, resultCode, data);
+       if (requestCode == PICK_VIDEO && resultCode == RESULT_OK) {
+           Intent youtubeIntent = YouTubeIntents.createUploadIntent(this, data.getData());
+           startActivity(youtubeIntent);
+       }
+   }
+
 }

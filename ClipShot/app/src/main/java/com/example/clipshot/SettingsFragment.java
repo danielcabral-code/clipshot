@@ -210,7 +210,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 // Call the method to upload image
                 uploadImage(email);
 
-                ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+                //((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
             }
         });
 
