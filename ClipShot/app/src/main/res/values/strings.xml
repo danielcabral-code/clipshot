@@ -23,4 +23,7 @@
     <string name="testFollowingNumber">234</string>
     <string name="testFollowerNumber">975</string>
     <string name="testClipsNumber">21</string>
+    <string name="upload_video">Upload Video</string>
+    <string name="description">Description</string>
+
 </resources>

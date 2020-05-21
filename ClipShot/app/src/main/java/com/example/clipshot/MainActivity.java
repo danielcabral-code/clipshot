@@ -29,22 +29,33 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static android.app.PendingIntent.getActivity;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PICK_VIDEO =2;
-    private static final String ID_CHANNEL ="UCCKfMX_dyqpseLDAoi5Y2ug";
-
-
+    Uri videoUri;
+    StorageReference storageReference;
+    String email;
+    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Google variable to detect the user that is signed
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+
+
+        // Variables that will get the email and userId value from the user google account
+         email = acct.getEmail().toString();
 
         // Call Feed TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -162,18 +173,41 @@ public class MainActivity extends AppCompatActivity {
     //Method to pick video from smartphone
     private void pickVideo(){
         Intent gallery = new Intent(Intent.ACTION_PICK);
-        if (YouTubeIntents.canResolveUploadIntent(this))
         gallery.setType("video/*");
         startActivityForResult(gallery, PICK_VIDEO);
+
+
     }
 
-   @Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-       super.onActivityResult(requestCode, resultCode, data);
-       if (requestCode == PICK_VIDEO && resultCode == RESULT_OK) {
-           Intent youtubeIntent = YouTubeIntents.createUploadIntent(this, data.getData());
-           startActivity(youtubeIntent);
-       }
-   }
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_VIDEO && resultCode == RESULT_OK && data != null) {
+
+            videoUri = data.getData();
+            Intent upload = new Intent(this,UploadVideoActivity.class);
+            upload.putExtra("video", videoUri.toString());
+            upload.putExtra("userID",userUid);
+            startActivity(upload);
+        }
+
+    }
+
+    public void uploadVideo(String email){
+
+        if (videoUri != null){
+            String randomUUID = UUID.randomUUID().toString();
+            storageReference= FirebaseStorage.getInstance().getReference(email+"/videos/"+ randomUUID);
+            storageReference.putFile(videoUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Log.d("TAG", "onSuccess: uploaded"+ randomUUID);
+
+                        }
+                    });
+        }
+    }
 
 }

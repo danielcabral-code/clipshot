@@ -53,6 +53,7 @@ public class ProfileFragment extends Fragment {
         // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
+
         // Variables that will get the email and userId value from the user google account
         String email = acct.getEmail().toString();
         String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
