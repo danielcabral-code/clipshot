@@ -41,6 +41,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
@@ -48,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
-    private static final int PICK_IMAGE =1;
+    private static final int PICK_IMAGE = 1;
 
     Uri imageUri;
     FirebaseStorage imageStorage;
@@ -66,6 +68,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private String psnName;
     private String xBoxName;
     private String nintendoName;
+    AppCompatImageView iconDoneSettings;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -181,7 +184,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText xboxInput = getActivity().findViewById(R.id.xboxInput);
         EditText switchInput = getActivity().findViewById(R.id.switchInput);
 
-        AppCompatImageView iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
+        iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
 
         // Listener to call method to pick an image from gallery
         profileImage.setOnClickListener(new View.OnClickListener() {
@@ -196,21 +199,50 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClick(View v) {
 
-                String email;
-                // FirebaseFirestore db;
+                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
+                FirebaseFirestore db;
 
-                // Email get the user google email that will create a collection with that email
+                // Email gets the user google email that will create a collection with that email
                 email = acct.getEmail().toString();
 
                 // Firestore instance
-                // db = FirebaseFirestore.getInstance();
+                db = FirebaseFirestore.getInstance();
                 imageStorage = FirebaseStorage.getInstance();
                 storageReference = imageStorage.getReference();
+
+                // Declaring variables that will be inserted in Firestore
+                dataUsername = displayName.getText().toString();
+                dataName = realName.getText().toString();
+                dataBio = bio.getText().toString();
+                dataSteam = steamInput.getText().toString();
+                dataOrigin = originInput.getText().toString();
+                dataPsn = psnInput.getText().toString();
+                dataXbox = xboxInput.getText().toString();
+                dataNintendo = switchInput.getText().toString();
+                dataGamifyTitle = "";
+
+                // Map that will fill our database with values
+                Map<String,String> Userdata = new HashMap<>();
+                Userdata.put("Username",dataUsername);
+                Userdata.put("Name", dataName);
+                Userdata.put("Bio", dataBio);
+                Userdata.put("Steam", dataSteam);
+                Userdata.put("Origin", dataOrigin);
+                Userdata.put("Psn", dataPsn);
+                Userdata.put("Xbox", dataXbox);
+                Userdata.put("Nintendo", dataNintendo);
+                Userdata.put("GamifyTitle",dataGamifyTitle);
 
                 // Call the method to upload image
                 uploadImage(email);
 
-                //((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+                // On success data is inserted in database and user go to MainActivity
+                db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+                    }
+                });
             }
         });
 
@@ -416,6 +448,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null) {
 
             imageUri = data.getData();
+            iconDoneSettings.setVisibility(View.VISIBLE);
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), imageUri);

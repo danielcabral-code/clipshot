@@ -159,14 +159,12 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-
     //Method to pick video from smartphone
     private void pickVideo(){
         Intent gallery = new Intent(Intent.ACTION_PICK);
         if (YouTubeIntents.canResolveUploadIntent(this))
         gallery.setType("video/*");
         startActivityForResult(gallery, PICK_VIDEO);
-
     }
 
    @Override

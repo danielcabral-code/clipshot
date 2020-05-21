@@ -119,25 +119,25 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-        //Listener that insert data into database and change to the Main Activity
+        // Listener that inserts data into database and changes to the Main Activity
         iconDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //Declaring variables
+                // Declaring variables
                 String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
                 FirebaseFirestore db;
 
 
-                //email get the user google email that will create a collection with that email
-                email= acct.getEmail().toString();
+                // Gets the user google email that will create a collection with that email
+                email = acct.getEmail().toString();
 
-                //Firestore instance
+                // Firestore instance
                 db = FirebaseFirestore.getInstance();
                 imageStorage = FirebaseStorage.getInstance();
                 storageReference = imageStorage.getReference();
 
-                //Declaring variables that will be inserted in Firestore
+                // Declaring variables that will be inserted in Firestore
                 dataUsername = username.getText().toString();
                 dataName = name.getText().toString();
                 dataBio = bio.getText().toString();
@@ -146,9 +146,9 @@ public class WelcomeActivity extends AppCompatActivity {
                 dataPsn =psnInput.getText().toString();
                 dataXbox = xboxInput.getText().toString();
                 dataNintendo = nintendoInput.getText().toString();
-                dataGamifyTitle ="";
+                dataGamifyTitle = "";
 
-                //Map that will fill our database with values
+                // Map that will fill our database with values
                 Map<String,String> Userdata = new HashMap<>();
                 Userdata.put("Username",dataUsername);
                 Userdata.put("Name", dataName);
@@ -163,7 +163,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 // Call the method to upload image
                 uploadImage(email);
 
-                // On sucess data is inserted in database and user go to MainActivity
+                // On success data is inserted in database and user go to MainActivity
                 db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
