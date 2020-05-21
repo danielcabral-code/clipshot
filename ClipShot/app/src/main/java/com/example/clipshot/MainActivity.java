@@ -51,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.feed_action_bar_layout);
 
         // Set Elevation to TopBar and NavBar
-        getSupportActionBar().setElevation(50f); // Float == px
+        getSupportActionBar().setElevation(20f); // Float == px
         BottomAppBar bottomAppBar = findViewById(R.id.navigation);
-        bottomAppBar.setElevation(50f); // Float == px
+        bottomAppBar.setElevation(20f); // Float == px
 
         // Opens Feed page by default
         openFragment(FeedFragment.newInstance("",""));
