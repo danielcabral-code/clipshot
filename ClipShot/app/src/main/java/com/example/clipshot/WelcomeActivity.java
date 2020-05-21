@@ -146,7 +146,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 dataPsn =psnInput.getText().toString();
                 dataXbox = xboxInput.getText().toString();
                 dataNintendo = nintendoInput.getText().toString();
-                dataGamifyTitle = "";
+                dataGamifyTitle = "Expert";
 
                 // Map that will fill our database with values
                 Map<String,String> Userdata = new HashMap<>();

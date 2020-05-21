@@ -165,6 +165,24 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        // Download uri from user image folder using the storageReference inicialized at top of document
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                // Load the image using Glide
+                Glide.with(container).load(uri).into(img);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Uri personPhoto = acct.getPhotoUrl();
+                Glide.with(container).load(String.valueOf(personPhoto)).into(img);
+                Log.d("TAG", "onFailure: error "+ exception);
+            }
+        });
+
         // Inflate the layout for this fragment
         return returnView;
     }
@@ -219,7 +237,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 dataPsn = psnInput.getText().toString();
                 dataXbox = xboxInput.getText().toString();
                 dataNintendo = switchInput.getText().toString();
-                dataGamifyTitle = "";
+                dataGamifyTitle = "Expert";
 
                 // Map that will fill our database with values
                 Map<String,String> Userdata = new HashMap<>();
