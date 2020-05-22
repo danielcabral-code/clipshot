@@ -25,4 +25,12 @@
         android:textSize="28sp"
         android:textColor="@color/colorWhite" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iconSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_search" />
+
 </RelativeLayout>

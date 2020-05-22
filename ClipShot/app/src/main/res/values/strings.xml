@@ -25,5 +25,6 @@
     <string name="testClipsNumber">21</string>
     <string name="upload_video">Upload Video</string>
     <string name="description">Description</string>
+    <string name="search"><font size="18">Search</font></string>
 
 </resources>
