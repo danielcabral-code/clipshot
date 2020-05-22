@@ -41,7 +41,6 @@ import static android.app.PendingIntent.getActivity;
 public class MainActivity extends AppCompatActivity {
     private static final int PICK_VIDEO =2;
     Uri videoUri;
-    StorageReference storageReference;
     String email;
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -194,20 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void uploadVideo(String email){
 
-        if (videoUri != null){
-            String randomUUID = UUID.randomUUID().toString();
-            storageReference= FirebaseStorage.getInstance().getReference(email+"/videos/"+ randomUUID);
-            storageReference.putFile(videoUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Log.d("TAG", "onSuccess: uploaded"+ randomUUID);
-
-                        }
-                    });
-        }
-    }
 
 }
