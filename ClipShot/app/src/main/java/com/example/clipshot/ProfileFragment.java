@@ -13,8 +13,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,10 +27,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class ProfileFragment extends Fragment {
+    FirestoreRecyclerAdapter adapter;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -72,6 +79,8 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
         AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
+        RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
+
 
         FirebaseStorage imageStorage;
 
@@ -197,7 +206,59 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+        Query query = db.collection("videos");
+
+        FirestoreRecyclerOptions<ProfileVideos> options = new FirestoreRecyclerOptions.Builder<ProfileVideos>()
+                .setQuery(query, ProfileVideos.class)
+                .build();
+
+        adapter = new FirestoreRecyclerAdapter<ProfileVideos, ProfileVideosHolder>(options) {
+            @NonNull
+            @Override
+            public ProfileVideosHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_videos_layout,parent,false);
+                return new ProfileVideosHolder(view);
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
+
+                holder.listDescription.setText(model.getDescription());
+
+            }
+        };
+
+        profileVideos.setHasFixedSize(true);
+        profileVideos.setLayoutManager(new LinearLayoutManager(getContext()));
+        profileVideos.setAdapter(adapter);
+        profileVideos.setNestedScrollingEnabled(false);
+
         // Inflate the layout for this fragment
         return returnView;
+    }
+
+    private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
+        private  TextView listDescription;
+
+        public ProfileVideosHolder(@NonNull View itemView) {
+            super(itemView);
+
+            listDescription=itemView.findViewById(R.id.videosDescription);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 }
