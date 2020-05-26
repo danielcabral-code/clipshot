@@ -90,7 +90,9 @@
                 android:id="@+id/followingContainer"
                 android:layout_marginTop="20dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:onClick="goToFollowing"
+                tools:ignore="OnClick">
 
                 <TextView
                     android:id="@+id/followingNumber"
@@ -116,14 +118,16 @@
 
             </RelativeLayout>
 
-            <!-- Following Container -->
+            <!-- Followers Container -->
             <RelativeLayout
                 android:id="@+id/followerContainer"
                 android:layout_marginTop="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/followingContainer"
-                android:layout_marginStart="18dp">
+                android:layout_marginStart="18dp"
+                android:onClick="goToFollowers"
+                tools:ignore="OnClick">
 
                 <TextView
                     android:id="@+id/followerNumber"

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FollowersFragment">
+
+    <RelativeLayout
+        android:id="@+id/followersFragment"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:elevation="4dp"
+        android:background="@color/colorPrimary">
+
+        <RelativeLayout
+            android:id="@+id/centerFollowBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/followers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginHorizontal="20dp"
+                android:paddingBottom="6dp"
+                android:text="@string/following"
+                android:textColor="@color/colorWhite"
+                android:alpha="0.65"
+                android:textSize="18sp"
+                android:fontFamily="@font/open_sans"
+                android:onClick="goToFollowing"
+                tools:ignore="OnClick"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/followers"
+                android:paddingBottom="6dp"
+                android:layout_toEndOf="@+id/followers"
+                android:layout_marginHorizontal="20dp"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp"
+                android:fontFamily="@font/open_sans_bold"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

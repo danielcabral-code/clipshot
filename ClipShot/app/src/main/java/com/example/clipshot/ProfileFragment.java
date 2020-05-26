@@ -2,6 +2,7 @@ package com.example.clipshot;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
 
@@ -199,5 +202,10 @@ public class ProfileFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return returnView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FollowingFragment">
+
+    <RelativeLayout
+        android:id="@+id/followingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:elevation="4dp"
+        android:background="@color/colorPrimary">
+
+        <RelativeLayout
+            android:id="@+id/centerFollowBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            tools:ignore="UselessParent">
+
+        <TextView
+            android:id="@+id/following"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="20dp"
+            android:paddingBottom="6dp"
+            android:text="@string/following"
+            android:textColor="@color/colorWhite"
+            android:textSize="18sp"
+            android:fontFamily="@font/open_sans_bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/followers"
+            android:paddingBottom="6dp"
+            android:layout_toEndOf="@+id/following"
+            android:layout_marginHorizontal="20dp"
+            android:textColor="@color/colorWhite"
+            android:alpha="0.65"
+            android:textSize="18sp"
+            android:fontFamily="@font/open_sans"
+            android:onClick="goToFollowers"
+            tools:ignore="OnClick" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

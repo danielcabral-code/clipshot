@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         AppCompatImageView iconProfile = findViewById(R.id.iconProfile);
         iconProfile.setAlpha((float) 0.45);
 
-        //Button to add video
+        // Button to add video
         FloatingActionButton addVideo = findViewById(R.id.addClipButton);
         addVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,11 +81,69 @@ public class MainActivity extends AppCompatActivity {
                 pickVideo();
             }
         });
-
-
-
     }
 
+    @SuppressLint("WrongConstant")
+    public void goToFollowing(View v) {
+
+        openFragment(FollowingFragment.newInstance("",""));
+
+        // Call Follow TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.follow_action_bar);
+        getSupportActionBar().setElevation(0f); // Float == px
+
+        // Firebase variables
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Document reference of user data that will read user data
+        DocumentReference documentReference = db.collection("users").document(userUid);
+
+        AppCompatTextView profileNameBar = findViewById(R.id.appBarTitle);
+
+        // Access user document and if it exists set the topbar name with the user nickname
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()){
+                            String userName  =documentSnapshot.getString("Username");
+                            profileNameBar.setText(userName);
+                        }
+                    }
+                });
+    }
+
+    @SuppressLint("WrongConstant")
+    public void goToFollowers(View v) {
+
+        openFragment(FollowersFragment.newInstance("",""));
+
+        // Call Follow TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.follow_action_bar);
+        getSupportActionBar().setElevation(0f); // Float == px
+
+        // Firebase variables
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Document reference of user data that will read user data
+        DocumentReference documentReference = db.collection("users").document(userUid);
+
+        AppCompatTextView profileNameBar = findViewById(R.id.appBarTitle);
+
+        // Access user document and if it exists set the topbar name with the user nickname
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()){
+                            String userName  =documentSnapshot.getString("Username");
+                            profileNameBar.setText(userName);
+                        }
+                    }
+                });
+    }
 
     // Go To Feed (NavBar Button)
     @SuppressLint("WrongConstant")
@@ -94,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         // Call Feed TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.feed_action_bar_layout);
+        getSupportActionBar().setElevation(20f); // Float == px
 
         openFragment(FeedFragment.newInstance("",""));
         // Opacity changes on Bottom Bar Icon depending on what page is selected
@@ -106,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
     // Go To Profile (NavBar Button)
     @SuppressLint("WrongConstant")
     public void goToProfile(View v) {
+
+        Objects.requireNonNull(getSupportActionBar()).setElevation(20f); // Float == px
 
         // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
@@ -152,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         // Call Settings TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.settings_action_bar_layout);
+        getSupportActionBar().setElevation(20f); // Float == px
 
         openFragment(SettingsFragment.newInstance("",""));
         // Opacity changes on Bottom Bar Icon depending on what page is selected
@@ -169,13 +231,11 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    //Method to pick video from smartphone
+    // Method to pick video from smartphone
     private void pickVideo(){
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("video/*");
         startActivityForResult(gallery, PICK_VIDEO);
-
-
     }
 
     @Override
@@ -190,9 +250,5 @@ public class MainActivity extends AppCompatActivity {
             upload.putExtra("userID",userUid);
             startActivity(upload);
         }
-
     }
-
-
-
 }
