@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.service.autofill.UserData;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -60,10 +61,10 @@ public class UploadVideoActivity extends AppCompatActivity {
         AppCompatImageView iconDone = findViewById(R.id.iconDone);
         EditText descrtiption = findViewById(R.id.description);
 
-        for (int i = 1; i <= 19838 ; i++) {
+        /*for (int i = 1; i <= 19838 ; i++) {
             new GetIp().execute("https://api.rawg.io/api/games?page="+i);
 
-        }
+        }*/
 
 
         //Get extras from Main Activity
@@ -101,7 +102,6 @@ public class UploadVideoActivity extends AppCompatActivity {
             Map<String,String> Userdata = new HashMap<>();
             Userdata.put("Description",videoDescription);
             Userdata.put("UserID",userUid);
-            Userdata.put("Url", randomUUID);
 
             // On success data is inserted in database and user go to MainActivity
             db.collection("videos").document(randomUUID).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -113,6 +113,16 @@ public class UploadVideoActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                     Log.d("TAG", "onSuccess: uploaded");
+
+                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            db.collection("videos").document(randomUUID).update("Url",uri.toString());
+
+                                        }
+                                    });
+
+
 
                                 }
                             });
