@@ -98,26 +98,24 @@ public class UploadVideoActivity extends AppCompatActivity {
 
             String randomUUID = UUID.randomUUID().toString();
 
-            // Map that will fill our database with values
-            Map<String,String> Userdata = new HashMap<>();
-            Userdata.put("Description",videoDescription);
-            Userdata.put("UserID",userUid);
 
-            // On success data is inserted in database and user go to MainActivity
-            db.collection("videos").document(randomUUID).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    storageReference = FirebaseStorage.getInstance().getReference("videos/" + randomUUID);
-                    storageReference.putFile(videoUri)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            // Add video to folder videos in Firebase Storage and after upload it create a file in database with video details
+            storageReference = FirebaseStorage.getInstance().getReference("videos/" + randomUUID);
+            storageReference.putFile(videoUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Log.d("TAG", "onSuccess: uploaded");
+                                public void onSuccess(Uri uri) {
 
-                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            db.collection("videos").document(randomUUID).update("Url",uri.toString());
+                                    // Map that will fill our database with values
+                                    Map<String,String> Userdata = new HashMap<>();
+                                    Userdata.put("Description",videoDescription);
+                                    Userdata.put("UserID",userUid);
+                                    Userdata.put("Url",uri.toString());
+
+                                    db.collection("videos").document(randomUUID).set(Userdata);
 
                                         }
                                     });
@@ -127,12 +125,12 @@ public class UploadVideoActivity extends AppCompatActivity {
                                 }
                             });
                 }
-            });
+
 
 
         }
     }
-    public class GetIp extends AsyncTask<String,String,String> {
+   /* public class GetIp extends AsyncTask<String,String,String> {
         @Override
 
         protected  String doInBackground(String ... fileUrl){
@@ -192,6 +190,6 @@ public class UploadVideoActivity extends AppCompatActivity {
         } catch (JSONException e) {
                         e.printStackTrace();
                     }
-        }
-    }
-}
+        }*/
+
+

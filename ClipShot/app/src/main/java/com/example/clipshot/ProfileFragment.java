@@ -33,7 +33,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class ProfileFragment extends Fragment {
-    FirestoreRecyclerAdapter adapter;
+    private FirestoreRecyclerAdapter adapter;
 
 
     public ProfileFragment() {
@@ -208,6 +208,8 @@ public class ProfileFragment extends Fragment {
         });
 
 
+
+
         Query query = db.collection("videos");
 
         FirestoreRecyclerOptions<ProfileVideos> options = new FirestoreRecyclerOptions.Builder<ProfileVideos>()
@@ -227,7 +229,14 @@ public class ProfileFragment extends Fragment {
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
                 holder.listDescription.setText(model.getDescription());
-                VideoView videos;
+                holder.listVideo = new VideoView(getContext());
+                Uri url = Uri.parse(model.getUrl());
+                //Log.d("TAG", "onBindViewHolder: "+ model.getUrl());
+                holder.listVideo.setVideoURI(url);
+                //holder.listVideo.requestFocus();
+                holder.listVideo.setAlpha(1);
+                holder.listVideo.setZOrderOnTop(true);
+                holder.listVideo.start();
 
 
             }
@@ -244,12 +253,15 @@ public class ProfileFragment extends Fragment {
 
     private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
         private  TextView listDescription;
+        private  VideoView listVideo;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
 
             listDescription=itemView.findViewById(R.id.videosDescription);
+            listVideo=itemView.findViewById(R.id.videosFrame);
         }
+
     }
 
     @Override
@@ -264,4 +276,9 @@ public class ProfileFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
+
+
+
+
+
 }
