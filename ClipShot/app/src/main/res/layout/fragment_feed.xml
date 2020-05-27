@@ -24,10 +24,12 @@
             android:background="@drawable/edit_text_border"
             android:autofillHints="Search"
             android:hint="@string/search"
-            android:textColorHint="@color/colorWhite"
+            android:textColorHint="#55FFFFFF"
             android:inputType=""
             tools:ignore="LabelFor,RtlSymmetry"
-            android:paddingStart="12dp"/>
+            android:fontFamily="@font/open_sans"
+            android:textColor="@color/colorWhite"
+            android:paddingStart="14dp"/>
 
     </RelativeLayout>
 

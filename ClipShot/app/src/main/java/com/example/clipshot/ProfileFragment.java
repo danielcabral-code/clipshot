@@ -82,7 +82,6 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
 
-
         FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
@@ -207,9 +206,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-
-
         Query query = db.collection("videos");
 
         FirestoreRecyclerOptions<ProfileVideos> options = new FirestoreRecyclerOptions.Builder<ProfileVideos>()
@@ -251,6 +247,11 @@ public class ProfileFragment extends Fragment {
         return returnView;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
         private  TextView listDescription;
         private  VideoView listVideo;
@@ -268,7 +269,6 @@ public class ProfileFragment extends Fragment {
     public void onStart() {
         super.onStart();
         adapter.startListening();
-
     }
 
     @Override
