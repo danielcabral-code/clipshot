@@ -1,5 +1,6 @@
 package com.example.clipshot;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -227,15 +228,18 @@ public class ProfileFragment extends Fragment {
                 holder.listDescription.setText(model.getDescription());
                 holder.listVideo = new VideoView(getContext());
                 Uri url = Uri.parse(model.getUrl());
-                //Log.d("TAG", "onBindViewHolder: "+ model.getUrl());
+                Log.d("TAG", "onBindViewHolder: "+ model.getUrl());
                 holder.listVideo.setVideoURI(url);
-                //holder.listVideo.requestFocus();
-                holder.listVideo.setAlpha(1);
-                holder.listVideo.setZOrderOnTop(true);
-                holder.listVideo.start();
 
+                holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        holder.listVideo.start();
+                    }
+                });
 
             }
+
         };
 
         profileVideos.setHasFixedSize(true);

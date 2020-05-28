@@ -10,10 +10,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.service.autofill.UserData;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,10 +39,13 @@ import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class UploadVideoActivity extends AppCompatActivity {
@@ -46,7 +54,12 @@ public class UploadVideoActivity extends AppCompatActivity {
     StorageReference storageReference;
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     String name;
-    ArrayList gameName = new ArrayList();
+    ArrayList gameNameArray = new ArrayList();
+    public Timer timer=new Timer();
+    final long DELAY = 1000; // milliseconds
+    String myUrl;
+
+
 
     @SuppressLint("WrongConstant")
     @Override
@@ -60,11 +73,10 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         AppCompatImageView iconDone = findViewById(R.id.iconDone);
         EditText descrtiption = findViewById(R.id.description);
+        EditText gameName = findViewById(R.id.gameName);
 
-        /*for (int i = 1; i <= 19838 ; i++) {
-            new GetIp().execute("https://api.rawg.io/api/games?page="+i);
 
-        }*/
+
 
 
         //Get extras from Main Activity
@@ -79,6 +91,55 @@ public class UploadVideoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 uploadVideo();
+            }
+        });
+
+        // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+        gameName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+               timer.cancel();
+                timer = new Timer();
+                timer.schedule(
+                        new TimerTask() {
+                            @Override
+                            public void run() {
+                                Uri.Builder builder = new Uri.Builder();
+                                builder.scheme("https")
+                                        .authority("api.rawg.io")
+                                        .appendPath("api")
+                                        .appendPath("games")
+                                        .appendQueryParameter("ordering","-rating")
+                                        .appendQueryParameter("search",s.toString());
+                                Log.d("TAG", "afterTextChanged: "+s.toString());
+
+
+
+                               myUrl = builder.build().toString();
+                                new GetIp().execute(myUrl);
+                            }
+                        },
+                        DELAY
+                );
+
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+
+
             }
         });
 
@@ -117,79 +178,86 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                                     db.collection("videos").document(randomUUID).set(Userdata);
 
-                                        }
-                                    });
-
-
-
                                 }
                             });
-                }
 
 
 
-        }
-    }
-   /* public class GetIp extends AsyncTask<String,String,String> {
-        @Override
-
-        protected  String doInBackground(String ... fileUrl){
-            StringBuilder stringBuilder = new StringBuilder();
-            try {
-                URL url = new URL(fileUrl[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-                connection.connect();
-                InputStream in = connection.getInputStream();
-
-                stringBuilder = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line;
-                while ((line = reader.readLine())!=null){
-                    stringBuilder.append(line);
-                }
-
-            }
-            catch (Exception e){
-                Log.e("ERROR", "onCreate" + e );
-            }
-            return stringBuilder.toString();
-
-
-        }
-
-        @Override
-        protected void onPostExecute(final String result) {
-            super.onPostExecute(result);
-
-
-                    try {
-                        JSONObject jsonResponse = new JSONObject(result);
-                        JSONArray results = jsonResponse.getJSONArray("results");
-
-                        //Log.d("TAG", "onPostExecute: " + results.toString());
-
-
-
-
-                        for (int i = 0; i < results.length(); i++) {
-                            JSONObject c = results.getJSONObject(i);
-
-                            double rating =c.getDouble("rating");
-                            if (rating>=4) {
-                                 name = c.getString("name");
-
-                            }
-                            if (!gameName.contains(name)) {
-                                gameName.add(name);
-                            }
                         }
-                        Log.d("TAG", "onPostExecute: "+ gameName);
+                    });
+        }
+
+
+
+    }
+
+class GetIp extends AsyncTask<String,String,String> {
+    @Override
+
+    protected String doInBackground(String... fileUrl) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            URL url = new URL(fileUrl[0]);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.connect();
+            InputStream in = connection.getInputStream();
+
+            stringBuilder = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+        } catch (Exception e) {
+            Log.e("ERROR", "onCreate" + e);
+        }
+        return stringBuilder.toString();
+
+
+    }
+
+    @Override
+    protected void onPostExecute(final String result) {
+        super.onPostExecute(result);
+        gameNameArray.clear();
+
+
+        try {
+            JSONObject jsonResponse = new JSONObject(result);
+            JSONArray results = jsonResponse.getJSONArray("results");
+
+
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject c = results.getJSONObject(i);
+
+                double rating =c.getDouble("rating");
+                if (rating >= 3) {
+                    name = c.getString("name");
+                }
+
+                if (!gameNameArray.contains(name)) {
+                    gameNameArray.add(name);
+                }
+            }
+            Log.d("TAG", "onPostExecute: "+ gameNameArray);
+
+           /* String[] array = new String[gameNameArray.size()];
+            array= (String[]) gameNameArray.toArray(array);
+            for (String s:array){
+                //Log.d("TAG", "onPostExecute: "+s);
+            }*/
+
 
 
         } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-        }*/
+            e.printStackTrace();
+        }
 
 
+    }
+
+
+
+}}
