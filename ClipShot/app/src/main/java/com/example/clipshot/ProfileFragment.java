@@ -238,7 +238,7 @@ public class ProfileFragment extends Fragment {
             }
         };
 
-        profileVideos.setHasFixedSize(true);
+        // profileVideos.setHasFixedSize(true);
         profileVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         profileVideos.setAdapter(adapter);
         profileVideos.setNestedScrollingEnabled(false);
