@@ -226,9 +226,11 @@ public class ProfileFragment extends Fragment {
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
                 holder.listDescription.setText(model.getDescription());
+
                 //holder.listVideo = new VideoView(getContext());
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
+
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
