@@ -226,6 +226,7 @@ public class ProfileFragment extends Fragment {
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
                 holder.listDescription.setText(model.getDescription());
+                holder.listGameName.setText(model.getGameName());
 
                 //holder.listVideo = new VideoView(getContext());
                 Uri uri = Uri.parse(model.getUrl());
@@ -235,7 +236,14 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
 
-                        holder.listVideo.start();
+                        holder.listVideo.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                holder.listVideo.start();
+                            }
+                        });
+
+
                     }
                 });
 
@@ -258,12 +266,15 @@ public class ProfileFragment extends Fragment {
     }
 
     private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
+
+        private  TextView listGameName;
         private  TextView listDescription;
         private  VideoView listVideo;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
 
+            listGameName =itemView.findViewById(R.id.videosGameName);
             listDescription=itemView.findViewById(R.id.videosDescription);
             listVideo=itemView.findViewById(R.id.videosFrame);
         }

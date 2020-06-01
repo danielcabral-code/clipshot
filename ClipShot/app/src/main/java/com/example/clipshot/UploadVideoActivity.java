@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,6 +63,7 @@ public class UploadVideoActivity extends AppCompatActivity {
     final long DELAY = 1000; // milliseconds
     String myUrl;
     MaterialSpinner spinner;
+    String game;
 
 
     @SuppressLint("WrongConstant")
@@ -159,6 +161,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
                 Log.d("TAG", "onItemSelected: " + item);
+                game=item;
                 gameName.setText(item);
             }
         });
@@ -193,11 +196,15 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                                     // Map that will fill our database with values
                                     Map<String,String> Userdata = new HashMap<>();
+                                    Userdata.put("GameName",game);
                                     Userdata.put("Description",videoDescription);
                                     Userdata.put("UserID",userUid);
                                     Userdata.put("Url",uri.toString());
+                                    Userdata.put("Likes", "0");
 
                                     db.collection("videos").document(randomUUID).set(Userdata);
+                                    Intent goToFeed = new Intent(UploadVideoActivity.this, MainActivity.class);
+                                    startActivity(goToFeed);
 
                                 }
                             });
@@ -252,11 +259,13 @@ class GetIp extends AsyncTask<String,String,String> {
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject c = results.getJSONObject(i);
-
+                name = c.getString("name");
+/*
                 double rating =c.getDouble("rating");
                 if (rating >= 3) {
-                    name = c.getString("name");
+
                 }
+*/
 
                 if (!gameNameArray.contains(name)) {
                     gameNameArray.add(name);
