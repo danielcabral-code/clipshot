@@ -19,6 +19,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ public class UploadVideoActivity extends AppCompatActivity {
     public Timer timer=new Timer();
     final long DELAY = 1000; // milliseconds
     String myUrl;
-
+    MaterialSpinner spinner;
 
 
     @SuppressLint("WrongConstant")
@@ -74,6 +77,8 @@ public class UploadVideoActivity extends AppCompatActivity {
         AppCompatImageView iconDone = findViewById(R.id.iconDone);
         EditText descrtiption = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
+        spinner= findViewById(R.id.spinner);
+
 
 
 
@@ -142,6 +147,22 @@ public class UploadVideoActivity extends AppCompatActivity {
 
             }
         });
+        /*spinner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("TAG", "onClick: "+ spinner.getSelectedIndex());
+            }
+        });*/
+
+        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                Log.d("TAG", "onItemSelected: " + item);
+                gameName.setText(item);
+            }
+        });
+
 
 
     }
@@ -239,16 +260,16 @@ class GetIp extends AsyncTask<String,String,String> {
 
                 if (!gameNameArray.contains(name)) {
                     gameNameArray.add(name);
+
                 }
             }
             Log.d("TAG", "onPostExecute: "+ gameNameArray);
 
-           /* String[] array = new String[gameNameArray.size()];
+            String[] array = new String[gameNameArray.size()];
             array= (String[]) gameNameArray.toArray(array);
-            for (String s:array){
-                //Log.d("TAG", "onPostExecute: "+s);
-            }*/
 
+            ArrayAdapter<String> adapter= new ArrayAdapter<String>(UploadVideoActivity.this,R.layout.spinner_layout,array);
+            spinner.setAdapter(adapter);
 
 
         } catch (JSONException e) {
