@@ -226,7 +226,7 @@ public class ProfileFragment extends Fragment {
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
                 holder.listDescription.setText(model.getDescription());
-                holder.listVideo = new VideoView(getContext());
+                // holder.listVideo = new VideoView(getContext());
                 Uri url = Uri.parse(model.getUrl());
                 Log.d("TAG", "onBindViewHolder: "+ model.getUrl());
                 holder.listVideo.setVideoURI(url);
