@@ -36,6 +36,9 @@ import com.google.firebase.storage.StorageReference;
 public class ProfileFragment extends Fragment {
     private FirestoreRecyclerAdapter adapter;
 
+    // Firebase variables
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference documentReference;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -55,9 +58,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Firebase variables
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference documentReference;
+
 
         // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
@@ -213,6 +214,7 @@ public class ProfileFragment extends Fragment {
                 .setQuery(query, ProfileVideos.class)
                 .build();
 
+        FirebaseFirestore finalDb = db;
         adapter = new FirestoreRecyclerAdapter<ProfileVideos, ProfileVideosHolder>(options) {
             @NonNull
             @Override
@@ -227,6 +229,21 @@ public class ProfileFragment extends Fragment {
 
                 holder.listDescription.setText(model.getDescription());
                 holder.listGameName.setText(model.getGameName());
+                documentReference = db.collection("users").document(model.getUserID());
+                documentReference.get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                  @Override
+                                                  public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                      if (documentSnapshot.exists()) {
+                                                          String dataUser = documentSnapshot.getString("Username");
+                                                          holder.listUsername.setText(dataUser);
+                                                      }
+                                                  }
+                                              });
+
+
+
+
 
                 //holder.listVideo = new VideoView(getContext());
                 Uri uri = Uri.parse(model.getUrl());
@@ -270,10 +287,12 @@ public class ProfileFragment extends Fragment {
         private  TextView listGameName;
         private  TextView listDescription;
         private  VideoView listVideo;
+        private  TextView listUsername;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
 
+            listUsername =itemView.findViewById(R.id.videosUsername);
             listGameName =itemView.findViewById(R.id.videosGameName);
             listDescription=itemView.findViewById(R.id.videosDescription);
             listVideo=itemView.findViewById(R.id.videosFrame);

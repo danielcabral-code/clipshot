@@ -7,16 +7,48 @@
     android:padding="16dp">
 
 
+    <!-- Placeholder for profile image -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageCard"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:cardCornerRadius="50dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/colorWhite">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/userimage" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
-        android:id="@+id/videosGameName"
-        android:layout_width="wrap_content"
+        android:id="@+id/videosUsername"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/imageCard"/>
+
+    <TextView
+        android:id="@+id/videosGameName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_below="@+id/videosUsername"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/imageCard"/>
 
     <VideoView
         android:id="@+id/videosFrame"
@@ -27,7 +59,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="visible"
-        android:layout_below="@+id/videosGameName"/>
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/imageCard"/>
 
     <TextView
         android:id="@+id/videosDescription"
