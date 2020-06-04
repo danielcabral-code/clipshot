@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         // Firebase variables
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        
+
         DocumentReference documentReference;
 
         // Variables that will get the userId value from the user google account

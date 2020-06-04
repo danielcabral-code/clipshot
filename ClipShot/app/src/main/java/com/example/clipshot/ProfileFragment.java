@@ -1,12 +1,15 @@
 package com.example.clipshot;
 
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -229,6 +233,27 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
+                int screenSize = getResources().getConfiguration().screenLayout &
+                        Configuration.SCREENLAYOUT_SIZE_MASK;
+
+                String toastMsg;
+                switch(screenSize) {
+                    case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                        toastMsg = "Large screen";
+
+                        break;
+                    case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                        toastMsg = "Normal screen";
+                        holder.listVideo.getLayoutParams().height = 900;
+                        break;
+                    case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                        toastMsg = "Small screen";
+                        break;
+                    default:
+                        toastMsg = "Screen size is neither large, normal or small";
+                }
+                Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();
+
                 // Download uri from user image folder using the storageReference inicialized at top of document
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
@@ -299,7 +324,7 @@ public class ProfileFragment extends Fragment {
 
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
-
+                holder.listVideo.seekTo( 1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
@@ -311,8 +336,15 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
+                        holder.listVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                holder.listVideo.seekTo( 1);
+                            }
+                        });
 
                     }
+
                 });
 
             }
@@ -327,6 +359,7 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         return returnView;
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
