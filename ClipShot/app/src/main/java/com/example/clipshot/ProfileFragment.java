@@ -35,10 +35,9 @@ import com.google.firebase.storage.StorageReference;
 
 public class ProfileFragment extends Fragment {
     private FirestoreRecyclerAdapter adapter;
-
-    // Firebase variables
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
     private DocumentReference documentReference;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -87,6 +86,7 @@ public class ProfileFragment extends Fragment {
         FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
+
 
         // Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
@@ -208,13 +208,15 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        Query query = db.collection("videos");
+        Query query = db.collection("videos").whereEqualTo("UserID",userUid).orderBy("ReleasedTime", Query.Direction.DESCENDING);
+
+
 
         FirestoreRecyclerOptions<ProfileVideos> options = new FirestoreRecyclerOptions.Builder<ProfileVideos>()
                 .setQuery(query, ProfileVideos.class)
                 .build();
 
-        FirebaseFirestore finalDb = db;
+
         adapter = new FirestoreRecyclerAdapter<ProfileVideos, ProfileVideosHolder>(options) {
             @NonNull
             @Override
@@ -227,25 +229,74 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
-                holder.listDescription.setText(model.getDescription());
-                holder.listGameName.setText(model.getGameName());
+                // Download uri from user image folder using the storageReference inicialized at top of document
+                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+
+                        // Load the image using Glide
+                        Glide.with(container).load(uri).into(holder.listUserImage);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Uri personPhoto = acct.getPhotoUrl();
+                        Glide.with(container).load(String.valueOf(personPhoto)).into(holder.listUserImage);
+                        Log.d("TAG", "onFailure: error "+ exception);
+                    }
+                });
+
+
                 documentReference = db.collection("users").document(model.getUserID());
+
                 documentReference.get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                  @Override
-                                                  public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                      if (documentSnapshot.exists()) {
-                                                          String dataUser = documentSnapshot.getString("Username");
-                                                          holder.listUsername.setText(dataUser);
-                                                      }
-                                                  }
-                                              });
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    String dataUser = documentSnapshot.getString("Username");
+                                    holder.listUsername.setText(dataUser);
+
+                                }
+                            }
+                        });
+
+                holder.listDescription.setText(model.getDescription());
+                holder.listGameName.setText(model.getGameName());
+                holder.listLikes.setText(model.getLikes());
+
+               /* db.collection("videos")
+                        .whereEqualTo("UserID",userUid)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    for (que) {
+
+                                    }
+                                    Log.d("TAG", "onComplete: "+ task.getResult());
+                                }
+                            }
+
+                           *//* @Override
+                            public void onComplete(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
 
 
+                                    holder.listDescription.setText(documentSnapshot.getString("Likes"));
+                                    holder.listGameName.setText(model.getGameName());
+                                    holder.listLikes.setText(model.getLikes());
+                                    Log.d("TAG", "onBindViewHolder: "+ model.getLikes());
+                                    Log.d("TAG", "onBindViewHolder: "+ model.getDescription());
+                                    Log.d("TAG", "onSuccess: "+ documentSnapshot.getString("Likes"));
+                                }
+                            }*//*
+                        });*/
 
 
-
-                //holder.listVideo = new VideoView(getContext());
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
 
@@ -284,10 +335,12 @@ public class ProfileFragment extends Fragment {
 
     private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
 
+        private  ImageView listUserImage;
         private  TextView listGameName;
         private  TextView listDescription;
         private  VideoView listVideo;
         private  TextView listUsername;
+        private  TextView listLikes;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
@@ -296,6 +349,8 @@ public class ProfileFragment extends Fragment {
             listGameName =itemView.findViewById(R.id.videosGameName);
             listDescription=itemView.findViewById(R.id.videosDescription);
             listVideo=itemView.findViewById(R.id.videosFrame);
+            listUserImage= itemView.findViewById(R.id.videosImage);
+            listLikes=itemView.findViewById(R.id.videosLikes);
         }
 
     }

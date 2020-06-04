@@ -17,7 +17,7 @@
         app:strokeColor="@color/colorWhite">
 
         <ImageView
-            android:id="@+id/image"
+            android:id="@+id/videosImage"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:scaleType="fitCenter"
@@ -27,7 +27,7 @@
 
     <TextView
         android:id="@+id/videosUsername"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -35,11 +35,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="5dp"
+        android:textSize="18sp"
         android:layout_toEndOf="@+id/imageCard"/>
 
     <TextView
         android:id="@+id/videosGameName"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -48,7 +49,23 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_below="@+id/videosUsername"
         android:layout_marginStart="5dp"
-        android:layout_toEndOf="@+id/imageCard"/>
+        android:textSize="10sp"
+        android:layout_toEndOf="@+id/imageCard"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/videosLikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="5dp"
+        android:textSize="18sp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@id/videosUsername"/>
 
     <VideoView
         android:id="@+id/videosFrame"
