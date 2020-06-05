@@ -138,7 +138,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 storageReference = imageStorage.getReference();
 
                 // Declaring variables that will be inserted in Firestore
-                dataUsername = username.getText().toString();
+                dataUsername = username.getText().toString().toLowerCase();
                 dataName = name.getText().toString();
                 dataBio = bio.getText().toString();
                 dataSteam = steamInput.getText().toString();

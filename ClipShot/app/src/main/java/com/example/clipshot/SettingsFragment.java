@@ -229,7 +229,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 storageReference = imageStorage.getReference();
 
                 // Declaring variables that will be inserted in Firestore
-                dataUsername = displayName.getText().toString();
+                dataUsername = displayName.getText().toString().toLowerCase();
                 dataName = realName.getText().toString();
                 dataBio = bio.getText().toString();
                 dataSteam = steamInput.getText().toString();

@@ -6,31 +6,53 @@
     android:layout_height="match_parent"
     tools:context=".FeedFragment">
 
-    <RelativeLayout
-        android:id="@+id/searchBarContainer"
+    <LinearLayout
+        android:id="@+id/alignSearchAndContents"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:elevation="4dp"
-        android:background="@color/colorPrimary"
-        android:visibility="invisible">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <EditText
+        <RelativeLayout
+            android:id="@+id/searchBarContainer"
             android:layout_width="match_parent"
-            android:layout_marginHorizontal="16dp"
-            android:layout_height="48dp"
-            android:layout_marginBottom="4dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/edit_text_border"
-            android:autofillHints="Search"
-            android:hint="@string/search"
-            android:textColorHint="#55FFFFFF"
-            android:inputType=""
-            tools:ignore="LabelFor,RtlSymmetry"
-            android:fontFamily="@font/open_sans"
-            android:textColor="@color/colorWhite"
-            android:paddingStart="14dp"/>
+            android:layout_height="64dp"
+            android:elevation="4dp"
+            android:background="@color/colorPrimary"
+            android:visibility="invisible">
 
-    </RelativeLayout>
+            <EditText
+                android:id="@+id/searchQuery"
+                android:layout_width="match_parent"
+                android:layout_marginHorizontal="16dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="4dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/edit_text_border"
+                android:autofillHints="Search"
+                android:hint="@string/search"
+                android:textColorHint="#55FFFFFF"
+                android:inputType=""
+                tools:ignore="LabelFor,RtlSymmetry"
+                android:fontFamily="@font/open_sans"
+                android:textColor="@color/colorWhite"
+                android:paddingStart="14dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/feedContents"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="-60dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/testFeedString"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </ScrollView>
