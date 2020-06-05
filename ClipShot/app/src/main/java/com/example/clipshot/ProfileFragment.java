@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -300,11 +302,15 @@ public class ProfileFragment extends Fragment {
                 holder.listLikes.setText(model.getLikes());
 
                 Uri uri = Uri.parse(model.getUrl());
+                //holder.listVideo.getLayoutParams().height=1500;
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        layoutParams.setMargins(0, 200, 0, 0);
+                        holder.listVideo.setLayoutParams(layoutParams);
 
                         holder.listVideo.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -316,6 +322,7 @@ public class ProfileFragment extends Fragment {
                         holder.listVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
+
                                 holder.listVideo.seekTo( 1);
                             }
                         });
