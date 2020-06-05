@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         // Firebase variables
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+
         // Document reference of user data that will read user data
         DocumentReference documentReference = db.collection("users").document(userUid);
 

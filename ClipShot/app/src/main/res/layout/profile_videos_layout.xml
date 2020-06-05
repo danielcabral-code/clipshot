@@ -13,6 +13,8 @@
         android:layout_height="30dp"
         app:cardCornerRadius="50dp"
         app:strokeWidth="1dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
         app:strokeColor="@color/colorWhite">
 
         <ImageView
@@ -34,6 +36,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
         android:textSize="18sp"
         android:layout_toEndOf="@+id/imageCard"/>
 
@@ -63,7 +66,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="5dp"
         android:textSize="18sp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:layout_toEndOf="@id/videosUsername"/>
 
     <VideoView
@@ -87,6 +90,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="15dp"
         android:layout_below="@+id/videosFrame"/>
 
 </RelativeLayout>

@@ -18,12 +18,16 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
+import com.firebase.ui.firestore.paging.FirestorePagingOptions;
+import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,7 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class ProfileFragment extends Fragment {
-    private FirestoreRecyclerAdapter adapter;
+    private FirestorePagingAdapter adapter;
     private FirebaseFirestore db;
     private DocumentReference documentReference;
 
@@ -90,6 +94,7 @@ public class ProfileFragment extends Fragment {
         FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
+
 
 
         // Document reference of user data that will be read to the fields in profile
@@ -213,15 +218,18 @@ public class ProfileFragment extends Fragment {
         });
 
         Query query = db.collection("videos").whereEqualTo("UserID",userUid).orderBy("ReleasedTime", Query.Direction.DESCENDING);
-
-
-
-        FirestoreRecyclerOptions<ProfileVideos> options = new FirestoreRecyclerOptions.Builder<ProfileVideos>()
-                .setQuery(query, ProfileVideos.class)
+        PagedList.Config config = new PagedList.Config.Builder()
+                .setInitialLoadSizeHint(10)
+                .setPageSize(3)
                 .build();
 
 
-        adapter = new FirestoreRecyclerAdapter<ProfileVideos, ProfileVideosHolder>(options) {
+        FirestorePagingOptions<ProfileVideos> options = new FirestorePagingOptions.Builder<ProfileVideos>()
+                .setQuery(query,config, ProfileVideos.class)
+                .build();
+
+
+        adapter = new FirestorePagingAdapter<ProfileVideos, ProfileVideosHolder>(options) {
             @NonNull
             @Override
             public ProfileVideosHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -233,7 +241,7 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
-                int screenSize = getResources().getConfiguration().screenLayout &
+              /*  int screenSize = getResources().getConfiguration().screenLayout &
                         Configuration.SCREENLAYOUT_SIZE_MASK;
 
                 String toastMsg;
@@ -252,7 +260,7 @@ public class ProfileFragment extends Fragment {
                     default:
                         toastMsg = "Screen size is neither large, normal or small";
                 }
-                Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();*/
 
                 // Download uri from user image folder using the storageReference inicialized at top of document
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -291,37 +299,6 @@ public class ProfileFragment extends Fragment {
                 holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
 
-               /* db.collection("videos")
-                        .whereEqualTo("UserID",userUid)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-
-                                    for (que) {
-
-                                    }
-                                    Log.d("TAG", "onComplete: "+ task.getResult());
-                                }
-                            }
-
-                           *//* @Override
-                            public void onComplete(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-
-
-                                    holder.listDescription.setText(documentSnapshot.getString("Likes"));
-                                    holder.listGameName.setText(model.getGameName());
-                                    holder.listLikes.setText(model.getLikes());
-                                    Log.d("TAG", "onBindViewHolder: "+ model.getLikes());
-                                    Log.d("TAG", "onBindViewHolder: "+ model.getDescription());
-                                    Log.d("TAG", "onSuccess: "+ documentSnapshot.getString("Likes"));
-                                }
-                            }*//*
-                        });*/
-
-
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
@@ -348,6 +325,7 @@ public class ProfileFragment extends Fragment {
                 });
 
             }
+
 
         };
 
