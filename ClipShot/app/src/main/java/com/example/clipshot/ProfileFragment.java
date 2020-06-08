@@ -89,6 +89,7 @@ public class ProfileFragment extends Fragment {
         TextView realName = returnView.findViewById(R.id.realName);
         TextView bio = returnView.findViewById(R.id.bio);
         TextView title = returnView.findViewById(R.id.gamifyTitle);
+        TextView numberOfVideos = returnView.findViewById(R.id.clipsNumber);
         AppCompatImageView steamIcon = returnView.findViewById(R.id.iconSteam);
         AppCompatImageView xboxIcon = returnView.findViewById(R.id.iconXbox);
         AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
@@ -97,13 +98,36 @@ public class ProfileFragment extends Fragment {
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
 
 
-
-        int LIKE_DONE = 0;
-
         FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
 
+        db.collection("videos").whereEqualTo("UserID",userUid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            int count = 0;
+                            for (DocumentSnapshot document : task.getResult()) {
+
+                                count++;
+                                Log.d("TAG", "onComplete: " + count);
+                                Log.d("TAG", "onComplete: "+ task.getResult().toString());
+
+
+                            }
+                            numberOfVideos.setText(String.valueOf(count));
+                        } else {
+
+                            Log.d("TAG", "Error getting documents: ", task.getException());
+                        }
+
+
+
+                    }
+                });
 
 
         // Document reference of user data that will be read to the fields in profile
@@ -309,13 +333,14 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
-                        if (holder.listLikesIcon.getTag().toString().equals("liked"))  // here "bg" is the tag that you set previously
+                        if (holder.listLikesIcon.getTag().toString().equals("liked"))
                         {
-                            Log.d("TAG", "onClick:com explosao ");
+
                             String likesCount = (String) holder.listLikes.getText();
                             int likeDone= Integer.parseInt(likesCount)-1;
                             holder.listLikes.setText(String.valueOf(likeDone));
                             holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
+                            holder.listLikesIcon.setTag("noLike");
 
 
 
@@ -324,13 +349,14 @@ public class ProfileFragment extends Fragment {
                         }
                         else
                         {
-                            Log.d("TAG", "onClick:sem explosao ");
+
                             String likesCount = (String) holder.listLikes.getText();
                             int likeDone= Integer.parseInt(likesCount)+1;
                             holder.listLikes.setText(String.valueOf(likeDone));
                             holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            holder.listLikesIcon.setTag("liked");
 
-                            
+
                             db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
                             db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
                         }

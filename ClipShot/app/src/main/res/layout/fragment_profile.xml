@@ -191,7 +191,6 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:fontFamily="@font/open_sans_bold"
-                                android:text="@string/testClipsNumber"
                                 android:textAlignment="center"
                                 android:textColor="@color/colorWhite"
                                 android:textSize="12sp" />
