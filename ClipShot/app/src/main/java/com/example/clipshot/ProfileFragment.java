@@ -1,17 +1,14 @@
 package com.example.clipshot;
 
-import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,23 +22,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
-import com.firebase.ui.firestore.paging.LoadingState;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
     private FirestorePagingAdapter adapter;
@@ -92,6 +94,10 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView psnIcon = returnView.findViewById(R.id.iconPsn);
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
+
+
+
+        int LIKE_DONE = 0;
 
         FirebaseStorage imageStorage;
 
@@ -219,6 +225,8 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+
         Query query = db.collection("videos").whereEqualTo("UserID",userUid).orderBy("ReleasedTime", Query.Direction.DESCENDING);
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
@@ -243,27 +251,6 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
-              /*  int screenSize = getResources().getConfiguration().screenLayout &
-                        Configuration.SCREENLAYOUT_SIZE_MASK;
-
-                String toastMsg;
-                switch(screenSize) {
-                    case Configuration.SCREENLAYOUT_SIZE_LARGE:
-                        toastMsg = "Large screen";
-
-                        break;
-                    case Configuration.SCREENLAYOUT_SIZE_NORMAL:
-                        toastMsg = "Normal screen";
-                        holder.listVideo.getLayoutParams().height = 900;
-                        break;
-                    case Configuration.SCREENLAYOUT_SIZE_SMALL:
-                        toastMsg = "Small screen";
-                        break;
-                    default:
-                        toastMsg = "Screen size is neither large, normal or small";
-                }
-                Toast.makeText(getContext(), toastMsg, Toast.LENGTH_LONG).show();*/
-
                 // Download uri from user image folder using the storageReference inicialized at top of document
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
@@ -284,6 +271,8 @@ public class ProfileFragment extends Fragment {
 
 
                 documentReference = db.collection("users").document(model.getUserID());
+               DocumentReference documentReference2 = db.collection("videos").document();
+
 
                 documentReference.get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -297,9 +286,33 @@ public class ProfileFragment extends Fragment {
                             }
                         });
 
+
+
                 holder.listDescription.setText(model.getDescription());
                 holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
+                holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+
+
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone= Integer.parseInt(likesCount)+1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+
+
+                        // On success data is inserted in database and user go to MainActivity
+                        db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
+
+
+
+
+                    }
+                });
 
                 Uri uri = Uri.parse(model.getUrl());
                 //holder.listVideo.getLayoutParams().height=1500;
@@ -359,6 +372,7 @@ public class ProfileFragment extends Fragment {
         private  VideoView listVideo;
         private  TextView listUsername;
         private  TextView listLikes;
+        private  ImageView listLikesIcon;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
@@ -369,6 +383,7 @@ public class ProfileFragment extends Fragment {
             listVideo=itemView.findViewById(R.id.videosFrame);
             listUserImage= itemView.findViewById(R.id.videosImage);
             listLikes=itemView.findViewById(R.id.videosLikes);
+            listLikesIcon=itemView.findViewById(R.id.videosLikeIcon);
         }
 
     }
@@ -384,9 +399,6 @@ public class ProfileFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
-
-
-
 
 
 }

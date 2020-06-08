@@ -38,11 +38,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.cert.Extension;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -197,13 +197,16 @@ public class UploadVideoActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     Date date = new Date();
                                     // Map that will fill our database with values
-                                    Map<String, String> Userdata = new HashMap<>();
+                                    Map<String, Object> Userdata = new HashMap<>();
                                     Userdata.put("GameName", game);
                                     Userdata.put("Description", videoDescription);
                                     Userdata.put("UserID", userUid);
                                     Userdata.put("Url", uri.toString());
-                                    Userdata.put("Likes", "0");
+                                    Userdata.put("Likes","0");
+                                    String[] array = new String[0];
+                                    Userdata.put("UsersThatLiked", Arrays.asList(array));
                                     Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
+                                    Userdata.put("DocumentName",randomUUID);
 
 
                                     db.collection("videos").document(randomUUID).set(Userdata);
