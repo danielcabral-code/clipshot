@@ -64,8 +64,8 @@ public class SearchFragment extends Fragment {
         EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
         searchQuery.requestFocus();
 
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchQuery, InputMethodManager.SHOW_IMPLICIT);
+        /*InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchQuery, InputMethodManager.SHOW_IMPLICIT);*/
 
         iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
 
