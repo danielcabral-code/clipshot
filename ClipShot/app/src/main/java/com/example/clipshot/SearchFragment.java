@@ -1,9 +1,12 @@
 package com.example.clipshot;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
@@ -13,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -24,6 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class SearchFragment extends Fragment {
+
+    private AppCompatImageView iconSearch;
+    private int SEARCHBAR_VISIBILITY = 0;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -49,6 +56,20 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
+
+        Log.d("checkClick", String.valueOf(SEARCHBAR_VISIBILITY));
+
+        iconSearch.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public void onClick(View v) {
+
+                ((MainActivity) Objects.requireNonNull(getActivity())).openFragment(FeedFragment.newInstance("",""));
+                Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setElevation(20f); // Float == px
+            }
+        });
 
         EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
 

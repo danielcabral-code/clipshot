@@ -1,47 +1,19 @@
 package com.example.clipshot;
 
 import android.annotation.SuppressLint;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.Layout;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.SearchView;
-import android.widget.TextView;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import java.lang.ref.Reference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class FeedFragment extends Fragment {
@@ -70,6 +42,7 @@ public class FeedFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_feed, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -84,7 +57,6 @@ public class FeedFragment extends Fragment {
             public void onClick(View v) {
 
                 View searchBarContainer = Objects.requireNonNull(getActivity()).findViewById(R.id.searchBarContainer);
-                EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
                 View feedContents = Objects.requireNonNull(getActivity()).findViewById(R.id.feedContents);
 
                 if (SEARCHBAR_VISIBILITY == 1) {
@@ -105,19 +77,20 @@ public class FeedFragment extends Fragment {
                     feedContents.setLayoutParams(layoutParams);
 
                     SEARCHBAR_VISIBILITY = 1;
-
-                    searchQuery.setOnTouchListener(new View.OnTouchListener() {
-                        @SuppressLint("ClickableViewAccessibility")
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-
-                            ((MainActivity) getActivity()).openFragment(SearchFragment.newInstance("",""));
-
-                            return true;
-                        }
-                    });
                 }
             }
         });
+
+        EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
+        searchQuery.setOnFocusChangeListener(focusListener);
     }
+
+    private View.OnFocusChangeListener focusListener = new View.OnFocusChangeListener() {
+        public void onFocusChange(View v, boolean hasFocus) {
+
+            if (hasFocus){
+                ((MainActivity) Objects.requireNonNull(getActivity())).openFragment(SearchFragment.newInstance("",""));
+            }
+        }
+    };
 }

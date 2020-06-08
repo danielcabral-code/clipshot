@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:elevation="4dp"
-        android:background="@color/colorPrimary"
-        android:visibility="invisible">
+        android:background="@color/colorPrimary">
 
         <EditText
             android:id="@+id/searchQuery"
