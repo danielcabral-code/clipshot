@@ -42,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -287,6 +288,19 @@ public class ProfileFragment extends Fragment {
                         });
 
 
+                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        List<String> group = (List<String>) document.get("UsersThatLiked");
+                        assert group != null;
+                        if (group.contains(userUid)){
+                            //Log.d("TAG", "onComplete: existe ");
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            holder.listLikesIcon.setTag("liked");
+                        }
+                    }
+                });
 
                 holder.listDescription.setText(model.getDescription());
                 holder.listGameName.setText(model.getGameName());
@@ -295,18 +309,35 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
+                        if (holder.listLikesIcon.getTag().toString().equals("liked"))  // here "bg" is the tag that you set previously
+                        {
+                            Log.d("TAG", "onClick:com explosao ");
+                            String likesCount = (String) holder.listLikes.getText();
+                            int likeDone= Integer.parseInt(likesCount)-1;
+                            holder.listLikes.setText(String.valueOf(likeDone));
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
 
 
 
-                        String likesCount = (String) holder.listLikes.getText();
-                        int likeDone= Integer.parseInt(likesCount)+1;
-                        holder.listLikes.setText(String.valueOf(likeDone));
-                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
+                        }
+                        else
+                        {
+                            Log.d("TAG", "onClick:sem explosao ");
+                            String likesCount = (String) holder.listLikes.getText();
+                            int likeDone= Integer.parseInt(likesCount)+1;
+                            holder.listLikes.setText(String.valueOf(likeDone));
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+
+                            
+                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
+                        }
 
 
-                        // On success data is inserted in database and user go to MainActivity
-                        db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
-                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
+
+
 
 
 
@@ -315,7 +346,6 @@ public class ProfileFragment extends Fragment {
                 });
 
                 Uri uri = Uri.parse(model.getUrl());
-                //holder.listVideo.getLayoutParams().height=1500;
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
