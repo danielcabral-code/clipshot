@@ -1,11 +1,14 @@
 package com.example.clipshot;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -19,6 +22,7 @@ import java.util.Objects;
 public class FeedFragment extends Fragment {
 
     private AppCompatImageView iconSearch;
+    private EditText searchQuery;
     private int SEARCHBAR_VISIBILITY = 0;
 
     public FeedFragment() {
@@ -38,6 +42,7 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_feed, container, false);
     }
@@ -46,6 +51,11 @@ public class FeedFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Trying to make this close keyboard when changing to this fragment from SearchFragment (not working yet)
+        final InputMethodManager imm = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.hideSoftInputFromWindow(Objects.requireNonNull(view).getWindowToken(), 0);
 
         iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
 
@@ -81,7 +91,7 @@ public class FeedFragment extends Fragment {
             }
         });
 
-        EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
+        searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
         searchQuery.setOnFocusChangeListener(focusListener);
     }
 
