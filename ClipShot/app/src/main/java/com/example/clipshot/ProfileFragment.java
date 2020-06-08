@@ -42,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -88,6 +89,7 @@ public class ProfileFragment extends Fragment {
         TextView realName = returnView.findViewById(R.id.realName);
         TextView bio = returnView.findViewById(R.id.bio);
         TextView title = returnView.findViewById(R.id.gamifyTitle);
+        TextView numberOfVideos = returnView.findViewById(R.id.clipsNumber);
         AppCompatImageView steamIcon = returnView.findViewById(R.id.iconSteam);
         AppCompatImageView xboxIcon = returnView.findViewById(R.id.iconXbox);
         AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
@@ -96,13 +98,36 @@ public class ProfileFragment extends Fragment {
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
 
 
-
-        int LIKE_DONE = 0;
-
         FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
 
+        db.collection("videos").whereEqualTo("UserID",userUid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            int count = 0;
+                            for (DocumentSnapshot document : task.getResult()) {
+
+                                count++;
+                                Log.d("TAG", "onComplete: " + count);
+                                Log.d("TAG", "onComplete: "+ task.getResult().toString());
+
+
+                            }
+                            numberOfVideos.setText(String.valueOf(count));
+                        } else {
+
+                            Log.d("TAG", "Error getting documents: ", task.getException());
+                        }
+
+
+
+                    }
+                });
 
 
         // Document reference of user data that will be read to the fields in profile
@@ -287,6 +312,19 @@ public class ProfileFragment extends Fragment {
                         });
 
 
+                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        List<String> group = (List<String>) document.get("UsersThatLiked");
+                        assert group != null;
+                        if (group.contains(userUid)){
+                            //Log.d("TAG", "onComplete: existe ");
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            holder.listLikesIcon.setTag("liked");
+                        }
+                    }
+                });
 
                 holder.listDescription.setText(model.getDescription());
                 holder.listGameName.setText(model.getGameName());
@@ -295,18 +333,37 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
+                        if (holder.listLikesIcon.getTag().toString().equals("liked"))
+                        {
+
+                            String likesCount = (String) holder.listLikes.getText();
+                            int likeDone= Integer.parseInt(likesCount)-1;
+                            holder.listLikes.setText(String.valueOf(likeDone));
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
+                            holder.listLikesIcon.setTag("noLike");
 
 
 
-                        String likesCount = (String) holder.listLikes.getText();
-                        int likeDone= Integer.parseInt(likesCount)+1;
-                        holder.listLikes.setText(String.valueOf(likeDone));
-                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
+                        }
+                        else
+                        {
+
+                            String likesCount = (String) holder.listLikes.getText();
+                            int likeDone= Integer.parseInt(likesCount)+1;
+                            holder.listLikes.setText(String.valueOf(likeDone));
+                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                            holder.listLikesIcon.setTag("liked");
 
 
-                        // On success data is inserted in database and user go to MainActivity
-                        db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
-                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
+                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
+                        }
+
+
+
+
 
 
 
@@ -315,7 +372,6 @@ public class ProfileFragment extends Fragment {
                 });
 
                 Uri uri = Uri.parse(model.getUrl());
-                //holder.listVideo.getLayoutParams().height=1500;
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
