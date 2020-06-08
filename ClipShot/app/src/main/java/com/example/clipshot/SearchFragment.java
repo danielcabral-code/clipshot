@@ -1,6 +1,7 @@
 package com.example.clipshot;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -26,6 +28,8 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 public class SearchFragment extends Fragment {
 
@@ -57,6 +61,12 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
+        searchQuery.requestFocus();
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchQuery, InputMethodManager.SHOW_IMPLICIT);
+
         iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
 
         Log.d("checkClick", String.valueOf(SEARCHBAR_VISIBILITY));
@@ -70,8 +80,6 @@ public class SearchFragment extends Fragment {
                 Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setElevation(20f); // Float == px
             }
         });
-
-        EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
 
         searchQuery.addTextChangedListener(new TextWatcher() {
             @Override
