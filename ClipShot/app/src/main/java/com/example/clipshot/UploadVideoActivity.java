@@ -6,6 +6,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,9 +20,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -85,6 +90,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         EditText descrtiption = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
         spinner = findViewById(R.id.spinner);
+        VideoView videoSelected = findViewById(R.id.videoToBeUploaded);
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
@@ -102,72 +108,105 @@ public class UploadVideoActivity extends AppCompatActivity {
             Log.d("RES", "onCreate: " + videoUri + "/" + id);
         }
 
-        iconDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadVideo();
-            }
-        });
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        //use one of overloaded setDataSource() functions to set your data source
+        retriever.setDataSource(this, Uri.parse(String.valueOf(videoUri)));
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        long timeInMillisec = Long.parseLong(time);
+        retriever.release();
+        Log.d("TAG", "tempo: "+ timeInMillisec);
 
-        // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
-        gameName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (timeInMillisec > 60000){
 
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                timer.cancel();
-                timer = new Timer();
-                timer.schedule(
-                        new TimerTask() {
-                            @Override
-                            public void run() {
-                                Uri.Builder builder = new Uri.Builder();
-                                builder.scheme("https")
-                                        .authority("api.rawg.io")
-                                        .appendPath("api")
-                                        .appendPath("games")
-                                        .appendQueryParameter("ordering", "-rating")
-                                        .appendQueryParameter("search", s.toString());
-                                Log.d("TAG", "afterTextChanged: " + s.toString());
+            Toast.makeText(this,"Your clip exceeds the 60s max permitted!" , Toast.LENGTH_LONG).show();
+            Intent goToFeed = new Intent(UploadVideoActivity.this,MainActivity.class);
+            startActivity(goToFeed);
 
 
-                                myUrl = builder.build().toString();
-                                new GetIp().execute(myUrl);
-                            }
-                        },
-                        DELAY
-                );
+        }
+        else {
+
+            videoSelected.setVideoURI(videoUri);
+            videoSelected.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 20, 0, 0);
+                    videoSelected.setLayoutParams(layoutParams);
+                    videoSelected.start();
+                }
+
+            });
+
+            videoSelected.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+
+                    videoSelected.seekTo(1);
+                }
+            });
+
+            iconDone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    uploadVideo();
+                }
+            });
+
+            // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+            gameName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
 
-            }
+                }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    timer.cancel();
+                    timer = new Timer();
+                    timer.schedule(
+                            new TimerTask() {
+                                @Override
+                                public void run() {
+                                    Uri.Builder builder = new Uri.Builder();
+                                    builder.scheme("https")
+                                            .authority("api.rawg.io")
+                                            .appendPath("api")
+                                            .appendPath("games")
+                                            .appendQueryParameter("ordering", "-rating")
+                                            .appendQueryParameter("search", s.toString());
+                                    Log.d("TAG", "afterTextChanged: " + s.toString());
 
 
-            }
-        });
-        /*spinner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("TAG", "onClick: "+ spinner.getSelectedIndex());
-            }
-        });*/
+                                    myUrl = builder.build().toString();
+                                    new GetIp().execute(myUrl);
+                                }
+                            },
+                            DELAY
+                    );
 
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
-            @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Log.d("TAG", "onItemSelected: " + item);
-                game = item;
-                gameName.setText(item);
-            }
-        });
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+
+                }
+            });
+
+            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+                @Override
+                public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                    Log.d("TAG", "onItemSelected: " + item);
+                    game = item;
+                    gameName.setText(item);
+                }
+            });
+        }
 
 
     }
@@ -265,12 +304,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject c = results.getJSONObject(i);
                     name = c.getString("name");
-/*
-                double rating =c.getDouble("rating");
-                if (rating >= 3) {
-
-                }
-*/
 
                     if (!gameNameArray.contains(name)) {
                         gameNameArray.add(name);

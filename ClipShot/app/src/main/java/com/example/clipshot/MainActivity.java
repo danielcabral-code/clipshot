@@ -3,8 +3,12 @@ package com.example.clipshot;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -34,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -238,6 +243,9 @@ public class MainActivity extends AppCompatActivity {
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("video/*");
         startActivityForResult(gallery, PICK_VIDEO);
+
+
+
     }
 
     @Override
