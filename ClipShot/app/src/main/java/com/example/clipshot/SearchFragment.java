@@ -113,16 +113,16 @@ public class SearchFragment extends Fragment {
 
                                         usernames.add((String) findUsernames.get("Username"));
                                         Log.d("checkTAG", String.valueOf(usernames));
+
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
+                                        ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
+                                        lvData.setAdapter(adapter);
                                     }
                                 }
                             } else {
                                 Log.d("checkTAG", "Error getting documents: ", task.getException());
                             }
                         });
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_list_item_1, usernames);
-                ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
-                lvData.setAdapter(adapter);
             }
 
             @Override
