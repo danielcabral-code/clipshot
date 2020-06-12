@@ -17,11 +17,12 @@
         android:textSize="28sp" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iconDone"
+        android:id="@+id/iconDoneUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:visibility="invisible"
         android:layout_marginTop="20dp"
         android:src="@drawable/ic_done"/>
 

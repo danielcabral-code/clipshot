@@ -74,6 +74,9 @@ public class UploadVideoActivity extends AppCompatActivity {
     String myUrl;
     MaterialSpinner spinner;
     String game;
+    int descriptionIsEmpty = 1;
+    int gameNameIsEmpty = 1;
+    AppCompatImageView iconDone;
 
 
     @SuppressLint("WrongConstant")
@@ -86,11 +89,13 @@ public class UploadVideoActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.upload_action_bar);
 
-        AppCompatImageView iconDone = findViewById(R.id.iconDone);
+        //AppCompatImageView iconDone = findViewById(R.id.iconDoneUpload);
         EditText descrtiption = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
         spinner = findViewById(R.id.spinner);
         VideoView videoSelected = findViewById(R.id.videoToBeUploaded);
+        iconDone = findViewById(R.id.iconDoneUpload);
+
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
@@ -146,6 +151,34 @@ public class UploadVideoActivity extends AppCompatActivity {
                 }
             });
 
+
+
+
+            // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+            descrtiption.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    Log.d("TAG", "onTextChanged: mudou");
+
+                    if (s.toString().trim().length()==0){
+
+                          descriptionIsEmpty=1;
+
+
+                    }
+                    else descriptionIsEmpty=0;
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    showIconDone();
+                }
+            });
+
             iconDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -195,6 +228,8 @@ public class UploadVideoActivity extends AppCompatActivity {
 
 
                 }
+
+
             });
 
             spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
@@ -204,9 +239,14 @@ public class UploadVideoActivity extends AppCompatActivity {
                     Log.d("TAG", "onItemSelected: " + item);
                     game = item;
                     gameName.setText(item);
+
+                    gameNameIsEmpty=0;
+                    //showIconDone();
                 }
             });
         }
+
+
 
 
     }
@@ -329,6 +369,16 @@ public class UploadVideoActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void showIconDone(){
+
+        if (descriptionIsEmpty ==0 && gameNameIsEmpty==0){
+            iconDone.setVisibility(View.VISIBLE);
+            Log.d("TAG", "showIconDone:visivel ");
+        }
+        else{ iconDone.setVisibility(View.INVISIBLE);
+            Log.d("TAG", "showIconDone:visivel ");}
     }
 
 

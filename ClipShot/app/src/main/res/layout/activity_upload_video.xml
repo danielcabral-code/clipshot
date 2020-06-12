@@ -30,8 +30,7 @@
         android:id="@+id/spinner"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:dropDownWidth="300dp"
-        app:ms_dropdown_max_height="400dp"
+        app:ms_dropdown_height="250dp"
         app:ms_background_color="@color/colorPrimary"
         android:textColor="@color/colorWhite"/>
 
