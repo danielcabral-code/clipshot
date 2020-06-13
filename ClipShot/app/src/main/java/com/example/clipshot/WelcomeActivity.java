@@ -28,9 +28,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,6 +54,7 @@ public class WelcomeActivity extends AppCompatActivity {
     FirebaseStorage imageStorage;
     StorageReference storageReference;
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    CollectionReference usersRef;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -149,29 +154,54 @@ public class WelcomeActivity extends AppCompatActivity {
                 dataNintendo = nintendoInput.getText().toString();
                 dataGamifyTitle = "Expert";
 
-                // Map that will fill our database with values
-                Map<String,String> Userdata = new HashMap<>();
-                Userdata.put("Username",dataUsername);
-                Userdata.put("Name", dataName);
-                Userdata.put("Bio", dataBio);
-                Userdata.put("Steam", dataSteam);
-                Userdata.put("Origin", dataOrigin);
-                Userdata.put("Psn", dataPsn);
-                Userdata.put("Xbox", dataXbox);
-                Userdata.put("Nintendo", dataNintendo);
-                Userdata.put("GamifyTitle",dataGamifyTitle);
 
-                // Call the method to upload image
-                uploadImage(email);
+                CollectionReference usersRef = db.collection("users");
+                Query query = usersRef.whereEqualTo("Username", dataUsername);
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                      @Override
+                                                      public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                          if (task.isSuccessful()) {
+                                                              for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                                                  String user = documentSnapshot.getString("Username");
 
-                // On success data is inserted in database and user go to MainActivity
-                db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Intent goToFeed = new Intent(WelcomeActivity.this,MainActivity.class);
-                        startActivity(goToFeed);
-                    }
+                                                                  if (user.equals(dataUsername)) {
+                                                                      Log.d("TAG", "User Exists");
+
+                                                                  }
+                                                              }
+                                                          }
+
+                                                          if (task.getResult().size() == 0) {
+                                                              Log.d("TAG", "User not Exists");
+                                                              //You can store new user information here
+                                                              // Map that will fill our database with values
+                                                              Map<String, String> Userdata = new HashMap<>();
+                                                              Userdata.put("Username", dataUsername);
+                                                              Userdata.put("Name", dataName);
+                                                              Userdata.put("Bio", dataBio);
+                                                              Userdata.put("Steam", dataSteam);
+                                                              Userdata.put("Origin", dataOrigin);
+                                                              Userdata.put("Psn", dataPsn);
+                                                              Userdata.put("Xbox", dataXbox);
+                                                              Userdata.put("Nintendo", dataNintendo);
+                                                              Userdata.put("GamifyTitle", dataGamifyTitle);
+
+                                                              // Call the method to upload image
+                                                              uploadImage(email);
+                                                              //On success data is inserted in database and user go to MainActivity
+                                                              db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                  @Override
+                                                                  public void onSuccess(Void aVoid) {
+                                                                      Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
+                                                                      startActivity(goToFeed);
+                                                                  }
+                                                              });
+                                                          }
+                                                      }
                 });
+
+
+
             }
         });
     }

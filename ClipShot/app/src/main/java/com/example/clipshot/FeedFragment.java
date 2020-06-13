@@ -129,9 +129,7 @@ public class FeedFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
-                        Uri personPhoto = acct.getPhotoUrl();
-                        Glide.with(container).load(String.valueOf(personPhoto)).into(holder.listUserImage);
-                        Log.d("TAG", "onFailure: error " + exception);
+
                     }
                 });
 
