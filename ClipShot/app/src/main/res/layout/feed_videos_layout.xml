@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <!-- Placeholder for profile image -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageCard"
+        android:layout_width="37dp"
+        android:layout_height="37dp"
+        app:cardCornerRadius="50dp"
+        app:strokeWidth="1dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        app:strokeColor="@color/colorWhite">
+
+        <ImageView
+            android:id="@+id/videosImageFeed"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/userimage" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/videosUsernameFeed"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"
+        android:layout_toEndOf="@+id/imageCard"/>
+
+    <TextView
+        android:id="@+id/videosGameNameFeed"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_below="@+id/videosUsernameFeed"
+        android:layout_marginStart="5dp"
+        android:textSize="10sp"
+        android:layout_toEndOf="@+id/imageCard"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/videosLikesFeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="5dp"
+        android:textSize="18sp"
+        android:layout_marginTop="15dp"
+        android:layout_toEndOf="@id/videosUsernameFeed"/>
+
+    <ImageView
+        android:id="@+id/videosLikeIconFeed"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/videosLikesFeed"
+        android:layout_marginTop="5dp"
+        android:tag="noLike"
+        android:src="@drawable/ic_explosion_outline"/>
+
+    <VideoView
+        android:id="@+id/videosFrameFeed"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/imageCard"/>
+
+    <TextView
+        android:id="@+id/videosDescriptionFeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_below="@+id/videosFrameFeed"/>
+
+</RelativeLayout>

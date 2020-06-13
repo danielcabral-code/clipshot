@@ -28,6 +28,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.firebase.ui.auth.data.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -67,13 +69,12 @@ public class UploadVideoActivity extends AppCompatActivity {
     Uri videoUri;
     StorageReference storageReference;
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    String name;
     ArrayList gameNameArray = new ArrayList();
     public Timer timer = new Timer();
     final long DELAY = 1000; // milliseconds
     String myUrl;
     MaterialSpinner spinner;
-    String game;
+    String game,name, email;
     int descriptionIsEmpty = 1;
     int gameNameIsEmpty = 1;
     AppCompatImageView iconDone;
@@ -84,6 +85,9 @@ public class UploadVideoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_video);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        email= acct.getEmail();
 
         // Call Upload TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -225,6 +229,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable s) {
+                    //showIconDone();
 
 
                 }
@@ -241,7 +246,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                     gameName.setText(item);
 
                     gameNameIsEmpty=0;
-                    //showIconDone();
+                    showIconDone();
                 }
             });
         }
@@ -257,6 +262,8 @@ public class UploadVideoActivity extends AppCompatActivity {
 
             // Firestore instance
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
 
             EditText descrtiption = findViewById(R.id.description);
             // Declaring variables that will be inserted in Firestore
@@ -286,6 +293,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                                     Userdata.put("UsersThatLiked", Arrays.asList(array));
                                     Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
                                     Userdata.put("DocumentName",randomUUID);
+                                    Userdata.put ("Email", email);
 
 
                                     db.collection("videos").document(randomUUID).set(Userdata);

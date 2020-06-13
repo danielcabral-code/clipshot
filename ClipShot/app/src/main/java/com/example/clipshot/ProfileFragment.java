@@ -98,7 +98,7 @@ public class ProfileFragment extends Fragment {
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
 
 
-        FirebaseStorage imageStorage;
+        //FirebaseStorage imageStorage;
 
         db = FirebaseFirestore.getInstance();
 
@@ -296,8 +296,6 @@ public class ProfileFragment extends Fragment {
 
 
                 documentReference = db.collection("users").document(model.getUserID());
-               DocumentReference documentReference2 = db.collection("videos").document();
-
 
                 documentReference.get()
                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
