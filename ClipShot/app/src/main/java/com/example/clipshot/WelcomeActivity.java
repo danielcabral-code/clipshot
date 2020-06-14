@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -79,6 +80,7 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText psnInput = findViewById(R.id.psnInput);
         EditText xboxInput = findViewById(R.id.xboxInput);
         EditText nintendoInput = findViewById(R.id.switchInput);
+        TextView errorUsername = findViewById(R.id.labelErrorUsername);
 
 
         // Automatically fill avatar with Google Account Image and real name
@@ -91,8 +93,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
             name.setText(personName);
 
-            Glide.with(this).load(String.valueOf(personPhoto)).into(img);
         }
+
+        Glide.with(this).load(R.drawable.default_avatar).into(img);
 
         // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
         username.addTextChangedListener(new TextWatcher() {
@@ -158,46 +161,50 @@ public class WelcomeActivity extends AppCompatActivity {
                 CollectionReference usersRef = db.collection("users");
                 Query query = usersRef.whereEqualTo("Username", dataUsername);
                 query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                      @Override
-                                                      public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                          if (task.isSuccessful()) {
-                                                              for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                                                  String user = documentSnapshot.getString("Username");
+                 @Override
+                  public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                   if (task.isSuccessful()) {
+                       for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                           String user = documentSnapshot.getString("Username");
 
-                                                                  if (user.equals(dataUsername)) {
-                                                                      Log.d("TAG", "User Exists");
+                           if (user.equals(dataUsername)) {
+                               Log.d("TAG", "User Exists");
 
-                                                                  }
-                                                              }
-                                                          }
+                               errorUsername.setVisibility(View.VISIBLE);
 
-                                                          if (task.getResult().size() == 0) {
-                                                              Log.d("TAG", "User not Exists");
-                                                              //You can store new user information here
-                                                              // Map that will fill our database with values
-                                                              Map<String, String> Userdata = new HashMap<>();
-                                                              Userdata.put("Username", dataUsername);
-                                                              Userdata.put("Name", dataName);
-                                                              Userdata.put("Bio", dataBio);
-                                                              Userdata.put("Steam", dataSteam);
-                                                              Userdata.put("Origin", dataOrigin);
-                                                              Userdata.put("Psn", dataPsn);
-                                                              Userdata.put("Xbox", dataXbox);
-                                                              Userdata.put("Nintendo", dataNintendo);
-                                                              Userdata.put("GamifyTitle", dataGamifyTitle);
+                           }
+                       }
+                   }
 
-                                                              // Call the method to upload image
-                                                              uploadImage(email);
-                                                              //On success data is inserted in database and user go to MainActivity
-                                                              db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                  @Override
-                                                                  public void onSuccess(Void aVoid) {
-                                                                      Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
-                                                                      startActivity(goToFeed);
-                                                                  }
-                                                              });
-                                                          }
-                                                      }
+                    if (task.getResult().size() == 0) {
+                        Log.d("TAG", "User not Exists");
+                        errorUsername.setVisibility(View.INVISIBLE);
+
+                        // Map that will fill our database with values
+                        Map<String, String> Userdata = new HashMap<>();
+                        Userdata.put("Username", dataUsername);
+                        Userdata.put("Name", dataName);
+                        Userdata.put("Bio", dataBio);
+                        Userdata.put("Steam", dataSteam);
+                        Userdata.put("Origin", dataOrigin);
+                        Userdata.put("Psn", dataPsn);
+                        Userdata.put("Xbox", dataXbox);
+                        Userdata.put("Nintendo", dataNintendo);
+                        Userdata.put("GamifyTitle", dataGamifyTitle);
+
+                         // Call the method to upload image
+                        uploadImage(email);
+
+                        //On success data is inserted in database and user go to MainActivity
+                        db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
+                                startActivity(goToFeed);
+                            }
+                        });
+                    }
+                 }
                 });
 
 

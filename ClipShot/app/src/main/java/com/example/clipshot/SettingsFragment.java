@@ -33,9 +33,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -201,6 +204,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText psnInput = getActivity().findViewById(R.id.psnInput);
         EditText xboxInput = getActivity().findViewById(R.id.xboxInput);
         EditText switchInput = getActivity().findViewById(R.id.switchInput);
+        TextView errorUsername = getActivity().findViewById(R.id.labelErrorUsername);
 
         iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
 
@@ -239,7 +243,57 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 dataNintendo = switchInput.getText().toString();
                 dataGamifyTitle = "Expert";
 
-                // Map that will fill our database with values
+                CollectionReference usersRef = db.collection("users");
+                Query query = usersRef.whereEqualTo("Username", dataUsername);
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                   @Override
+                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                       if (task.isSuccessful()) {
+                           for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                               String user = documentSnapshot.getString("Username");
+
+                               if (user.equals(dataUsername)) {
+                                   Log.d("TAG", "User Exists");
+
+                                   errorUsername.setVisibility(View.VISIBLE);
+
+                               }
+                           }
+                       }
+                       if (task.getResult().size() == 0) {
+                           Log.d("TAG", "User not Exists");
+                           errorUsername.setVisibility(View.INVISIBLE);
+
+                           // Map that will fill our database with values
+                           Map<String, String> Userdata = new HashMap<>();
+                           Userdata.put("Username", dataUsername);
+                           Userdata.put("Name", dataName);
+                           Userdata.put("Bio", dataBio);
+                           Userdata.put("Steam", dataSteam);
+                           Userdata.put("Origin", dataOrigin);
+                           Userdata.put("Psn", dataPsn);
+                           Userdata.put("Xbox", dataXbox);
+                           Userdata.put("Nintendo", dataNintendo);
+                           Userdata.put("GamifyTitle", dataGamifyTitle);
+
+                           // Call the method to upload image
+                           uploadImage(email);
+
+                           // On success data is inserted in database and user go to MainActivity
+                           db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                               @Override
+                               public void onSuccess(Void aVoid) {
+                                   ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+                               }
+                           });
+                       }
+                   }
+
+                });
+
+
+
+               /* // Map that will fill our database with values
                 Map<String,String> Userdata = new HashMap<>();
                 Userdata.put("Username",dataUsername);
                 Userdata.put("Name", dataName);
@@ -260,7 +314,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                     public void onSuccess(Void aVoid) {
                         ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
                     }
-                });
+                });*/
             }
         });
 

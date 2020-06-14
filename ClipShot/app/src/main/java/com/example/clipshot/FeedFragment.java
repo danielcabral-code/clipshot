@@ -129,7 +129,8 @@ public class FeedFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
-
+                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
+                        Log.d("TAG", "onFailure: error "+ exception);
                     }
                 });
 

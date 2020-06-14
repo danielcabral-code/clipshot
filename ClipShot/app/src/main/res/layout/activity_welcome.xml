@@ -73,6 +73,21 @@
         android:inputType=""
         tools:ignore="LabelFor" />
 
+        <!-- Username already exists Label -->
+        <TextView
+            android:id="@+id/labelErrorUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.6"
+            android:text="@string/username_already_exists_choose_another"
+            android:layout_marginTop="1dp"
+            android:layout_below="@+id/displayName"
+            android:layout_marginHorizontal="43dp"
+            android:textColor="#FF0000"
+            android:fontFamily="@font/open_sans"
+            android:visibility="invisible"
+            android:textSize="12sp"/>
+
     <!-- Real Name Label -->
     <TextView
         android:id="@+id/labelRealName"
@@ -81,7 +96,7 @@
         android:alpha="0.6"
         android:text="@string/realName"
         android:layout_marginTop="16dp"
-        android:layout_below="@+id/displayName"
+        android:layout_below="@+id/labelErrorUsername"
         android:layout_marginHorizontal="43dp"
         android:textColor="@color/colorWhite"
         android:fontFamily="@font/open_sans"
