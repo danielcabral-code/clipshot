@@ -2,6 +2,7 @@ package com.example.clipshot;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -17,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -109,7 +111,7 @@ public class SearchFragment extends Fragment {
 
                                     Map<String, Object> findUsernames = document.getData();
 
-                                    if (Objects.requireNonNull(findUsernames.get("Username")).toString().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() >= 2) {
+                                    if (Objects.requireNonNull(findUsernames.get("Username")).toString().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
 
                                         usernames.add((String) findUsernames.get("Username"));
                                         Log.d("checkTAG", String.valueOf(usernames));
@@ -117,6 +119,24 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
+
+                                        lvData.setClickable(true);
+                                        lvData.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+
+                                                String pickedProfile = lvData.getItemAtPosition(position).toString();
+
+                                                Bundle args = new Bundle();
+                                                args.putString("pickedProfile", pickedProfile);
+
+                                                VisitedProfileFragment fragment = new VisitedProfileFragment();
+                                                fragment.setArguments(args);
+
+                                                assert getFragmentManager() != null;
+                                                getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+                                            }
+                                        });
                                     }
                                 }
                             } else {

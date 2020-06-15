@@ -8,28 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:381082056800:android:8127b4d06068c305736b05",
+        "mobilesdk_app_id": "1:381082056800:android:1f4252a3f58eb479736b05",
         "android_client_info": {
           "package_name": "com.example.clipshot"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "381082056800-fmvteoh6i1u888mepbp21cuh64j2fm1l.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.clipshot",
-            "certificate_hash": "ea6679e3beda1758ac73ffec6a32772d44e9c010"
-          }
-        },
-        {
-          "client_id": "381082056800-u75vfovkjorhvgrj1hu1pp6ntuob927h.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.clipshot",
-            "certificate_hash": "8c04bb2380add9fb98ce1f18ab88e9c40dd17719"
-          }
-        },
         {
           "client_id": "381082056800-jkodd7stk6hni2f0p40va9t81m8kiilf.apps.googleusercontent.com",
           "client_type": 3
@@ -37,7 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCbqZRVpqLWIYLCiT3J0Ywn1rIPGjrVB9U"
+          "current_key": "AIzaSyBmI8BdwAmWuBgcdDnE1uBvvVDXnFBkIk4"
         }
       ],
       "services": {

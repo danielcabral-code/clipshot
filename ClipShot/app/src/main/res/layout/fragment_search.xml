@@ -37,8 +37,7 @@
             android:id="@+id/searchResults"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="70dp"
-            android:layout_marginStart="18dp">
+            android:layout_marginTop="70dp">
 
             <ListView
                 android:id="@+id/lvData"

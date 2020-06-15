@@ -51,6 +51,8 @@ public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private DocumentReference documentReference;
 
+    int count;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -109,7 +111,7 @@ public class ProfileFragment extends Fragment {
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
 
-                            int count = 0;
+                            count = 0;
                             for (DocumentSnapshot document : task.getResult()) {
 
                                 count++;
@@ -128,6 +130,12 @@ public class ProfileFragment extends Fragment {
 
                     }
                 });
+
+        // Remove elevation on last video
+        if (count > 0) {
+            View bioAndRecyclerContainer = Objects.requireNonNull(getActivity()).findViewById(R.id.bioAndRecyclerContainer);
+            bioAndRecyclerContainer.setElevation(0f);
+        }
 
 
         // Document reference of user data that will be read to the fields in profile
