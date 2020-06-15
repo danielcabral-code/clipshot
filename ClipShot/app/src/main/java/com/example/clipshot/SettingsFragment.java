@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -54,6 +55,7 @@ import static android.app.Activity.RESULT_OK;
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private static final int PICK_IMAGE = 1;
+    private int usernameChanged =0;
 
     Uri imageUri;
     FirebaseStorage imageStorage;
@@ -72,6 +74,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private String xBoxName;
     private String nintendoName;
     AppCompatImageView iconDoneSettings;
+    ProgressBar progressBar;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -180,9 +183,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Uri personPhoto = acct.getPhotoUrl();
-                Glide.with(container).load(String.valueOf(personPhoto)).into(img);
-                Log.d("TAG", "onFailure: error "+ exception);
+
+                Glide.with(container).load(R.drawable.default_avatar).into(img);
             }
         });
 
@@ -207,6 +209,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         TextView errorUsername = getActivity().findViewById(R.id.labelErrorUsername);
 
         iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
+        progressBar= Objects.requireNonNull(getActivity()).findViewById(R.id.progress_circular);
 
         // Listener to call method to pick an image from gallery
         profileImage.setOnClickListener(new View.OnClickListener() {
@@ -220,6 +223,9 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         iconDoneSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                progressBar.setVisibility(View.VISIBLE);
+                iconDoneSettings.setVisibility(View.INVISIBLE);
 
                 String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
                 FirebaseFirestore db;
@@ -246,75 +252,64 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 CollectionReference usersRef = db.collection("users");
                 Query query = usersRef.whereEqualTo("Username", dataUsername);
                 query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                   @Override
-                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                       if (task.isSuccessful()) {
-                           for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                               String user = documentSnapshot.getString("Username");
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                String user = documentSnapshot.getString("Username");
 
-                               if (user.equals(dataUsername)) {
-                                   Log.d("TAG", "User Exists");
+                                if (user.equals(dataUsername) && usernameChanged == 1) {
+                                    Log.d("TAG", "User Exists");
 
-                                   errorUsername.setVisibility(View.VISIBLE);
+                                    errorUsername.setVisibility(View.VISIBLE);
 
-                               }
-                           }
-                       }
-                       if (task.getResult().size() == 0) {
-                           Log.d("TAG", "User not Exists");
-                           errorUsername.setVisibility(View.INVISIBLE);
+                                }
+                                else {
 
-                           // Map that will fill our database with values
-                           Map<String, String> Userdata = new HashMap<>();
-                           Userdata.put("Username", dataUsername);
-                           Userdata.put("Name", dataName);
-                           Userdata.put("Bio", dataBio);
-                           Userdata.put("Steam", dataSteam);
-                           Userdata.put("Origin", dataOrigin);
-                           Userdata.put("Psn", dataPsn);
-                           Userdata.put("Xbox", dataXbox);
-                           Userdata.put("Nintendo", dataNintendo);
-                           Userdata.put("GamifyTitle", dataGamifyTitle);
 
-                           // Call the method to upload image
-                           uploadImage(email);
+                                    Log.d("TAG", "User not Exists");
+                                    errorUsername.setVisibility(View.INVISIBLE);
 
-                           // On success data is inserted in database and user go to MainActivity
-                           db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                               @Override
-                               public void onSuccess(Void aVoid) {
-                                   ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
-                               }
-                           });
-                       }
-                   }
+                                    // Map that will fill our database with values
+                                    Map<String, String> Userdata = new HashMap<>();
+                                    Userdata.put("Username", dataUsername);
+                                    Userdata.put("Name", dataName);
+                                    Userdata.put("Bio", dataBio);
+                                    Userdata.put("Steam", dataSteam);
+                                    Userdata.put("Origin", dataOrigin);
+                                    Userdata.put("Psn", dataPsn);
+                                    Userdata.put("Xbox", dataXbox);
+                                    Userdata.put("Nintendo", dataNintendo);
+                                    Userdata.put("GamifyTitle", dataGamifyTitle);
+
+                                    // Call the method to upload image
+                                    uploadImage(email);
+
+                                    // On success data is inserted in database and user go to MainActivity
+                                    db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            new Handler().postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+
+                                                }
+                                            }, 5000);
+                                        }
+                                    });
+
+                                }
+                            }
+                        }
+
+
+
+                    }
 
                 });
 
-
-
-               /* // Map that will fill our database with values
-                Map<String,String> Userdata = new HashMap<>();
-                Userdata.put("Username",dataUsername);
-                Userdata.put("Name", dataName);
-                Userdata.put("Bio", dataBio);
-                Userdata.put("Steam", dataSteam);
-                Userdata.put("Origin", dataOrigin);
-                Userdata.put("Psn", dataPsn);
-                Userdata.put("Xbox", dataXbox);
-                Userdata.put("Nintendo", dataNintendo);
-                Userdata.put("GamifyTitle",dataGamifyTitle);
-
-                // Call the method to upload image
-                uploadImage(email);
-
-                // On success data is inserted in database and user go to MainActivity
-                db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
-                    }
-                });*/
             }
         });
 
@@ -325,13 +320,16 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
+            public void onTextChanged(CharSequence s, int start, int before, int count) { Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(dataUsername)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
-                else iconDoneSettings.setVisibility(View.VISIBLE);
+                else {
+
+                    iconDoneSettings.setVisibility(View.VISIBLE);
+                    usernameChanged = 1;
+                }
             }
 
             @Override

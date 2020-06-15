@@ -21,6 +21,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -68,7 +69,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
     Uri videoUri;
     StorageReference storageReference;
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
     ArrayList gameNameArray = new ArrayList();
     public Timer timer = new Timer();
     final long DELAY = 1000; // milliseconds
@@ -78,6 +79,8 @@ public class UploadVideoActivity extends AppCompatActivity {
     int descriptionIsEmpty = 1;
     int gameNameIsEmpty = 1;
     AppCompatImageView iconDone;
+    ProgressBar progressBar;
+    TextView uploadLabel;
 
 
     @SuppressLint("WrongConstant")
@@ -99,6 +102,8 @@ public class UploadVideoActivity extends AppCompatActivity {
         spinner = findViewById(R.id.spinner);
         VideoView videoSelected = findViewById(R.id.videoToBeUploaded);
         iconDone = findViewById(R.id.iconDoneUpload);
+        progressBar=findViewById(R.id.progress_circular);
+
 
 
         Date c = Calendar.getInstance().getTime();
@@ -170,7 +175,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                     if (s.toString().trim().length()==0){
 
-                          descriptionIsEmpty=1;
+                        descriptionIsEmpty=1;
 
 
                     }
@@ -186,6 +191,8 @@ public class UploadVideoActivity extends AppCompatActivity {
             iconDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    iconDone.setVisibility(View.INVISIBLE);
                     uploadVideo();
                 }
             });
@@ -281,6 +288,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                             storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
+
                                     Date date = new Date();
                                     // Map that will fill our database with values
                                     Map<String, Object> Userdata = new HashMap<>();
