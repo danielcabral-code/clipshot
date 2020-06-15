@@ -252,8 +252,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Uri personPhoto = acct.getPhotoUrl();
-                Glide.with(container).load(String.valueOf(personPhoto)).into(img);
+                Glide.with(getContext()).load(R.drawable.default_avatar).into(img);
                 Log.d("TAG", "onFailure: error "+ exception);
             }
         });
@@ -296,8 +295,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
-                        Uri personPhoto = acct.getPhotoUrl();
-                        Glide.with(container).load(String.valueOf(personPhoto)).into(holder.listUserImage);
+                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                         Log.d("TAG", "onFailure: error "+ exception);
                     }
                 });
