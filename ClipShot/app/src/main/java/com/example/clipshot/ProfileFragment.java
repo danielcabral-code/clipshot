@@ -1,5 +1,7 @@
 package com.example.clipshot;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -107,6 +109,7 @@ public class ProfileFragment extends Fragment {
         db.collection("videos").whereEqualTo("UserID",userUid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -121,6 +124,12 @@ public class ProfileFragment extends Fragment {
 
                             }
                             numberOfVideos.setText(String.valueOf(count));
+
+                            TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
+                            if (count == 0) {
+                                noVideosMessage.setText("You haven't shared any Clips yet...");
+                            }
+
                         } else {
 
                             Log.d("TAG", "Error getting documents: ", task.getException());
@@ -131,11 +140,13 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
+
         // Remove elevation on last video
-        if (count > 0) {
+        /*if (count == 0) {
+            Log.d("checkItem", String.valueOf(count));
             View bioAndRecyclerContainer = Objects.requireNonNull(getActivity()).findViewById(R.id.bioAndRecyclerContainer);
             bioAndRecyclerContainer.setElevation(0f);
-        }
+        }*/
 
 
         // Document reference of user data that will be read to the fields in profile
@@ -422,6 +433,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
     }
 
     private class ProfileVideosHolder extends  RecyclerView.ViewHolder{

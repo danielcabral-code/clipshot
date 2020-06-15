@@ -13,9 +13,7 @@
         <RelativeLayout
             android:id="@+id/bioAndRecyclerContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:background="@color/colorPrimary">
+            android:layout_height="wrap_content">
 
             <RelativeLayout
                 android:id="@+id/biogr"
@@ -304,6 +302,19 @@
                 </RelativeLayout>
 
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/noVideosMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/biogr"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="70dp"
+                android:textSize="26sp"
+                android:fontFamily="@font/open_sans_light"
+                android:textColor="@color/colorWhite"
+                android:layout_marginHorizontal="30dp"
+                android:gravity="center"/>
 
             <!-- Video Recycler View -->
             <androidx.recyclerview.widget.RecyclerView
