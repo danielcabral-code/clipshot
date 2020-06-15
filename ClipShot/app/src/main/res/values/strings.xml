@@ -30,5 +30,6 @@
     <string name="games">Games</string>
     <string name="testFeedString">hello</string>
     <string name="username_already_exists_choose_another">Username already exists, choose another!</string>
+    <string name="uploading_video">Uploading video</string>
 
 </resources>
