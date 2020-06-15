@@ -95,9 +95,9 @@ public class SearchFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                Uri imageUri;
+                /*Uri imageUri;
                 FirebaseStorage imageStorage;
-                StorageReference storageReference;
+                StorageReference storageReference;*/
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
