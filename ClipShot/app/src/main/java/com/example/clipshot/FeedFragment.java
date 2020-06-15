@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -199,15 +200,19 @@ public class FeedFragment extends Fragment {
                     }
                 });
 
+                holder.progressBar.setVisibility(View.VISIBLE);
+
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo(1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        holder.progressBar.setVisibility(View.INVISIBLE);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                         layoutParams.setMargins(0, 200, 0, 0);
                         holder.listVideo.setLayoutParams(layoutParams);
+                        holder.listVideo.setBackgroundResource(0);
 
                         holder.listVideo.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -306,6 +311,7 @@ public class FeedFragment extends Fragment {
         private  TextView listUsername;
         private  TextView listLikes;
         private  ImageView listLikesIcon;
+        ProgressBar progressBar;
 
         public FeedVideosHolder(@NonNull View itemView) {
             super(itemView);
@@ -317,6 +323,7 @@ public class FeedFragment extends Fragment {
             listUserImage= itemView.findViewById(R.id.videosImageFeed);
             listLikes=itemView.findViewById(R.id.videosLikesFeed);
             listLikesIcon=itemView.findViewById(R.id.videosLikeIconFeed);
+            progressBar =itemView.findViewById(R.id.progress_circular);
 
         }
 

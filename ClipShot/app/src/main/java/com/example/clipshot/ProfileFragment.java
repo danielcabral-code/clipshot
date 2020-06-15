@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -140,13 +141,6 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
-
-        // Remove elevation on last video
-        /*if (count == 0) {
-            Log.d("checkItem", String.valueOf(count));
-            View bioAndRecyclerContainer = Objects.requireNonNull(getActivity()).findViewById(R.id.bioAndRecyclerContainer);
-            bioAndRecyclerContainer.setElevation(0f);
-        }*/
 
 
         // Document reference of user data that will be read to the fields in profile
@@ -386,15 +380,18 @@ public class ProfileFragment extends Fragment {
                     }
                 });
 
+                holder.progressBar.setVisibility(View.VISIBLE);
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
                 holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        holder.progressBar.setVisibility(View.INVISIBLE);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                         layoutParams.setMargins(0, 200, 0, 0);
                         holder.listVideo.setLayoutParams(layoutParams);
+                        holder.listVideo.setBackgroundResource(0);
 
                         holder.listVideo.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -445,6 +442,7 @@ public class ProfileFragment extends Fragment {
         private  TextView listUsername;
         private  TextView listLikes;
         private  ImageView listLikesIcon;
+        ProgressBar progressBar;
 
         public ProfileVideosHolder(@NonNull View itemView) {
             super(itemView);
@@ -456,6 +454,7 @@ public class ProfileFragment extends Fragment {
             listUserImage= itemView.findViewById(R.id.videosImage);
             listLikes=itemView.findViewById(R.id.videosLikes);
             listLikesIcon=itemView.findViewById(R.id.videosLikeIcon);
+            progressBar =itemView.findViewById(R.id.progress_circular);
         }
 
     }
