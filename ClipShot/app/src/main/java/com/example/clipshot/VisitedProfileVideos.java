@@ -1,8 +1,6 @@
 package com.example.clipshot;
 
-import android.net.Uri;
-
-public class ProfileVideos {
+public class VisitedProfileVideos {
 
     private String Description;
     private String Url;
@@ -10,20 +8,21 @@ public class ProfileVideos {
     private String UserID;
     private String Likes;
     private String DocumentName;
+    private String Email;
 
-    public ProfileVideos() {
+    public VisitedProfileVideos() {
     }
 
-    public ProfileVideos(String description, String url, String gameName, String userId, String likes, String documentName) {
+    public VisitedProfileVideos(String description, String url, String gameName, String userID, String likes, String documentName, String email) {
+        Description = description;
+        Url = url;
+        GameName = gameName;
+        UserID = userID;
+        Likes = likes;
+        DocumentName = documentName;
+        Email = email;
 
-        this.Description = description;
-        this.Url=url;
-        this.GameName=gameName;
-        this.UserID=userId;
-        this.Likes=likes;
-        this.DocumentName=documentName;
     }
-
 
     public String getDescription() {
         return Description;
@@ -47,5 +46,9 @@ public class ProfileVideos {
 
     public String getDocumentName() {
         return DocumentName;
+    }
+
+    public String getEmail() {
+        return Email;
     }
 }

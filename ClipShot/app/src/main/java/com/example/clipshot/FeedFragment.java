@@ -60,6 +60,7 @@ public class FeedFragment extends Fragment {
     public FeedFragment() {
         // Required empty public constructor
     }
+    
 
     public static FeedFragment newInstance(String param1, String param2) {
         FeedFragment fragment = new FeedFragment();

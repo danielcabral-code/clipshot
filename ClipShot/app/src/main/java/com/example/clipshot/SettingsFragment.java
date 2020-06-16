@@ -281,6 +281,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     Userdata.put("Xbox", dataXbox);
                                     Userdata.put("Nintendo", dataNintendo);
                                     Userdata.put("GamifyTitle", dataGamifyTitle);
+                                    Userdata.put("Email", email);
+
 
                                     // Call the method to upload image
                                     uploadImage(email);
