@@ -169,6 +169,7 @@ public class FeedFragment extends Fragment {
                 holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
                 holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
 
