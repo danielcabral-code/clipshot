@@ -24,8 +24,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -116,6 +122,7 @@ public class SearchFragment extends Fragment {
                                         usernames.add((String) findUsernames.get("Username"));
                                         Log.d("checkTAG", String.valueOf(usernames));
 
+
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
@@ -127,14 +134,53 @@ public class SearchFragment extends Fragment {
 
                                                 String pickedProfile = lvData.getItemAtPosition(position).toString();
 
-                                                Bundle args = new Bundle();
-                                                args.putString("pickedProfile", pickedProfile);
 
-                                                VisitedProfileFragment fragment = new VisitedProfileFragment();
-                                                fragment.setArguments(args);
+                                                CollectionReference usersRef = db.collection("users");
+                                                Query queryUser = usersRef.whereEqualTo("Username", pickedProfile);
+                                                queryUser.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        String userVisitedUid ="";
+                                                        String userVisitedEmail ="";
+                                                        if (task.isSuccessful()) {
+                                                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                                                String user = documentSnapshot.getString("Username");
 
-                                                assert getFragmentManager() != null;
-                                                getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+                                                                if (user.equals(pickedProfile)) {
+                                                                    Log.d("TAG", "User Exists antes de pesquisa");
+
+                                                                    userVisitedUid = documentSnapshot.getId();
+                                                                    userVisitedEmail= documentSnapshot.getString("Email");
+                                                                    Log.d("check", "onComplete: " + userVisitedEmail);
+
+                                                                    Log.d("TAG", "onComplete antes da pesquisa: " + userVisitedUid);
+
+
+                                                                }
+
+                                                            }
+                                                        }
+
+                                                        Bundle args = new Bundle();
+                                                        args.putString("pickedProfile", pickedProfile);
+                                                        args.putString("docID",userVisitedUid);
+                                                        args.putString("email",userVisitedEmail);
+
+
+
+
+                                                        VisitedProfileFragment fragment = new VisitedProfileFragment();
+                                                        fragment.setArguments(args);
+
+                                                        assert getFragmentManager() != null;
+                                                        getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+
+                                                    }
+
+
+                                                });
+
+
                                             }
                                         });
                                     }
