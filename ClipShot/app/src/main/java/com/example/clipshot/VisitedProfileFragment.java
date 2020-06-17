@@ -1,6 +1,7 @@
 package com.example.clipshot;
 
 import android.annotation.SuppressLint;
+import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -59,6 +61,8 @@ public class VisitedProfileFragment extends Fragment {
     String userVisitedUid;
     CollectionReference usersRef;
     StorageReference storageReference;
+    int count;
+    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     public VisitedProfileFragment() {
         // Required empty public constructor
@@ -88,7 +92,7 @@ public class VisitedProfileFragment extends Fragment {
         Log.d("TAG", "onCreateView: "+ acct.getEmail());*/
 
         /*String email = acct.getEmail().toString();*/
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
         View returnView = inflater.inflate(R.layout.fragment_visited_profile, container, false);
         RecyclerView visitedVideos = returnView.findViewById(R.id.recyclerView);
@@ -182,6 +186,7 @@ public class VisitedProfileFragment extends Fragment {
                 holder.listDescription.setText(model.getDescription());
                 holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
+
                 holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -283,6 +288,131 @@ public class VisitedProfileFragment extends Fragment {
         AppCompatImageView psnIcon = getActivity().findViewById(R.id.iconPsn);
         AppCompatImageView nintendoIcon = getActivity().findViewById(R.id.iconNintendo);
         TextView userName = getActivity().findViewById(R.id.appBarTitle);
+        Button btnFollow = getActivity().findViewById(R.id.containedButton);
+        TextView followerNumber = getActivity().findViewById(R.id.followerNumber);
+
+
+
+
+        FirebaseFirestore.getInstance().collection("users").document(docID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot document = task.getResult();
+                List<String> group = (List<String>) document.get("UsersFollowers");
+                assert group != null;
+                if (group.contains(userUid)) {
+                    btnFollow.setText("Unfollow");
+                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    btnFollow.setTag("following");
+                }
+            }
+        });
+
+        btnFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (btnFollow.getTag().toString().equals("following")) {
+
+
+                   String followingCount = (String) followerNumber.getText();
+                    int followDone = Integer.parseInt(followingCount) - 1;
+                    followerNumber.setText(String.valueOf(followDone));
+                    btnFollow.setTag("noFollow");
+                    btnFollow.setText("Follow");
+                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPurple));
+
+
+                    db.collection("users").document(docID).update("Followers", followerNumber.getText());
+                    db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+
+                    //Setting the visited user username in all videos that he got
+                    documentReference = db.collection("users").document(userUid);
+                    documentReference.get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if (documentSnapshot.exists()) {
+                                        String userFollowing = documentSnapshot.getString("Following");
+                                        int addFollowing = Integer.parseInt(userFollowing) -1;
+                                        db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
+
+                                    }
+                                }
+                            });
+
+                    db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(userVisitedUid));
+                } else {
+
+                    String followingCount = (String) followerNumber.getText();
+                    int followDone = Integer.parseInt(followingCount) + 1;
+                    followerNumber.setText(String.valueOf(followDone));
+                    btnFollow.setText("Unfollow");
+                    btnFollow.setTag("following");
+                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+
+                    db.collection("users").document(docID).update("Followers", followerNumber.getText());
+                    db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayUnion(userUid));
+
+                    //Setting the visited user username in all videos that he got
+                    documentReference = db.collection("users").document(userUid);
+                    documentReference.get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if (documentSnapshot.exists()) {
+                                        String userFollowing = documentSnapshot.getString("Following");
+                                        int addFollowing = Integer.parseInt(userFollowing) +1;
+                                        db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
+                                        db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayUnion(docID));
+
+                                    }
+                                }
+                            });
+
+                  ;
+                }
+
+
+            }
+        });
+
+
+        db.collection("videos").whereEqualTo("UserID",docID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            count = 0;
+                            for (DocumentSnapshot document : task.getResult()) {
+
+                                count++;
+                                Log.d("TAG", "onComplete: " + count);
+                                Log.d("TAG", "onComplete: "+ task.getResult().toString());
+
+
+                            }
+                            numberOfVideos.setText(String.valueOf(count));
+
+                           /* TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
+                            if (count == 0) {
+                                noVideosMessage.setText("You haven't shared any Clips yet...");
+                            }*/
+
+                        } else {
+
+                            Log.d("TAG", "Error getting documents: ", task.getException());
+                        }
+
+
+
+                    }
+                });
+
 
         db.collection("users")
                 .whereEqualTo("Username", pickedProfile)

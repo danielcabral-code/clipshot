@@ -95,6 +95,8 @@ public class ProfileFragment extends Fragment {
         TextView bio = returnView.findViewById(R.id.bio);
         TextView title = returnView.findViewById(R.id.gamifyTitle);
         TextView numberOfVideos = returnView.findViewById(R.id.clipsNumber);
+        TextView followingNumber = returnView.findViewById(R.id.followingNumber);
+        TextView followersNumber = returnView.findViewById(R.id.followerNumber);
         AppCompatImageView steamIcon = returnView.findViewById(R.id.iconSteam);
         AppCompatImageView xboxIcon = returnView.findViewById(R.id.iconXbox);
         AppCompatImageView originIcon = returnView.findViewById(R.id.iconOrigin);
@@ -161,9 +163,14 @@ public class ProfileFragment extends Fragment {
                             String psnName = documentSnapshot.getString("Psn");
                             String xBoxName = documentSnapshot.getString("Xbox");
                             String nintendoName = documentSnapshot.getString("Nintendo");
+                            String dataFollowingNumber = documentSnapshot.getString("Following");
+                            String dataFollowersNumber = documentSnapshot.getString("Followers");
                             realName.setText(dataName);
                             bio.setText(dataBio);
                             title.setText(dataTitle);
+                            followingNumber.setText(dataFollowingNumber);
+                            followersNumber.setText(dataFollowersNumber);
+
 
                             long tEnd = System.currentTimeMillis();
                             long tDelta = tEnd - tStart;
