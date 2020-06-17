@@ -42,7 +42,16 @@
             <ListView
                 android:id="@+id/lvData"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:dividerHeight="0dp"/>
+
+            <ListView
+                android:id="@+id/lvDataGames"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lvData"
+                android:layout_marginTop="30dp"
                 android:divider="@null"
                 android:dividerHeight="0dp"/>
 

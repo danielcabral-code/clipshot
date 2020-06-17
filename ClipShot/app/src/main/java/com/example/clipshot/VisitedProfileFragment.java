@@ -228,7 +228,7 @@ public class VisitedProfileFragment extends Fragment {
                         //When the video is fully loaded the loading disappear, the heigth is setted to wrap content and the video frame background its removed too
                         holder.progressBar.setVisibility(View.INVISIBLE);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 200, 0, 0);
+                        layoutParams.setMargins(0, 140, 0, 0);
                         holder.listVideo.setLayoutParams(layoutParams);
                         holder.listVideo.setBackgroundResource(0);
 

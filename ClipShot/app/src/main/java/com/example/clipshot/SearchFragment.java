@@ -108,6 +108,7 @@ public class SearchFragment extends Fragment {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                 ArrayList<String> usernames = new ArrayList<>();
+                ArrayList<String> gameNames = new ArrayList<>();
 
                 db.collection("users")
                         .get()
@@ -179,6 +180,82 @@ public class SearchFragment extends Fragment {
 
 
                                                 });
+
+
+                                            }
+                                        });
+                                    }
+                                }
+                            } else {
+                                Log.d("checkTAG", "Error getting documents: ", task.getException());
+                            }
+                        });
+
+                db.collection("videos")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+
+                                    Map<String, Object> findGameNames = document.getData();
+
+                                    if (Objects.requireNonNull(findGameNames.get("GameName")).toString().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
+
+                                        gameNames.add((String) findGameNames.get("GameName"));
+                                        Log.d("checkTAG", String.valueOf(gameNames));
+
+
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
+                                        ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
+                                        lvData2.setAdapter(adapter);
+
+                                        lvData2.setClickable(true);
+                                        lvData2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+
+                                                String pickedGameName = lvData2.getItemAtPosition(position).toString();
+
+
+                                                /*CollectionReference usersRef = db.collection("users");
+                                                Query queryUser = usersRef.whereEqualTo("Username", pickedProfile);
+                                                queryUser.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                        String userVisitedUid ="";
+                                                        String userVisitedEmail ="";
+                                                        if (task.isSuccessful()) {
+                                                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                                                String user = documentSnapshot.getString("Username");
+
+                                                                if (user.equals(pickedProfile)) {
+                                                                    Log.d("TAG", "User Exists antes de pesquisa");
+
+                                                                    userVisitedUid = documentSnapshot.getId();
+                                                                    userVisitedEmail= documentSnapshot.getString("Email");
+                                                                    Log.d("check", "onComplete: " + userVisitedEmail);
+
+                                                                    Log.d("TAG", "onComplete antes da pesquisa: " + userVisitedUid);
+
+
+                                                                }
+
+                                                            }
+                                                        }*/
+
+                                                        Bundle args = new Bundle();
+                                                        args.putString("pickedGameName", pickedGameName);
+                                                        /*args.putString("docID",userVisitedUid);
+                                                        args.putString("email",userVisitedEmail);*/
+
+
+                                                        VisitedGameFragment fragment = new VisitedGameFragment();
+                                                        fragment.setArguments(args);
+
+                                                        assert getFragmentManager() != null;
+                                                        getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+                                                 /*   }
+                                                });*/
 
 
                                             }

@@ -212,7 +212,7 @@ public class FeedFragment extends Fragment {
                     public void onPrepared(MediaPlayer mp) {
                         holder.progressBar.setVisibility(View.INVISIBLE);
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 200, 0, 0);
+                        layoutParams.setMargins(0, 140, 0, 0);
                         holder.listVideo.setLayoutParams(layoutParams);
                         holder.listVideo.setBackgroundResource(0);
 

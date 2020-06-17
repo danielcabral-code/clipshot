@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="12dp">
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="12dp">
 
     <RelativeLayout
         android:id="@+id/aboveVideoElements"
@@ -89,6 +90,7 @@
         android:layout_centerInParent="true"
         android:visibility="visible"
         android:background="@color/colorPrimary"
+        android:layout_marginTop="26dp"
         android:layout_below="@+id/aboveVideoElements"/>
 
     <ProgressBar
@@ -103,6 +105,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorWhite"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
         android:layout_below="@+id/videosFrame"/>
 
 </RelativeLayout>
