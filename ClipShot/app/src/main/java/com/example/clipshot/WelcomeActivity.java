@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +42,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -181,7 +183,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         errorUsername.setVisibility(View.INVISIBLE);
 
                         // Map that will fill our database with values
-                        Map<String, String> Userdata = new HashMap<>();
+                        Map<String, Object> Userdata = new HashMap<>();
                         Userdata.put("Username", dataUsername);
                         Userdata.put("Name", dataName);
                         Userdata.put("Bio", dataBio);
@@ -192,6 +194,13 @@ public class WelcomeActivity extends AppCompatActivity {
                         Userdata.put("Nintendo", dataNintendo);
                         Userdata.put("GamifyTitle", dataGamifyTitle);
                         Userdata.put("Email", email);
+                        Userdata.put("Followers","0");
+                        Userdata.put("Following","0");
+                        String[] followersArray = new String[0];
+                        Userdata.put("UsersFollowers", Arrays.asList(followersArray));
+                        String[] followingArray = new String[0];
+                        Userdata.put("UsersFollowing", Arrays.asList(followingArray));
+
 
                          // Call the method to upload image
                         uploadImage(email);

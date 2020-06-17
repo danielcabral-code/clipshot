@@ -37,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -46,6 +47,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -65,14 +67,10 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     ImageView profileImage;
-    private String dataUsername;
-    private String dataName;
-    private String dataBio;
-    private String steamName;
-    private String originName;
-    private String psnName;
-    private String xBoxName;
-    private String nintendoName;
+    private String dataUsername,dataName,dataBio,steamName,originName,psnName,xBoxName,nintendoName,followers,following;
+    String[] followersArray = new String[0];
+    String[] followingArray = new String[0];
+
     AppCompatImageView iconDoneSettings;
     ProgressBar progressBar;
 
@@ -134,6 +132,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                             psnName = documentSnapshot.getString("Psn");
                             xBoxName = documentSnapshot.getString("Xbox");
                             nintendoName = documentSnapshot.getString("Nintendo");
+                            followers=documentSnapshot.getString("Followers");
+                            following=documentSnapshot.getString("Following");
+                            Log.d("TAG", "onSuccess: "+ following + followers);
+
+
 
                             displayName.setText(dataUsername);
                             realName.setText(dataName);
@@ -270,8 +273,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     Log.d("TAG", "User not Exists");
                                     errorUsername.setVisibility(View.INVISIBLE);
 
-                                    // Map that will fill our database with values
-                                    Map<String, String> Userdata = new HashMap<>();
+                                   /* // Map that will fill our database with values
+                                    Map<String, Objects> Userdata = new HashMap<>();
                                     Userdata.put("Username", dataUsername);
                                     Userdata.put("Name", dataName);
                                     Userdata.put("Bio", dataBio);
@@ -282,12 +285,30 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     Userdata.put("Nintendo", dataNintendo);
                                     Userdata.put("GamifyTitle", dataGamifyTitle);
                                     Userdata.put("Email", email);
+                                    Userdata.put("Followers", followers);
+                                    Userdata.put("Following", following);*/
 
+                                    db.collection("users").document(userUid).update("Username", dataUsername);
+                                    db.collection("users").document(userUid).update("Name", dataName);
+                                    db.collection("users").document(userUid).update("Bio", dataBio);
+                                    db.collection("users").document(userUid).update("Steam", dataSteam);
+                                    db.collection("users").document(userUid).update("Origin", dataOrigin);
+                                    db.collection("users").document(userUid).update("Psn", dataPsn);
+                                    db.collection("users").document(userUid).update("Xbox", dataXbox);
+                                    db.collection("users").document(userUid).update("Nintendo", dataNintendo);
+                                    db.collection("users").document(userUid).update("GamifyTitle", dataGamifyTitle);
+                                    db.collection("users").document(userUid).update("Email", email);
+                                    db.collection("users").document(userUid).update("Followers", followers);
+                                    db.collection("users").document(userUid).update("Following", following);
 
                                     // Call the method to upload image
                                     uploadImage(email);
 
-                                    // On success data is inserted in database and user go to MainActivity
+                                    ((MainActivity) (getActivity())).goToProfile(view);
+
+                                    //((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+
+                                    /*// On success data is inserted in database and user go to MainActivity
                                     db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
@@ -300,7 +321,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                                 }
                                             }, 5000);
                                         }
-                                    });
+                                    });*/
 
                                 }
                             }
@@ -322,7 +343,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { Log.d("TAG", "onTextChanged: mudou");
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(dataUsername)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
