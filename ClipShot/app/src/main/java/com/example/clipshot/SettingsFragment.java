@@ -46,6 +46,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,9 +258,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d("TAG", String.valueOf(usernameChanged));
+                        Log.d("TAG", String.valueOf(task.getResult().size()));
+
                         if (task.isSuccessful()) {
+
                             for (DocumentSnapshot documentSnapshot : task.getResult()) {
                                 String user = documentSnapshot.getString("Username");
+
+
 
                                 if (user.equals(dataUsername) && usernameChanged == 1) {
                                     Log.d("TAG", "User Exists");
@@ -267,26 +274,13 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     errorUsername.setVisibility(View.VISIBLE);
 
                                 }
-                                else {
 
-
+                                if (user.equals(dataUsername) && usernameChanged == 0) {
                                     Log.d("TAG", "User not Exists");
                                     errorUsername.setVisibility(View.INVISIBLE);
 
-                                   /* // Map that will fill our database with values
-                                    Map<String, Objects> Userdata = new HashMap<>();
-                                    Userdata.put("Username", dataUsername);
-                                    Userdata.put("Name", dataName);
-                                    Userdata.put("Bio", dataBio);
-                                    Userdata.put("Steam", dataSteam);
-                                    Userdata.put("Origin", dataOrigin);
-                                    Userdata.put("Psn", dataPsn);
-                                    Userdata.put("Xbox", dataXbox);
-                                    Userdata.put("Nintendo", dataNintendo);
-                                    Userdata.put("GamifyTitle", dataGamifyTitle);
-                                    Userdata.put("Email", email);
-                                    Userdata.put("Followers", followers);
-                                    Userdata.put("Following", following);*/
+
+
 
                                     db.collection("users").document(userUid).update("Username", dataUsername);
                                     db.collection("users").document(userUid).update("Name", dataName);
@@ -304,26 +298,60 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     // Call the method to upload image
                                     uploadImage(email);
 
-                                    ((MainActivity) (getActivity())).goToProfile(view);
-
-                                    //((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
-
-                                    /*// On success data is inserted in database and user go to MainActivity
-                                    db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    new Handler().postDelayed(new Runnable() {
                                         @Override
-                                        public void onSuccess(Void aVoid) {
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
+                                        public void run() {
 
-                                                    ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+                                            ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
 
-                                                }
-                                            }, 5000);
                                         }
-                                    });*/
+                                    }, 5000);
+
+                                    Log.d("TAG", "onComplete: chegou aqui");
+
 
                                 }
+
+                            }
+
+                            if (task.getResult().size() == 0) {
+
+
+                                    Log.d("TAG", "User not Exists");
+                                    errorUsername.setVisibility(View.INVISIBLE);
+
+
+
+
+                                    db.collection("users").document(userUid).update("Username", dataUsername);
+                                    db.collection("users").document(userUid).update("Name", dataName);
+                                    db.collection("users").document(userUid).update("Bio", dataBio);
+                                    db.collection("users").document(userUid).update("Steam", dataSteam);
+                                    db.collection("users").document(userUid).update("Origin", dataOrigin);
+                                    db.collection("users").document(userUid).update("Psn", dataPsn);
+                                    db.collection("users").document(userUid).update("Xbox", dataXbox);
+                                    db.collection("users").document(userUid).update("Nintendo", dataNintendo);
+                                    db.collection("users").document(userUid).update("GamifyTitle", dataGamifyTitle);
+                                    db.collection("users").document(userUid).update("Email", email);
+                                    db.collection("users").document(userUid).update("Followers", followers);
+                                    db.collection("users").document(userUid).update("Following", following);
+
+                                    // Call the method to upload image
+                                    uploadImage(email);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                        ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
+
+                                    }
+                                }, 5000);
+
+
+                                Log.d("TAG", "onComplete: chegou aqui");
+
+
                             }
                         }
 

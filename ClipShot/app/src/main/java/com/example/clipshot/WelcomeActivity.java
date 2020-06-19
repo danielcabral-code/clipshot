@@ -176,44 +176,46 @@ public class WelcomeActivity extends AppCompatActivity {
 
                            }
                        }
+
+                       if (task.getResult().size() == 0) {
+                           Log.d("TAG", "User not Exists");
+                           errorUsername.setVisibility(View.INVISIBLE);
+
+                           // Map that will fill our database with values
+                           Map<String, Object> Userdata = new HashMap<>();
+                           Userdata.put("Username", dataUsername);
+                           Userdata.put("Name", dataName);
+                           Userdata.put("Bio", dataBio);
+                           Userdata.put("Steam", dataSteam);
+                           Userdata.put("Origin", dataOrigin);
+                           Userdata.put("Psn", dataPsn);
+                           Userdata.put("Xbox", dataXbox);
+                           Userdata.put("Nintendo", dataNintendo);
+                           Userdata.put("GamifyTitle", dataGamifyTitle);
+                           Userdata.put("Email", email);
+                           Userdata.put("Followers","0");
+                           Userdata.put("Following","0");
+                           String[] followersArray = new String[0];
+                           Userdata.put("UsersFollowers", Arrays.asList(followersArray));
+                           String[] followingArray = new String[0];
+                           Userdata.put("UsersFollowing", Arrays.asList(followingArray));
+
+
+                           // Call the method to upload image
+                           uploadImage(email);
+
+                           //On success data is inserted in database and user go to MainActivity
+                           db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
+                               @Override
+                               public void onSuccess(Void aVoid) {
+                                   Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
+                                   startActivity(goToFeed);
+                               }
+                           });
+                       }
                    }
 
-                    if (task.getResult().size() == 0) {
-                        Log.d("TAG", "User not Exists");
-                        errorUsername.setVisibility(View.INVISIBLE);
 
-                        // Map that will fill our database with values
-                        Map<String, Object> Userdata = new HashMap<>();
-                        Userdata.put("Username", dataUsername);
-                        Userdata.put("Name", dataName);
-                        Userdata.put("Bio", dataBio);
-                        Userdata.put("Steam", dataSteam);
-                        Userdata.put("Origin", dataOrigin);
-                        Userdata.put("Psn", dataPsn);
-                        Userdata.put("Xbox", dataXbox);
-                        Userdata.put("Nintendo", dataNintendo);
-                        Userdata.put("GamifyTitle", dataGamifyTitle);
-                        Userdata.put("Email", email);
-                        Userdata.put("Followers","0");
-                        Userdata.put("Following","0");
-                        String[] followersArray = new String[0];
-                        Userdata.put("UsersFollowers", Arrays.asList(followersArray));
-                        String[] followingArray = new String[0];
-                        Userdata.put("UsersFollowing", Arrays.asList(followingArray));
-
-
-                         // Call the method to upload image
-                        uploadImage(email);
-
-                        //On success data is inserted in database and user go to MainActivity
-                        db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
-                                startActivity(goToFeed);
-                            }
-                        });
-                    }
                  }
                 });
 
