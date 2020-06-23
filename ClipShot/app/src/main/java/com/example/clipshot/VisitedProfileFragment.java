@@ -398,10 +398,10 @@ public class VisitedProfileFragment extends Fragment {
                             }
                             numberOfVideos.setText(String.valueOf(count));
 
-                           /* TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
+                            TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
                             if (count == 0) {
-                                noVideosMessage.setText("You haven't shared any Clips yet...");
-                            }*/
+                                noVideosMessage.setText("This user hasn't shared any Clips yet...");
+                            }
 
                         } else {
 

@@ -26,7 +26,9 @@ import android.widget.ListView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -44,8 +46,11 @@ import static androidx.core.content.ContextCompat.getSystemService;
 
 public class SearchFragment extends Fragment {
 
+    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private AppCompatImageView iconSearch;
     private int SEARCHBAR_VISIBILITY = 0;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    String currentUsername;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -93,6 +98,30 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        // Document reference of user data that will read user data
+        DocumentReference documentReference = db.collection("users").document(userUid);
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+
+                        Map<String, Object> findCurrentUsername = document.getData();
+
+                        currentUsername = (String) findCurrentUsername.get("Username");
+
+                        Log.d("checkItem", currentUsername);
+                    } else {
+                        Log.d("checkItem", "No such document");
+                    }
+                } else {
+                    Log.d("checkItem", "get failed with ", task.getException());
+                }
+            }
+        });
+
         searchQuery.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -104,8 +133,6 @@ public class SearchFragment extends Fragment {
                 /*Uri imageUri;
                 FirebaseStorage imageStorage;
                 StorageReference storageReference;*/
-
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                 ArrayList<String> usernames = new ArrayList<>();
                 ArrayList<String> gameNames = new ArrayList<>();
@@ -120,9 +147,17 @@ public class SearchFragment extends Fragment {
 
                                     if (Objects.requireNonNull(findUsernames.get("Username")).toString().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
 
-                                        usernames.add((String) findUsernames.get("Username"));
-                                        Log.d("checkTAG", String.valueOf(usernames));
+                                        if (usernames.size() < 10) {
+                                            usernames.add((String) findUsernames.get("Username"));
+                                        } else {
+                                            break;
+                                        }
 
+                                        if (currentUsername.contains(s.toString().toLowerCase())) {
+                                            usernames.remove(currentUsername);
+                                        }
+
+                                        Log.d("checkTAG", String.valueOf(usernames));
 
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
@@ -134,7 +169,6 @@ public class SearchFragment extends Fragment {
                                             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 
                                                 String pickedProfile = lvData.getItemAtPosition(position).toString();
-
 
                                                 CollectionReference usersRef = db.collection("users");
                                                 Query queryUser = usersRef.whereEqualTo("Username", pickedProfile);
@@ -199,11 +233,15 @@ public class SearchFragment extends Fragment {
 
                                     Map<String, Object> findGameNames = document.getData();
 
-                                    if (Objects.requireNonNull(findGameNames.get("GameName")).toString().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
+                                    if (Objects.requireNonNull(findGameNames.get("GameName")).toString().contains(s.toString()) && s.toString().length() > 0) {
 
-                                        gameNames.add((String) findGameNames.get("GameName"));
-                                        Log.d("checkTAG", String.valueOf(gameNames));
+                                        if (gameNames.size() < 1) {
 
+                                            gameNames.add((String) findGameNames.get("GameName"));
+                                            Log.d("checkTAG", String.valueOf(gameNames));
+                                        } else {
+                                            break;
+                                        }
 
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
