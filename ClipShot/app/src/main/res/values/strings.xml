@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">ClipShot</string>
     <string name="clipshot">ClipShot</string>
-    <string name="welcome">Welcome</string>
+    <string name="welcome">Welcome!</string>
     <string name="testprofilename">testProfileName</string>
     <string name="username">Username</string>
     <string name="real_name">Real Name</string>
@@ -29,7 +29,7 @@
     <string name="select_game_name">Select game name</string>
     <string name="games">Games</string>
     <string name="testFeedString">hello</string>
-    <string name="username_already_exists_choose_another">Username already exists, choose another!</string>
+    <string name="username_already_exists_choose_another">Username already exists, try again!</string>
     <string name="uploading_video">Uploading video</string>
     <string name="likeicon">likeIcon</string>
     <string name="follow">Follow</string>

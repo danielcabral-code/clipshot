@@ -1,5 +1,7 @@
 package com.example.clipshot;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,10 +36,18 @@ public class LoginActivity extends AppCompatActivity implements
     GoogleSignInClient mGoogleSignInClient;
     ProgressBar progressBar;
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Call Login TopBar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.login_action_bar_layout);
+
+        // Set Elevation to TopBar
+        getSupportActionBar().setElevation(20f); // Float == px
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         mAuth=FirebaseAuth.getInstance();
@@ -64,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    // SignIn function that will open dialog to choose account
+    // Sign In function that will open dialog to choose account
     private void signIn() {
         progressBar.setVisibility(View.VISIBLE);
         signOut();

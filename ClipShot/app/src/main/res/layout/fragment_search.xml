@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".SearchFragment">
 
+    <!-- SearchBar Container -->
         <RelativeLayout
             android:id="@+id/searchBarContainer"
             android:layout_width="match_parent"
@@ -13,6 +14,7 @@
             android:elevation="4dp"
             android:background="@color/colorPrimary">
 
+            <!-- SearchBar -->
             <EditText
                 android:id="@+id/searchQuery"
                 android:layout_width="match_parent"
@@ -33,18 +35,22 @@
 
         </RelativeLayout>
 
+    <!-- Search Results -->
         <RelativeLayout
             android:id="@+id/searchResults"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="70dp">
 
+            <!-- Profile Search Results -->
+
+            <!-- Game Search Results -->
             <ListView
                 android:id="@+id/lvData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:divider="@null"
-                android:dividerHeight="0dp"/>
+                android:dividerHeight="0dp" />
 
             <ListView
                 android:id="@+id/lvDataGames"

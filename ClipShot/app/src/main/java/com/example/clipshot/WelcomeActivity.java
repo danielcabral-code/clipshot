@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,12 +53,12 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE =1;
 
+    // Declaring Variables
     Uri imageUri;
     ImageView img;
     FirebaseStorage imageStorage;
     StorageReference storageReference;
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    CollectionReference usersRef;
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
     @SuppressLint("WrongConstant")
     @Override
@@ -84,6 +85,24 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText nintendoInput = findViewById(R.id.switchInput);
         TextView errorUsername = findViewById(R.id.labelErrorUsername);
 
+        // Only allows user to input 3 lines into bio
+        bio.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                // limit to 3 lines
+                if (bio.getLayout().getLineCount() > 3)
+                    bio.getText().delete(bio.getText().length() - 1, bio.getText().length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         // Automatically fill avatar with Google Account Image and real name
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
@@ -91,10 +110,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
             String personName = acct.getDisplayName();
 
-            Uri personPhoto = acct.getPhotoUrl();
-
             name.setText(personName);
-
         }
 
         Glide.with(this).load(R.drawable.default_avatar).into(img);
@@ -122,106 +138,91 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         // Listener to call method to pick an image from gallery
-        img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                pickImageFromGallery();
-            }
-        });
+        img.setOnClickListener(v -> pickImageFromGallery());
 
         // Listener that inserts data into database and changes to the Main Activity
-        iconDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        iconDone.setOnClickListener(v -> {
 
-                // Declaring variables
-                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
-                FirebaseFirestore db;
+            // Declaring variables
+            String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
+            FirebaseFirestore db;
 
 
-                // Gets the user google email that will create a collection with that email
-                email = acct.getEmail().toString();
+            // Gets the user google email that will create a collection with that email
+            assert acct != null;
+            email = acct.getEmail();
 
-                // Firestore instance
-                db = FirebaseFirestore.getInstance();
-                imageStorage = FirebaseStorage.getInstance();
-                storageReference = imageStorage.getReference();
+            // Firestore instance
+            db = FirebaseFirestore.getInstance();
+            imageStorage = FirebaseStorage.getInstance();
+            storageReference = imageStorage.getReference();
 
-                // Declaring variables that will be inserted in Firestore
-                dataUsername = username.getText().toString().toLowerCase();
-                dataName = name.getText().toString();
-                dataBio = bio.getText().toString();
-                dataSteam = steamInput.getText().toString();
-                dataOrigin = originInput.getText().toString();
-                dataPsn =psnInput.getText().toString();
-                dataXbox = xboxInput.getText().toString();
-                dataNintendo = nintendoInput.getText().toString();
-                dataGamifyTitle = "Expert";
+            // Declaring variables that will be inserted in Firestore
+            dataUsername = username.getText().toString().toLowerCase();
+            dataName = name.getText().toString();
+            dataBio = bio.getText().toString();
+            dataSteam = steamInput.getText().toString();
+            dataOrigin = originInput.getText().toString();
+            dataPsn =psnInput.getText().toString();
+            dataXbox = xboxInput.getText().toString();
+            dataNintendo = nintendoInput.getText().toString();
+            dataGamifyTitle = "Expert";
 
+            CollectionReference usersRef = db.collection("users");
+            Query query = usersRef.whereEqualTo("Username", dataUsername);
+            query.get().addOnCompleteListener(task -> {
+              if (task.isSuccessful()) {
+                  for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
+                      String user = documentSnapshot.getString("Username");
 
-                CollectionReference usersRef = db.collection("users");
-                Query query = usersRef.whereEqualTo("Username", dataUsername);
-                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                 @Override
-                  public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                   if (task.isSuccessful()) {
-                       for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                           String user = documentSnapshot.getString("Username");
+                      assert user != null;
+                      if (user.equals(dataUsername)) {
+                          Log.d("TAG", "User Exists");
 
-                           if (user.equals(dataUsername)) {
-                               Log.d("TAG", "User Exists");
+                          errorUsername.setVisibility(View.VISIBLE);
 
-                               errorUsername.setVisibility(View.VISIBLE);
+                          TextView labelRealName = findViewById(R.id.labelRealName);
 
-                           }
-                       }
+                          RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) labelRealName.getLayoutParams();
+                          lp.setMargins(130,90,0,0);
+                          labelRealName.setLayoutParams(lp);
+                      }
+                  }
 
-                       if (task.getResult().size() == 0) {
-                           Log.d("TAG", "User not Exists");
-                           errorUsername.setVisibility(View.INVISIBLE);
+                  if (task.getResult().size() == 0) {
+                      Log.d("TAG", "User not Exists");
+                      errorUsername.setVisibility(View.INVISIBLE);
 
-                           // Map that will fill our database with values
-                           Map<String, Object> Userdata = new HashMap<>();
-                           Userdata.put("Username", dataUsername);
-                           Userdata.put("Name", dataName);
-                           Userdata.put("Bio", dataBio);
-                           Userdata.put("Steam", dataSteam);
-                           Userdata.put("Origin", dataOrigin);
-                           Userdata.put("Psn", dataPsn);
-                           Userdata.put("Xbox", dataXbox);
-                           Userdata.put("Nintendo", dataNintendo);
-                           Userdata.put("GamifyTitle", dataGamifyTitle);
-                           Userdata.put("Email", email);
-                           Userdata.put("Followers","0");
-                           Userdata.put("Following","0");
-                           String[] followersArray = new String[0];
-                           Userdata.put("UsersFollowers", Arrays.asList(followersArray));
-                           String[] followingArray = new String[0];
-                           Userdata.put("UsersFollowing", Arrays.asList(followingArray));
+                      // Map that will fill our database with values
+                      Map<String, Object> Userdata = new HashMap<>();
+                      Userdata.put("Username", dataUsername);
+                      Userdata.put("Name", dataName);
+                      Userdata.put("Bio", dataBio);
+                      Userdata.put("Steam", dataSteam);
+                      Userdata.put("Origin", dataOrigin);
+                      Userdata.put("Psn", dataPsn);
+                      Userdata.put("Xbox", dataXbox);
+                      Userdata.put("Nintendo", dataNintendo);
+                      Userdata.put("GamifyTitle", dataGamifyTitle);
+                      Userdata.put("Email", email);
+                      Userdata.put("Followers","0");
+                      Userdata.put("Following","0");
+                      String[] followersArray = new String[0];
+                      Userdata.put("UsersFollowers", Arrays.asList(followersArray));
+                      String[] followingArray = new String[0];
+                      Userdata.put("UsersFollowing", Arrays.asList(followingArray));
 
+                      // Call the method to upload image
+                      uploadImage(email);
 
-                           // Call the method to upload image
-                           uploadImage(email);
-
-                           //On success data is inserted in database and user go to MainActivity
-                           db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(new OnSuccessListener<Void>() {
-                               @Override
-                               public void onSuccess(Void aVoid) {
-                                   Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
-                                   startActivity(goToFeed);
-                               }
-                           });
-                       }
-                   }
-
-
-                 }
-                });
-
-
-
-            }
+                      // On success data is inserted in database and user go to MainActivity
+                      db.collection("users").document(userUid).set(Userdata).addOnSuccessListener(aVoid -> {
+                          Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
+                          startActivity(goToFeed);
+                      });
+                  }
+              }
+            });
         });
     }
 
@@ -258,10 +259,7 @@ public class WelcomeActivity extends AppCompatActivity {
         if (imageUri != null){
             StorageReference ref = storageReference.child(email+"/" + userUid);
             ref.putFile(imageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        }
+                    .addOnSuccessListener(taskSnapshot -> {
                     });
         }
     }

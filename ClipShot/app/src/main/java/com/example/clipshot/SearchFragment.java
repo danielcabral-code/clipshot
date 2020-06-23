@@ -46,9 +46,8 @@ import static androidx.core.content.ContextCompat.getSystemService;
 
 public class SearchFragment extends Fragment {
 
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    private AppCompatImageView iconSearch;
-    private int SEARCHBAR_VISIBILITY = 0;
+    // Declaring Variables
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     String currentUsername;
 
@@ -77,6 +76,7 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Call text focus and keyboard for smooth transtion from feed fragment
         EditText searchQuery = Objects.requireNonNull(getActivity()).findViewById(R.id.searchQuery);
         searchQuery.requestFocus();
 
@@ -84,8 +84,9 @@ public class SearchFragment extends Fragment {
         assert imm != null;
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-        iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
+        AppCompatImageView iconSearch = Objects.requireNonNull(getActivity()).findViewById(R.id.iconSearch);
 
+        int SEARCHBAR_VISIBILITY = 0;
         Log.d("checkClick", String.valueOf(SEARCHBAR_VISIBILITY));
 
         iconSearch.setOnClickListener(new View.OnClickListener() {
@@ -101,24 +102,21 @@ public class SearchFragment extends Fragment {
         // Document reference of user data that will read user data
         DocumentReference documentReference = db.collection("users").document(userUid);
 
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
+        documentReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
 
-                        Map<String, Object> findCurrentUsername = document.getData();
+                    Map<String, Object> findCurrentUsername = document.getData();
 
-                        currentUsername = (String) findCurrentUsername.get("Username");
+                    currentUsername = (String) findCurrentUsername.get("Username");
 
-                        Log.d("checkItem", currentUsername);
-                    } else {
-                        Log.d("checkItem", "No such document");
-                    }
+                    Log.d("checkItem", currentUsername);
                 } else {
-                    Log.d("checkItem", "get failed with ", task.getException());
+                    Log.d("checkItem", "No such document");
                 }
+            } else {
+                Log.d("checkItem", "get failed with ", task.getException());
             }
         });
 
@@ -242,6 +240,8 @@ public class SearchFragment extends Fragment {
                                         } else {
                                             break;
                                         }
+
+
 
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);

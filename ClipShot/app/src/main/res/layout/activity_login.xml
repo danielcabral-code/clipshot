@@ -5,18 +5,31 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
 
+    <!-- ClipShot App LogoV2 -->
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/clipshotLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="260dp"
+        android:src="@drawable/clipshoticonv2"
+        android:layout_marginTop="50dp"/>
+
+    <!-- Sign In Button -->
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/clipshotLogo"
+        android:layout_marginTop="70dp"/>
+
+    <!-- Google Loading Progress Bar -->
     <ProgressBar
         android:id="@+id/progress_circular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:visibility="invisible"
-        android:layout_marginTop="20dp"/>
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"/>
 
 </RelativeLayout>
