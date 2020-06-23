@@ -292,6 +292,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     db.collection("users").document(userUid).update("Nintendo", dataNintendo);
                                     db.collection("users").document(userUid).update("GamifyTitle", dataGamifyTitle);
                                     db.collection("users").document(userUid).update("Email", email);
+                                    db.collection("users").document(userUid).update("UserUID", userUid);
                                     db.collection("users").document(userUid).update("Followers", followers);
                                     db.collection("users").document(userUid).update("Following", following);
 

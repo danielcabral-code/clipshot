@@ -46,7 +46,7 @@ import java.util.Objects;
 public class VisitedGameFragment extends Fragment {
 
     private String pickedGameName;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
     StorageReference storageReference;
     private FirestorePagingAdapter adapter;
     private DocumentReference documentReference;
@@ -84,10 +84,14 @@ public class VisitedGameFragment extends Fragment {
         assert pickedGameName != null;
         Log.d("checkItem", pickedGameName);
 
+
         View returnView = inflater.inflate(R.layout.fragment_visited_game, container, false);
         RecyclerView VisitedGameVideos = returnView.findViewById(R.id.recyclerView);
 
-        Query query = db.collection("videos").whereEqualTo("GameName", pickedGameName).orderBy("ReleasedTime", Query.Direction.DESCENDING);
+
+        db = FirebaseFirestore.getInstance();
+
+        Query query = db.collection("videos").whereEqualTo("GameName",pickedGameName);
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
@@ -229,7 +233,7 @@ public class VisitedGameFragment extends Fragment {
         VisitedGameVideos.setAdapter(adapter);
         VisitedGameVideos.setNestedScrollingEnabled(false);
 
-        // Inflate the layout for this fragment
+
         return returnView;
     }
 

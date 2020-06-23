@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="12dp"
+    android:layout_marginBottom="12dp">
+
+    <RelativeLayout
+        android:id="@+id/aboveVideoElements"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp">
+
+        <!-- Placeholder for profile image -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/imageCard"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
+            app:cardCornerRadius="50dp"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/userImage"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/userimage"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <RelativeLayout
+            android:id="@+id/followerNameContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_toEndOf="@id/imageCard"
+            android:layout_marginStart="10dp"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp"
+                android:fontFamily="@font/open_sans"
+                android:layout_marginBottom="1dp"/>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/removeUser"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/username"
+                android:text="@string/remove"
+                android:textSize="15sp"
+                app:strokeColor="@color/colorWhite"
+                android:backgroundTint="@color/colorPrimary"
+                app:strokeWidth="20dp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>
