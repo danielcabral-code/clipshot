@@ -290,6 +290,7 @@ public class VisitedProfileFragment extends Fragment {
         TextView userName = getActivity().findViewById(R.id.appBarTitle);
         Button btnFollow = getActivity().findViewById(R.id.containedButton);
         TextView followerNumber = getActivity().findViewById(R.id.followerNumber);
+        TextView followingNumber =  getActivity().findViewById(R.id.followingNumber);
 
 
 
@@ -326,6 +327,7 @@ public class VisitedProfileFragment extends Fragment {
                     db.collection("users").document(docID).update("Followers", followerNumber.getText());
                     db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayRemove(userUid));
 
+
                     //Setting the visited user username in all videos that he got
                     documentReference = db.collection("users").document(userUid);
                     documentReference.get()
@@ -336,12 +338,12 @@ public class VisitedProfileFragment extends Fragment {
                                         String userFollowing = documentSnapshot.getString("Following");
                                         int addFollowing = Integer.parseInt(userFollowing) -1;
                                         db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
-
+                                        db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(docID));
                                     }
                                 }
                             });
 
-                    db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(userVisitedUid));
+
                 } else {
 
                     String followingCount = (String) followerNumber.getText();
@@ -434,11 +436,17 @@ public class VisitedProfileFragment extends Fragment {
                             String dataPsn = (String) Userdata.get("Psn");
                             String dataXbox = (String) Userdata.get("Xbox");
                             String dataNintendo = (String) Userdata.get("Nintendo");
+                            String dataFollower = (String) Userdata.get("Followers");
+                            String dataFollowing = (String) Userdata.get("Following");
+
+
 
                             realName.setText(dataName);
                             bio.setText(dataBio);
                             title.setText(gamifyTitle);
                             userName.setText(dataUsername);
+                            followerNumber.setText(dataFollower);
+                            followingNumber.setText(dataFollowing);
 
                             // If user has some nickname in some platform the opacity of that platform will be 1
                             assert dataSteam != null;

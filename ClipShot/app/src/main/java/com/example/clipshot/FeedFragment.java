@@ -90,8 +90,10 @@ public class FeedFragment extends Fragment {
         RecyclerView feedVideos = returnView.findViewById(R.id.recyclerView);
 
         db = FirebaseFirestore.getInstance();
+        Log.d("TAG", userUid);
 
         Query query = db.collection("videos").orderBy("ReleasedTime", Query.Direction.DESCENDING);
+
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
@@ -238,7 +240,6 @@ public class FeedFragment extends Fragment {
             }
         };
 
-        // profileVideos.setHasFixedSize(true);
         feedVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         feedVideos.setAdapter(adapter);
         feedVideos.setNestedScrollingEnabled(false);

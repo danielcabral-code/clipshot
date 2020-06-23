@@ -193,6 +193,7 @@ public class WelcomeActivity extends AppCompatActivity {
                            Userdata.put("Nintendo", dataNintendo);
                            Userdata.put("GamifyTitle", dataGamifyTitle);
                            Userdata.put("Email", email);
+                           Userdata.put("UserUID",userUid);
                            Userdata.put("Followers","0");
                            Userdata.put("Following","0");
                            String[] followersArray = new String[0];

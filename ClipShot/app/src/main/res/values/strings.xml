@@ -33,5 +33,7 @@
     <string name="uploading_video">Uploading video</string>
     <string name="likeicon">likeIcon</string>
     <string name="follow">Follow</string>
+    <string name="remove">Remove</string>
+    <string name="unfollow">Unfollow</string>
 
 </resources>
