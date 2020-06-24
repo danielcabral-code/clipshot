@@ -250,7 +250,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     dataPsn = psnInput.getText().toString();
                     dataXbox = xboxInput.getText().toString();
                     dataNintendo = nintendoInput.getText().toString();
-                    dataGamifyTitle = "Expert";
+                    dataGamifyTitle = "Begginner";
 
 
                     CollectionReference usersRef = db.collection("users");

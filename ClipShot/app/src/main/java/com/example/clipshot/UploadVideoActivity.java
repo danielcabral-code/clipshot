@@ -310,7 +310,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                                                 Log.d("TAG", "array: "+ Arrays.asList(arrayFollowers[0]).toString());
                                                 //db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
                                             }
-                                            
+
                                             Log.d("TAG", "array fora do query: " + Arrays.asList(arrayFollowers[0]).toString());
                                             Date date = new Date();
                                             // Map that will fill our database with values
