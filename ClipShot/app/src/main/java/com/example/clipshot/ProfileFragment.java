@@ -54,7 +54,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private DocumentReference documentReference;
 
-    int count;
+    int countTotalVideos;
 
 
     public ProfileFragment() {
@@ -117,19 +117,19 @@ public class ProfileFragment extends Fragment {
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
 
-                            count = 0;
+                            countTotalVideos = 0;
                             for (DocumentSnapshot document : task.getResult()) {
 
-                                count++;
-                                Log.d("TAG", "onComplete: " + count);
+                                countTotalVideos++;
+                                Log.d("TAG", "onComplete: " + countTotalVideos);
                                 Log.d("TAG", "onComplete: "+ task.getResult().toString());
 
 
                             }
-                            numberOfVideos.setText(String.valueOf(count));
+                            numberOfVideos.setText(String.valueOf(countTotalVideos));
 
                             TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
-                            if (count == 0) {
+                            if (countTotalVideos == 0) {
                                 noVideosMessage.setText("You haven't shared any Clips yet...");
                             }
 
@@ -144,6 +144,63 @@ public class ProfileFragment extends Fragment {
                 });
 
 
+
+        Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID",userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                int countTotalLikes =0;
+
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Log.d("TAG", document.getId() + " => " + document.getData());
+
+
+                    countTotalLikes = countTotalLikes + Integer.parseInt(document.getString("Likes"));
+
+                    //db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                }
+                Log.d("TAG", "Likes: " + countTotalLikes+ " " +  countTotalVideos);
+
+                if (countTotalLikes>0   && countTotalVideos>0 && countTotalVideos<10){
+                    Log.d("TAG", "begginer: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Begginer");
+                    
+                }
+                else if (countTotalLikes>99  && countTotalVideos>10 && countTotalVideos<24){
+                    Log.d("TAG", "Rookie: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Rookie");
+                }
+                else if (countTotalLikes>250 && countTotalVideos>24 && countTotalVideos<50){
+                    Log.d("TAG", "Intermediate: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Intermediate");
+                }
+                else if (countTotalLikes>500 && countTotalVideos>49 && countTotalVideos<100){
+                    Log.d("TAG", "Trained: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Trained");
+                }
+                else if (countTotalLikes>1000 && countTotalVideos>99 && countTotalVideos<150){
+                    Log.d("TAG", "Gamer: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Gamer");
+                }
+                else if (countTotalLikes>2000 && countTotalVideos>149 && countTotalVideos<200){
+                    Log.d("TAG", "Expert: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Expert");
+                }
+                else if (countTotalLikes>3000 && countTotalVideos>199 && countTotalVideos<300){
+                    Log.d("TAG", "Veteran: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Veteran");
+                }
+                else if (countTotalLikes>5000 && countTotalVideos>299 && countTotalVideos<400){
+                    Log.d("TAG", "Legend: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Legend");
+                }
+                else if (countTotalLikes>8000 && countTotalVideos>400){
+                    Log.d("TAG", "Clip Master: ");
+                    db.collection("users").document(userUid).update("GamifyTitle","Clip Master");
+                }
+
+
+            }
+        });
 
         // Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
@@ -477,6 +534,7 @@ public class ProfileFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
+
 
 
 }

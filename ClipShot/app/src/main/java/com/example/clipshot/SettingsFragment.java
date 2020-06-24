@@ -251,7 +251,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 dataPsn = psnInput.getText().toString();
                 dataXbox = xboxInput.getText().toString();
                 dataNintendo = switchInput.getText().toString();
-                dataGamifyTitle = "Expert";
+
 
                 CollectionReference usersRef = db.collection("users");
                 Query query = usersRef.whereEqualTo("Username", dataUsername);
@@ -290,7 +290,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     db.collection("users").document(userUid).update("Psn", dataPsn);
                                     db.collection("users").document(userUid).update("Xbox", dataXbox);
                                     db.collection("users").document(userUid).update("Nintendo", dataNintendo);
-                                    db.collection("users").document(userUid).update("GamifyTitle", dataGamifyTitle);
                                     db.collection("users").document(userUid).update("Email", email);
                                     db.collection("users").document(userUid).update("UserUID", userUid);
                                     db.collection("users").document(userUid).update("Followers", followers);
@@ -332,7 +331,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                                     db.collection("users").document(userUid).update("Psn", dataPsn);
                                     db.collection("users").document(userUid).update("Xbox", dataXbox);
                                     db.collection("users").document(userUid).update("Nintendo", dataNintendo);
-                                    db.collection("users").document(userUid).update("GamifyTitle", dataGamifyTitle);
+
                                     db.collection("users").document(userUid).update("Email", email);
                                     db.collection("users").document(userUid).update("Followers", followers);
                                     db.collection("users").document(userUid).update("Following", following);

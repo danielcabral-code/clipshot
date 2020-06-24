@@ -1,5 +1,6 @@
 package com.example.clipshot;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -31,9 +32,14 @@ import android.widget.VideoView;
 import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -288,25 +294,49 @@ public class UploadVideoActivity extends AppCompatActivity {
                             storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
+                                    final String[][] arrayFollowers = {new String[0]};
+                                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                                    Date date = new Date();
-                                    // Map that will fill our database with values
-                                    Map<String, Object> Userdata = new HashMap<>();
-                                    Userdata.put("GameName", game);
-                                    Userdata.put("Description", videoDescription);
-                                    Userdata.put("UserID", userUid);
-                                    Userdata.put("Url", uri.toString());
-                                    Userdata.put("Likes","0");
-                                    String[] array = new String[0];
-                                    Userdata.put("UsersThatLiked", Arrays.asList(array));
-                                    Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
-                                    Userdata.put("DocumentName",randomUUID);
-                                    Userdata.put ("Email", email);
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                Log.d("TAG", document.getId() + " => " + document.getData());
+                                                List<String> group = (List<String>) document.get("UsersFollowers");
+
+                                                Log.d("TAG", document.getId() + " => " + group);
+
+                                                arrayFollowers[0] = group.toArray(new String[0]);
+
+                                                Log.d("TAG", "array: "+ Arrays.asList(arrayFollowers[0]).toString());
+                                                //db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                                            }
+
+                                            Log.d("TAG", "array fora do query: " + Arrays.asList(arrayFollowers[0]).toString());
+                                            Date date = new Date();
+                                            // Map that will fill our database with values
+                                            Map<String, Object> Userdata = new HashMap<>();
+                                            Userdata.put("GameName", game);
+                                            Userdata.put("Description", videoDescription);
+                                            Userdata.put("UserID", userUid);
+                                            Userdata.put("Url", uri.toString());
+                                            Userdata.put("Likes","0");
+                                            String[] arrayLikes = new String[0];
+                                            Userdata.put("UsersThatLiked", Arrays.asList(arrayLikes));
+                                            Userdata.put("UsersFollowers", Arrays.asList(arrayFollowers[0]));
+                                            Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
+                                            Userdata.put("DocumentName",randomUUID);
+                                            Userdata.put ("Email", email);
 
 
-                                    db.collection("videos").document(randomUUID).set(Userdata);
-                                    Intent goToFeed = new Intent(UploadVideoActivity.this, MainActivity.class);
-                                    startActivity(goToFeed);
+                                            db.collection("videos").document(randomUUID).set(Userdata);
+                                            Intent goToFeed = new Intent(UploadVideoActivity.this, MainActivity.class);
+                                            startActivity(goToFeed);
+                                        }
+                                    });
+
+
+
+
 
                                 }
                             });
