@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -135,6 +136,8 @@ public class SearchFragment extends Fragment {
                 ArrayList<String> usernames = new ArrayList<>();
                 ArrayList<String> gameNames = new ArrayList<>();
 
+                View lineSeparator = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLine);
+
                 db.collection("users")
                         .get()
                         .addOnCompleteListener(task -> {
@@ -160,6 +163,51 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
+
+                                        int newHeightNormal = 670;
+                                        int newHeight4 = 500; // New height in pixels
+                                        int newHeight3 = 340; // New height in pixels
+                                        int newHeight2 = 180; // New height in pixels
+                                        int newHeight1 = 50; // New height in pixels
+
+                                        int listViewItems = lvData.getCount();
+
+                                        Log.d("checkItem", String.valueOf(listViewItems));
+
+                                        if (listViewItems > 3) {
+
+                                            // Apply the new height for ImageView programmatically
+                                            lvData.getLayoutParams().height = newHeightNormal;
+                                        }
+
+                                        if (listViewItems < 4) {
+
+                                            // Apply the new height for ImageView programmatically
+                                            lvData.getLayoutParams().height = newHeight4;
+                                        }
+
+                                        if (listViewItems < 3) {
+
+                                            // Apply the new height for ImageView programmatically
+                                            lvData.getLayoutParams().height = newHeight3;
+                                        }
+
+                                        if (listViewItems < 2) {
+
+                                            // Apply the new height for ImageView programmatically
+                                            lvData.getLayoutParams().height = newHeight2;
+                                        }
+
+                                        if (listViewItems < 1) {
+
+                                            // Apply the new height for ImageView programmatically
+                                            lvData.getLayoutParams().height = newHeight1;
+                                        }
+
+                                        if (usernames.size() == 0) {
+
+                                            lineSeparator.setVisibility(View.INVISIBLE);
+                                        }
 
                                         lvData.setClickable(true);
                                         lvData.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -233,18 +281,32 @@ public class SearchFragment extends Fragment {
 
                                     if (Objects.requireNonNull(findGameNames.get("GameName")).toString().contains(s.toString()) && s.toString().length() > 0) {
 
-                                        if (gameNames.size() < 1) {
+                                        gameNames.add((String) findGameNames.get("GameName"));
 
-                                            gameNames.add((String) findGameNames.get("GameName"));
-                                            Log.d("checkTAG", String.valueOf(gameNames));
-                                        } else {
-                                            break;
+                                        for (int i = 0; i < gameNames.size(); i++) {
+                                            for (int j = i + 1; j < gameNames.size(); j++) {
+                                                if (gameNames.get(i).equals(gameNames.get(j))) {
+
+                                                    gameNames.remove(i);
+                                                }
+                                            }
                                         }
-
-
 
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
+
+                                        if (usernames.size() > 0) {
+
+                                            lineSeparator.setVisibility(View.VISIBLE);
+                                        } else {
+
+                                            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) lvData2.getLayoutParams();
+                                            lp.setMargins(0, 0, 0, 0);
+                                            lvData2.setLayoutParams(lp);
+
+                                            lineSeparator.setVisibility(View.INVISIBLE);
+                                        }
+
                                         lvData2.setAdapter(adapter);
 
                                         lvData2.setClickable(true);

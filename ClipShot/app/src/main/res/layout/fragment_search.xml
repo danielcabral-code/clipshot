@@ -43,21 +43,34 @@
             android:layout_marginTop="70dp">
 
             <!-- Profile Search Results -->
-
-            <!-- Game Search Results -->
             <ListView
                 android:id="@+id/lvData"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="220dp"
+                android:fadeScrollbars="false"
+                android:scrollbars="vertical"
                 android:divider="@null"
                 android:dividerHeight="0dp" />
 
+            <View
+                android:id="@+id/listSeparatorLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/lvData"
+                android:layout_marginHorizontal="16dp"
+                android:background="@color/colorWhite"
+                android:visibility="invisible"/>
+
+            <!-- Game Search Results -->
             <ListView
                 android:id="@+id/lvDataGames"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/lvData"
-                android:layout_marginTop="30dp"
+                android:layout_below="@+id/listSeparatorLine"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false"
+                android:layout_marginTop="10dp"
                 android:divider="@null"
                 android:dividerHeight="0dp"/>
 

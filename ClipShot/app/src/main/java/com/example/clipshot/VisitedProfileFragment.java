@@ -296,6 +296,7 @@ public class VisitedProfileFragment extends Fragment {
 
 
         FirebaseFirestore.getInstance().collection("users").document(docID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 DocumentSnapshot document = task.getResult();
@@ -303,6 +304,8 @@ public class VisitedProfileFragment extends Fragment {
                 assert group != null;
                 if (group.contains(userUid)) {
                     btnFollow.setText("Unfollow");
+                    btnFollow.setTextSize(6);
+                    btnFollow.setElevation(0);
                     btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                     btnFollow.setTag("following");
                 }
@@ -310,6 +313,7 @@ public class VisitedProfileFragment extends Fragment {
         });
 
         btnFollow.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
 
@@ -352,6 +356,8 @@ public class VisitedProfileFragment extends Fragment {
                     btnFollow.setText("Unfollow");
                     btnFollow.setTag("following");
                     btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    btnFollow.setTextSize(6);
+                    btnFollow.setElevation(0);
 
 
                     db.collection("users").document(docID).update("Followers", followerNumber.getText());
