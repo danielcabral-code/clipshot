@@ -327,6 +327,18 @@ public class VisitedProfileFragment extends Fragment {
                     db.collection("users").document(docID).update("Followers", followerNumber.getText());
                     db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayRemove(userUid));
 
+                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("TAG", document.getId() + " => " + document.getData());
+
+                                db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                            }
+
+                        }
+                    });
 
                     //Setting the visited user username in all videos that he got
                     documentReference = db.collection("users").document(userUid);
@@ -356,6 +368,19 @@ public class VisitedProfileFragment extends Fragment {
 
                     db.collection("users").document(docID).update("Followers", followerNumber.getText());
                     db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayUnion(userUid));
+
+                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("TAG", document.getId() + " => " + document.getData());
+
+                                db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayUnion(userUid));
+                            }
+
+                        }
+                    });
 
                     //Setting the visited user username in all videos that he got
                     documentReference = db.collection("users").document(userUid);

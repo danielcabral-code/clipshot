@@ -92,7 +92,7 @@ public class FeedFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         Log.d("TAG", userUid);
 
-        Query query = db.collection("videos").orderBy("ReleasedTime", Query.Direction.DESCENDING);
+        Query query = db.collection("videos").whereArrayContains("UsersFollowers",userUid);
 
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
