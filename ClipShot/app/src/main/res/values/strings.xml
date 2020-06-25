@@ -35,5 +35,6 @@
     <string name="follow">Follow</string>
     <string name="remove">Remove</string>
     <string name="unfollow">Unfollow</string>
+    <string name="Message_feed_no_videos">Start following people to watch new Clips!</string>
 
 </resources>

@@ -58,7 +58,22 @@
 
         </RelativeLayout>
 
+
     </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/noVideosMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:textSize="26sp"
+        android:text="@string/Message_feed_no_videos"
+        android:visibility="invisible"
+        android:fontFamily="@font/open_sans_light"
+        android:textColor="@color/colorWhite"
+        android:layout_marginHorizontal="30dp"
+        android:gravity="center"/>
 
 </RelativeLayout>
