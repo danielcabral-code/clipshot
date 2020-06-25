@@ -168,7 +168,7 @@ public class WelcomeActivity extends AppCompatActivity {
             dataNintendo = nintendoInput.getText().toString();
             dataGamifyTitle = "Beginner";
 
-            CollectionReference usersRef = db.collection("users");
+           CollectionReference usersRef = db.collection("users");
             Query query = usersRef.whereEqualTo("Username", dataUsername);
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -222,87 +222,6 @@ public class WelcomeActivity extends AppCompatActivity {
                         });
                     }
                 }
-            });
-
-            iconDone.setOnClickListener(v1 -> {
-
-                // Declaring variables
-                String dataName1, dataUsername1, dataBio1, dataSteam1, dataOrigin1, dataPsn1, dataXbox1, dataNintendo1, dataGamifyTitle1, email1;
-                FirebaseFirestore db1;
-
-
-                // Gets the user google email that will create a collection with that email
-                email1 = acct.getEmail();
-
-                // Firestore instance
-                db1 = FirebaseFirestore.getInstance();
-                imageStorage = FirebaseStorage.getInstance();
-                storageReference = imageStorage.getReference();
-
-                // Declaring variables that will be inserted in Firestore
-                dataUsername1 = username.getText().toString().toLowerCase();
-                dataName1 = name.getText().toString();
-                dataBio1 = bio.getText().toString();
-                dataSteam1 = steamInput.getText().toString();
-                dataOrigin1 = originInput.getText().toString();
-                dataPsn1 = psnInput.getText().toString();
-                dataXbox1 = xboxInput.getText().toString();
-                dataNintendo1 = nintendoInput.getText().toString();
-                dataGamifyTitle1 = "Beginner";
-
-
-                CollectionReference usersRef1 = db1.collection("users");
-                Query query1 = usersRef1.whereEqualTo("Username", dataUsername1);
-                query1.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
-                            String user = documentSnapshot.getString("Username");
-
-                            assert user != null;
-                            if (user.equals(dataUsername1)) {
-
-                                Log.d("TAG", "User Exists");
-                                errorUsername.setVisibility(View.VISIBLE);
-
-                            }
-                        }
-
-                        if (task.getResult().size() == 0) {
-                            Log.d("TAG", "User not Exists");
-                            errorUsername.setVisibility(View.INVISIBLE);
-
-                            // Map that will fill our database with values
-                            Map<String, Object> Userdata = new HashMap<>();
-                            Userdata.put("Username", dataUsername1);
-                            Userdata.put("Name", dataName1);
-                            Userdata.put("Bio", dataBio1);
-                            Userdata.put("Steam", dataSteam1);
-                            Userdata.put("Origin", dataOrigin1);
-                            Userdata.put("Psn", dataPsn1);
-                            Userdata.put("Xbox", dataXbox1);
-                            Userdata.put("Nintendo", dataNintendo1);
-                            Userdata.put("GamifyTitle", dataGamifyTitle1);
-                            Userdata.put("Email", email1);
-                            Userdata.put("UserUID", userUid);
-                            Userdata.put("Followers", "0");
-                            Userdata.put("Following", "0");
-                            String[] followersArray = new String[0];
-                            Userdata.put("UsersFollowers", Arrays.asList(followersArray));
-                            String[] followingArray = new String[0];
-                            Userdata.put("UsersFollowing", Arrays.asList(followingArray));
-
-
-                            // Call the method to upload image
-                            uploadImage(email1);
-
-                            //On success data is inserted in database and user go to MainActivity
-                            db1.collection("users").document(userUid).set(Userdata).addOnSuccessListener(aVoid -> {
-                                Intent goToFeed = new Intent(WelcomeActivity.this, MainActivity.class);
-                                startActivity(goToFeed);
-                            });
-                        }
-                    }
-                });
             });
         });
     }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FeedFragment extends Fragment {
 
@@ -56,6 +59,7 @@ public class FeedFragment extends Fragment {
     private FirestorePagingAdapter adapter;
     private FirebaseFirestore db;
     private DocumentReference documentReference;
+
 
     public FeedFragment() {
         // Required empty public constructor
@@ -88,6 +92,7 @@ public class FeedFragment extends Fragment {
 
         View returnView = inflater.inflate(R.layout.fragment_feed, container, false);
         RecyclerView feedVideos = returnView.findViewById(R.id.recyclerView);
+        TextView message = returnView.findViewById(R.id.noVideosMessage);
 
         db = FirebaseFirestore.getInstance();
         Log.d("TAG", userUid);
@@ -112,11 +117,14 @@ public class FeedFragment extends Fragment {
 
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_videos_layout, parent, false);
                 return new FeedVideosHolder(view);
+
             }
+
 
             @Override
 
             protected void onBindViewHolder(@NonNull FeedVideosHolder holder, int position, @NonNull FeedVideos model) {
+
                 // Storage reference to the user avatar image
                 StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(model.getEmail()+"/"+model.getUserID());
                 Log.d("TAG", "onBindViewHolder: "+ model.getEmail());
@@ -237,14 +245,38 @@ public class FeedFragment extends Fragment {
 
                 });
 
+
             }
+
+
         };
+
 
         feedVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         feedVideos.setAdapter(adapter);
         feedVideos.setNestedScrollingEnabled(false);
 
+
+
+
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                int totalNumberOfItems = adapter.getItemCount();
+                Log.d("TAG", String.valueOf(totalNumberOfItems));
+                if(totalNumberOfItems == 0) {
+
+                    message.setVisibility(View.VISIBLE);
+
+                }
+                else message.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+
+
         return returnView;
+
 
     }
 
@@ -343,4 +375,9 @@ public class FeedFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
+
+
+
+
+
 }
