@@ -79,7 +79,6 @@
                         android:fontFamily="@font/open_sans_light_italic"
                         android:inputType=""
                         android:singleLine="true"
-                        android:text="@string/testGamifyTitle"
                         android:textColor="@color/colorWhite"
                         android:textSize="15sp"
                         tools:ignore="LabelFor" />
