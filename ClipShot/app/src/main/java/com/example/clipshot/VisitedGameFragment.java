@@ -91,7 +91,7 @@ public class VisitedGameFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        Query query = db.collection("videos").whereEqualTo("GameName",pickedGameName);
+        Query query = db.collection("videos").whereEqualTo("GameName",pickedGameName).orderBy("ReleasedTime", Query.Direction.DESCENDING);
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)

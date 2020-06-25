@@ -160,10 +160,9 @@ public class ProfileFragment extends Fragment {
                 }
                 Log.d("TAG", "Likes: " + countTotalLikes+ " " +  countTotalVideos);
 
-                if (countTotalLikes>0   && countTotalVideos>0 && countTotalVideos<10){
+                if (countTotalLikes>-1   && countTotalVideos>0 && countTotalVideos<10){
                     Log.d("TAG", "begginer: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Beginner");
-                    
                 }
                 else if (countTotalLikes>99  && countTotalVideos>10 && countTotalVideos<24){
                     Log.d("TAG", "Rookie: ");
