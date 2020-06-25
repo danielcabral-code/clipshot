@@ -48,6 +48,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FeedFragment extends Fragment {
 
@@ -57,6 +59,7 @@ public class FeedFragment extends Fragment {
     private FirestorePagingAdapter adapter;
     private FirebaseFirestore db;
     private DocumentReference documentReference;
+
 
     public FeedFragment() {
         // Required empty public constructor
@@ -254,6 +257,8 @@ public class FeedFragment extends Fragment {
         feedVideos.setNestedScrollingEnabled(false);
 
 
+
+
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 int totalNumberOfItems = adapter.getItemCount();
@@ -261,7 +266,6 @@ public class FeedFragment extends Fragment {
                 if(totalNumberOfItems == 0) {
 
                     message.setVisibility(View.VISIBLE);
-
 
                 }
                 else message.setVisibility(View.INVISIBLE);
