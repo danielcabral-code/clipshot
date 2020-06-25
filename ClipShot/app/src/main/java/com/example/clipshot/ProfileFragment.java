@@ -162,7 +162,7 @@ public class ProfileFragment extends Fragment {
 
                 if (countTotalLikes>0   && countTotalVideos>0 && countTotalVideos<10){
                     Log.d("TAG", "begginer: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Begginer");
+                    db.collection("users").document(userUid).update("GamifyTitle","Beginner");
                     
                 }
                 else if (countTotalLikes>99  && countTotalVideos>10 && countTotalVideos<24){
@@ -195,7 +195,7 @@ public class ProfileFragment extends Fragment {
                 }
                 else if (countTotalLikes>8000 && countTotalVideos>400){
                     Log.d("TAG", "Clip Master: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Clip Master");
+                    db.collection("users").document(userUid).update("GamifyTitle","ClipMaster");
                 }
 
 

@@ -136,7 +136,8 @@ public class SearchFragment extends Fragment {
                 ArrayList<String> usernames = new ArrayList<>();
                 ArrayList<String> gameNames = new ArrayList<>();
 
-                View lineSeparator = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLine);
+                View lineSeparatorNameSearch = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLineNameSearch);
+                View lineSeparatorGameSearch = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLineGameSearch);
 
                 db.collection("users")
                         .get()
@@ -172,8 +173,6 @@ public class SearchFragment extends Fragment {
 
                                         int listViewItems = lvData.getCount();
 
-                                        Log.d("checkItem", String.valueOf(listViewItems));
-
                                         if (listViewItems > 3) {
 
                                             // Apply the new height for ImageView programmatically
@@ -204,10 +203,7 @@ public class SearchFragment extends Fragment {
                                             lvData.getLayoutParams().height = newHeight1;
                                         }
 
-                                        if (usernames.size() == 0) {
-
-                                            lineSeparator.setVisibility(View.INVISIBLE);
-                                        }
+                                        lineSeparatorNameSearch.setVisibility(View.VISIBLE);
 
                                         lvData.setClickable(true);
                                         lvData.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -228,17 +224,10 @@ public class SearchFragment extends Fragment {
                                                                 String user = documentSnapshot.getString("Username");
 
                                                                 if (user.equals(pickedProfile)) {
-                                                                    Log.d("TAG", "User Exists antes de pesquisa");
 
                                                                     userVisitedUid = documentSnapshot.getId();
                                                                     userVisitedEmail= documentSnapshot.getString("Email");
-                                                                    Log.d("check", "onComplete: " + userVisitedEmail);
-
-                                                                    Log.d("TAG", "onComplete antes da pesquisa: " + userVisitedUid);
-
-
                                                                 }
-
                                                             }
                                                         }
 
@@ -247,9 +236,6 @@ public class SearchFragment extends Fragment {
                                                         args.putString("docID",userVisitedUid);
                                                         args.putString("email",userVisitedEmail);
 
-
-
-
                                                         VisitedProfileFragment fragment = new VisitedProfileFragment();
                                                         fragment.setArguments(args);
 
@@ -257,13 +243,19 @@ public class SearchFragment extends Fragment {
                                                         getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
 
                                                     }
-
-
                                                 });
-
-
                                             }
                                         });
+                                    } else {
+
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
+                                        ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
+                                        lvData.setAdapter(adapter);
+
+                                        // Apply the new height for ImageView programmatically
+                                        lvData.getLayoutParams().height = 0;
+
+                                        lineSeparatorNameSearch.setVisibility(View.INVISIBLE);
                                     }
                                 }
                             } else {
@@ -295,19 +287,9 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
 
-                                        if (usernames.size() > 0) {
-
-                                            lineSeparator.setVisibility(View.VISIBLE);
-                                        } else {
-
-                                            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) lvData2.getLayoutParams();
-                                            lp.setMargins(0, 0, 0, 0);
-                                            lvData2.setLayoutParams(lp);
-
-                                            lineSeparator.setVisibility(View.INVISIBLE);
-                                        }
-
                                         lvData2.setAdapter(adapter);
+
+                                        lineSeparatorNameSearch.setVisibility(View.VISIBLE);
 
                                         lvData2.setClickable(true);
                                         lvData2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -316,50 +298,23 @@ public class SearchFragment extends Fragment {
 
                                                 String pickedGameName = lvData2.getItemAtPosition(position).toString();
 
-
-                                                /*CollectionReference usersRef = db.collection("users");
-                                                Query queryUser = usersRef.whereEqualTo("Username", pickedProfile);
-                                                queryUser.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                        String userVisitedUid ="";
-                                                        String userVisitedEmail ="";
-                                                        if (task.isSuccessful()) {
-                                                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                                                String user = documentSnapshot.getString("Username");
-
-                                                                if (user.equals(pickedProfile)) {
-                                                                    Log.d("TAG", "User Exists antes de pesquisa");
-
-                                                                    userVisitedUid = documentSnapshot.getId();
-                                                                    userVisitedEmail= documentSnapshot.getString("Email");
-                                                                    Log.d("check", "onComplete: " + userVisitedEmail);
-
-                                                                    Log.d("TAG", "onComplete antes da pesquisa: " + userVisitedUid);
-
-
-                                                                }
-
-                                                            }
-                                                        }*/
-
                                                         Bundle args = new Bundle();
                                                         args.putString("pickedGameName", pickedGameName);
-                                                        /*args.putString("docID",userVisitedUid);
-                                                        args.putString("email",userVisitedEmail);*/
-
-
                                                         VisitedGameFragment fragment = new VisitedGameFragment();
                                                         fragment.setArguments(args);
 
                                                         assert getFragmentManager() != null;
                                                         getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
-                                                 /*   }
-                                                });*/
-
-
                                             }
                                         });
+                                    } else {
+
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
+                                        ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
+
+                                        lvData2.setAdapter(adapter);
+
+                                        lineSeparatorGameSearch.setVisibility(View.INVISIBLE);
                                     }
                                 }
                             } else {
