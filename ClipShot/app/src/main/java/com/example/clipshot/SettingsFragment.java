@@ -212,6 +212,25 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText switchInput = getActivity().findViewById(R.id.switchInput);
         TextView errorUsername = getActivity().findViewById(R.id.labelErrorUsername);
 
+        // Only allows user to input 3 lines into bio
+        bio.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                // limit to 3 lines
+                if (bio.getLayout().getLineCount() > 3)
+                    bio.getText().delete(bio.getText().length() - 1, bio.getText().length());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         iconDoneSettings = Objects.requireNonNull(getActivity()).findViewById(R.id.iconDone);
         progressBar= Objects.requireNonNull(getActivity()).findViewById(R.id.progress_circular);
 
@@ -231,11 +250,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                 progressBar.setVisibility(View.VISIBLE);
                 iconDoneSettings.setVisibility(View.INVISIBLE);
 
-                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo,dataGamifyTitle, email;
+                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo, email;
                 FirebaseFirestore db;
 
                 // Email gets the user google email that will create a collection with that email
-                email = acct.getEmail().toString();
+                email = acct.getEmail();
 
                 // Firestore instance
                 db = FirebaseFirestore.getInstance();

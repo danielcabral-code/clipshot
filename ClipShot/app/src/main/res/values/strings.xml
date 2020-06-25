@@ -23,7 +23,7 @@
     <string name="testFollowingNumber">234</string>
     <string name="testFollowerNumber">975</string>
     <string name="testClipsNumber">21</string>
-    <string name="upload_video">Upload Video</string>
+    <string name="upload_video">Upload Clip</string>
     <string name="description">Description</string>
     <string name="search"><font size="18"><i>Search</i></font></string>
     <string name="select_game_name">Select game name</string>
@@ -35,5 +35,8 @@
     <string name="follow">Follow</string>
     <string name="remove">Remove</string>
     <string name="unfollow">Unfollow</string>
+    <string name="clip">Clip:</string>
+    <string name="game">Game:</string>
+    <string name="caption">Caption:</string>
 
 </resources>

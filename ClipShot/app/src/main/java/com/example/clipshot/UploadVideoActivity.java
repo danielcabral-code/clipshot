@@ -103,7 +103,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.upload_action_bar);
 
         //AppCompatImageView iconDone = findViewById(R.id.iconDoneUpload);
-        EditText descrtiption = findViewById(R.id.description);
+        EditText description = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
         spinner = findViewById(R.id.spinner);
         VideoView videoSelected = findViewById(R.id.videoToBeUploaded);
@@ -138,7 +138,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         if (timeInMillisec > 60000){
 
-            Toast.makeText(this,"Your clip exceeds the 60s max permitted!" , Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Your Clip exceeds the 60s max permitted!" , Toast.LENGTH_LONG).show();
             Intent goToFeed = new Intent(UploadVideoActivity.this,MainActivity.class);
             startActivity(goToFeed);
 
@@ -170,7 +170,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
 
             // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
-            descrtiption.addTextChangedListener(new TextWatcher() {
+            description.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -186,6 +186,10 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                     }
                     else descriptionIsEmpty=0;
+
+                    // limit to 3 lines
+                    if (description.getLayout().getLineCount() > 3)
+                        description.getText().delete(description.getText().length() - 1, description.getText().length());
                 }
 
                 @Override
