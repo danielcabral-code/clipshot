@@ -164,35 +164,35 @@ public class ProfileFragment extends Fragment {
                     Log.d("TAG", "begginer: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Beginner");
                 }
-                else if (countTotalLikes>99  && countTotalVideos>10 && countTotalVideos<24){
+                else if (countTotalLikes>99  && countTotalVideos>9 && countTotalVideos<25){
                     Log.d("TAG", "Rookie: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Rookie");
                 }
-                else if (countTotalLikes>250 && countTotalVideos>24 && countTotalVideos<50){
+                else if (countTotalLikes>249 && countTotalVideos>24 && countTotalVideos<50){
                     Log.d("TAG", "Intermediate: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Intermediate");
                 }
-                else if (countTotalLikes>500 && countTotalVideos>49 && countTotalVideos<100){
+                else if (countTotalLikes>499 && countTotalVideos>49 && countTotalVideos<100){
                     Log.d("TAG", "Trained: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Trained");
                 }
-                else if (countTotalLikes>1000 && countTotalVideos>99 && countTotalVideos<150){
+                else if (countTotalLikes>999 && countTotalVideos>99 && countTotalVideos<150){
                     Log.d("TAG", "Gamer: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Gamer");
                 }
-                else if (countTotalLikes>2000 && countTotalVideos>149 && countTotalVideos<200){
+                else if (countTotalLikes>1999 && countTotalVideos>149 && countTotalVideos<200){
                     Log.d("TAG", "Expert: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Expert");
                 }
-                else if (countTotalLikes>3000 && countTotalVideos>199 && countTotalVideos<300){
+                else if (countTotalLikes>2999 && countTotalVideos>199 && countTotalVideos<300){
                     Log.d("TAG", "Veteran: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Veteran");
                 }
-                else if (countTotalLikes>5000 && countTotalVideos>299 && countTotalVideos<400){
+                else if (countTotalLikes>4999 && countTotalVideos>299 && countTotalVideos<400){
                     Log.d("TAG", "Legend: ");
                     db.collection("users").document(userUid).update("GamifyTitle","Legend");
                 }
-                else if (countTotalLikes>8000 && countTotalVideos>400){
+                else if (countTotalLikes>7999 && countTotalVideos>399){
                     Log.d("TAG", "Clip Master: ");
                     db.collection("users").document(userUid).update("GamifyTitle","ClipMaster");
                 }

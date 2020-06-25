@@ -159,10 +159,10 @@ public class FollowersFragment extends Fragment {
 
 
                         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Do you want to REMOVE " +model.getUsername() + " from your followers?");
+                        alert.setTitle("Are you sure you want to REMOVE " + model.getUsername() + "?");
                         // alert.setMessage("Message");
 
-                        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        alert.setPositiveButton("REMOVE", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 //Your action here
 

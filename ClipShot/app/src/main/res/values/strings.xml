@@ -20,9 +20,6 @@
     <string name="following">Following</string>
     <string name="followers">Followers</string>
     <string name="clips">Clips</string>
-    <string name="testFollowingNumber">234</string>
-    <string name="testFollowerNumber">975</string>
-    <string name="testClipsNumber">21</string>
     <string name="upload_video">Upload Clip</string>
     <string name="description">Description</string>
     <string name="search"><font size="18"><i>Search</i></font></string>
@@ -35,12 +32,10 @@
     <string name="follow">Follow</string>
     <string name="remove">Remove</string>
     <string name="unfollow">Unfollow</string>
-<<<<<<< HEAD
     <string name="clip">Clip:</string>
     <string name="game">Game:</string>
     <string name="caption">Caption:</string>
-=======
     <string name="Message_feed_no_videos">Start following people to watch new Clips!</string>
->>>>>>> 59cd3e48546c6066e851e1666c4130f9490a6810
+
 
 </resources>
