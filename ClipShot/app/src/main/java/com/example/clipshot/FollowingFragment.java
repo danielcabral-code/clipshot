@@ -103,8 +103,11 @@ public class FollowingFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull FollowingHolder holder, int position, @NonNull FollowersUsers model) {
 
+
                 // Gets UserID from users collection and places username in following list
                 documentReference = db.collection("users").document(model.getUserUID());
+                Log.d("TAG", "d"+ model.getUserUID());
+
                 documentReference.get()
                         .addOnSuccessListener(documentSnapshot -> {
                             if (documentSnapshot.exists()) {
