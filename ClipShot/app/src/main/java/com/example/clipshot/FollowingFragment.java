@@ -34,6 +34,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -159,6 +161,18 @@ public class FollowingFragment extends Fragment {
                             db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(model.getUserUID()));
                             db.collection("users").document(model.getUserUID()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
                             db.collection("users").document(model.getUserUID()).update("Followers",String.valueOf(followersCount) );
+                            Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", model.getUserUID()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d("TAG", document.getId() + " => " + document.getData());
+
+                                        db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                                    }
+
+                                }
+                            });
                             adapter.refresh();
                         });
 

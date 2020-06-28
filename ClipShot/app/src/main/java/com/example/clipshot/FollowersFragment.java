@@ -166,6 +166,18 @@ public class FollowersFragment extends Fragment {
                         db.collection("users").document(model.getUserUID()).update("UsersFollowing", FieldValue.arrayRemove(userUid));
                         db.collection("users").document(userUid).update("UsersFollowers", FieldValue.arrayRemove(model.getUserUID()));
                         db.collection("users").document(userUid).update("Followers",String.valueOf(followersCount) );
+                        Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("TAG", document.getId() + " => " + document.getData());
+
+                                    db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(model.getUserUID()));
+                                }
+
+                            }
+                        });
                         adapter.refresh();
                     }));
 

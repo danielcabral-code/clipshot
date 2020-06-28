@@ -239,7 +239,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                         final String[][] arrayFollowers = {new String[0]};
 
-                        db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(task -> {
+                        db.collection("users").whereEqualTo("UserUID", userUid).get().addOnCompleteListener(task -> {
 
                             for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
@@ -247,6 +247,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                                 assert group != null;
                                 arrayFollowers[0] = group.toArray(new String[0]);
+                                Log.d("TAG", "uploadVideo: " + arrayFollowers.toString());
                             }
 
                             Date date = new Date();
