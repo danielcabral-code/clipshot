@@ -46,7 +46,7 @@
             <ListView
                 android:id="@+id/lvData"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="wrap_content"
                 android:fadeScrollbars="false"
                 android:scrollbars="vertical"
                 android:divider="@null"
@@ -59,25 +59,14 @@
                 android:layout_marginTop="10dp"
                 android:layout_below="@+id/lvData"
                 android:layout_marginHorizontal="16dp"
-                android:background="@color/colorWhite"
-                android:visibility="invisible"/>
-
-            <View
-                android:id="@+id/listSeparatorLineGameSearch"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/lvData"
-                android:layout_marginHorizontal="16dp"
-                android:background="@color/colorWhite"
-                android:visibility="invisible"/>
+                android:background="@color/colorWhite" />
 
             <!-- Game Search Results -->
             <ListView
                 android:id="@+id/lvDataGames"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/listSeparatorLineGameSearch"
+                android:layout_below="@+id/listSeparatorLineNameSearch"
                 android:scrollbars="vertical"
                 android:fadeScrollbars="false"
                 android:layout_marginTop="10dp"

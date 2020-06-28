@@ -110,10 +110,6 @@ public class SearchFragment extends Fragment {
                 ArrayList<String> usernames = new ArrayList<>();
                 ArrayList<String> gameNames = new ArrayList<>();
 
-                // Declaring Layout Variables
-                View lineSeparatorNameSearch = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLineNameSearch);
-                View lineSeparatorGameSearch = Objects.requireNonNull(getView()).findViewById(R.id.listSeparatorLineGameSearch);
-
                 // Gets Usernames according to user search parameters
                 db.collection("users")
                         .get()
@@ -126,10 +122,15 @@ public class SearchFragment extends Fragment {
                                     // Allows user to search with Caps or non-Caps and still shows all results
                                     if (Objects.requireNonNull(findUsernames.get("Username")).toString().toLowerCase().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
 
-                                        // Permits a max of 10 usernames per search to account for loading times
-                                        if (usernames.size() < 10) {
+                                        Log.d("checkMe", String.valueOf(Objects.requireNonNull(findUsernames.get("Username")).toString().contains(s.toString().toLowerCase())));
+
+                                        // Permits a max of 4 usernames per search to account for layout separation for GameSearch
+                                        if (usernames.size() < 4) {
+
                                             usernames.add((String) findUsernames.get("Username"));
                                         }
+
+                                        Log.d("checkMe", String.valueOf(usernames));
 
                                         // Removes ability to search for yourself
                                         if (currentUsername.contains(s.toString().toLowerCase())) {
@@ -140,47 +141,6 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
-
-                                        // Visually change margins depending on amount of search results
-                                        int newHeightNormal = 670; // New height in pixels
-                                        int newHeight4 = 500;
-                                        int newHeight3 = 340;
-                                        int newHeight2 = 180;
-                                        int newHeight1 = 50;
-
-                                        int listViewItems = lvData.getCount();
-
-                                        if (listViewItems > 3) {
-
-                                            // Apply the new height for ImageView programmatically
-                                            lvData.getLayoutParams().height = newHeightNormal;
-                                        }
-
-                                        if (listViewItems < 4) {
-
-                                            // Apply the new height for ImageView programmatically
-                                            lvData.getLayoutParams().height = newHeight4;
-                                        }
-
-                                        if (listViewItems < 3) {
-
-                                            // Apply the new height for ImageView programmatically
-                                            lvData.getLayoutParams().height = newHeight3;
-                                        }
-
-                                        if (listViewItems < 2) {
-
-                                            // Apply the new height for ImageView programmatically
-                                            lvData.getLayoutParams().height = newHeight2;
-                                        }
-
-                                        if (listViewItems < 1) {
-
-                                            // Apply the new height for ImageView programmatically
-                                            lvData.getLayoutParams().height = newHeight1;
-                                        }
-
-                                        lineSeparatorNameSearch.setVisibility(View.VISIBLE);
 
                                         // When user presses a profile, app gets user's data from DB fragment changes to visit that profile
                                         lvData.setClickable(true);
@@ -228,11 +188,6 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
-
-                                        // Apply the new height to listView programmatically
-                                        lvData.getLayoutParams().height = 0;
-
-                                        lineSeparatorNameSearch.setVisibility(View.INVISIBLE);
                                     }
                                 }
                             } else {
@@ -268,8 +223,6 @@ public class SearchFragment extends Fragment {
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
                                         lvData2.setAdapter(adapter);
 
-                                        lineSeparatorNameSearch.setVisibility(View.VISIBLE);
-
                                         // When user presses a profile, app gets user's data from DB fragment changes to visit that profile
                                         lvData2.setClickable(true);
                                         lvData2.setOnItemClickListener((arg0, arg1, position, arg3) -> {
@@ -291,8 +244,6 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, gameNames);
                                         ListView lvData2 = Objects.requireNonNull(getActivity()).findViewById(R.id.lvDataGames);
                                         lvData2.setAdapter(adapter);
-
-                                        lineSeparatorGameSearch.setVisibility(View.INVISIBLE);
                                     }
                                 }
                             } else {
