@@ -50,12 +50,12 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
+
+    // Global Variables
     private FirestorePagingAdapter adapter;
     private FirebaseFirestore db;
     private DocumentReference documentReference;
-
     int countTotalVideos;
-
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -71,19 +71,18 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-
         // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
-
         // Variables that will get the email and userId value from the user google account
-        String email = acct.getEmail().toString();
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        assert acct != null;
+        String email = acct.getEmail();
+        String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Storage reference to the user avatar image
         StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(email+"/"+userUid);
@@ -104,240 +103,177 @@ public class ProfileFragment extends Fragment {
         AppCompatImageView nintendoIcon = returnView.findViewById(R.id.iconNintendo);
         RecyclerView profileVideos = returnView.findViewById(R.id.recyclerView);
 
-
-        //FirebaseStorage imageStorage;
-
+        // FireStore Instance
         db = FirebaseFirestore.getInstance();
 
+        // Gets user's videos
         db.collection("videos").whereEqualTo("UserID",userUid)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
 
-                            countTotalVideos = 0;
-                            for (DocumentSnapshot document : task.getResult()) {
+                        countTotalVideos = 0;
 
-                                countTotalVideos++;
-                                Log.d("TAG", "onComplete: " + countTotalVideos);
-                                Log.d("TAG", "onComplete: "+ task.getResult().toString());
+                        for (DocumentSnapshot ignored : Objects.requireNonNull(task.getResult())) {
 
-
-                            }
-                            numberOfVideos.setText(String.valueOf(countTotalVideos));
-
-                            TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
-                            if (countTotalVideos == 0) {
-                                noVideosMessage.setText("You haven't shared any Clips yet...");
-                            }
-
-                        } else {
-
-                            Log.d("TAG", "Error getting documents: ", task.getException());
+                            countTotalVideos++;
                         }
+                        numberOfVideos.setText(String.valueOf(countTotalVideos));
 
+                        // If there are no videos, shows message to user
+                        TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
 
-
+                        if (countTotalVideos == 0) {
+                            noVideosMessage.setText("You haven't shared any Clips yet...");
+                        }
                     }
                 });
 
+        // Gamification System (checks amount of user videos uploaded and likes recieved)
+        db.collection("videos").whereEqualTo("UserID",userUid).get().addOnCompleteListener(task -> {
+            int countTotalLikes =0;
 
+            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
-        Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID",userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                int countTotalLikes =0;
+                countTotalLikes = countTotalLikes + Integer.parseInt(Objects.requireNonNull(document.getString("Likes")));
+            }
 
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("TAG", document.getId() + " => " + document.getData());
+            if (countTotalLikes>-1   && countTotalVideos>0 && countTotalVideos<10){
+                db.collection("users").document(userUid).update("GamifyTitle","Beginner");
 
+            } else if (countTotalLikes>99  && countTotalVideos>9 && countTotalVideos<25){
+                db.collection("users").document(userUid).update("GamifyTitle","Rookie");
 
-                    countTotalLikes = countTotalLikes + Integer.parseInt(document.getString("Likes"));
+            } else if (countTotalLikes>249 && countTotalVideos>24 && countTotalVideos<50){
+                db.collection("users").document(userUid).update("GamifyTitle","Intermediate");
 
-                    //db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
-                }
-                Log.d("TAG", "Likes: " + countTotalLikes+ " " +  countTotalVideos);
+            } else if (countTotalLikes>499 && countTotalVideos>49 && countTotalVideos<100){
+                db.collection("users").document(userUid).update("GamifyTitle","Trained");
 
-                if (countTotalLikes>-1   && countTotalVideos>0 && countTotalVideos<10){
-                    Log.d("TAG", "begginer: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Beginner");
-                }
-                else if (countTotalLikes>99  && countTotalVideos>9 && countTotalVideos<25){
-                    Log.d("TAG", "Rookie: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Rookie");
-                }
-                else if (countTotalLikes>249 && countTotalVideos>24 && countTotalVideos<50){
-                    Log.d("TAG", "Intermediate: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Intermediate");
-                }
-                else if (countTotalLikes>499 && countTotalVideos>49 && countTotalVideos<100){
-                    Log.d("TAG", "Trained: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Trained");
-                }
-                else if (countTotalLikes>999 && countTotalVideos>99 && countTotalVideos<150){
-                    Log.d("TAG", "Gamer: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Gamer");
-                }
-                else if (countTotalLikes>1999 && countTotalVideos>149 && countTotalVideos<200){
-                    Log.d("TAG", "Expert: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Expert");
-                }
-                else if (countTotalLikes>2999 && countTotalVideos>199 && countTotalVideos<300){
-                    Log.d("TAG", "Veteran: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Veteran");
-                }
-                else if (countTotalLikes>4999 && countTotalVideos>299 && countTotalVideos<400){
-                    Log.d("TAG", "Legend: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","Legend");
-                }
-                else if (countTotalLikes>7999 && countTotalVideos>399){
-                    Log.d("TAG", "Clip Master: ");
-                    db.collection("users").document(userUid).update("GamifyTitle","ClipMaster");
-                }
+            } else if (countTotalLikes>999 && countTotalVideos>99 && countTotalVideos<150){
+                db.collection("users").document(userUid).update("GamifyTitle","Gamer");
 
+            } else if (countTotalLikes>1999 && countTotalVideos>149 && countTotalVideos<200){
+                db.collection("users").document(userUid).update("GamifyTitle","Expert");
 
+            } else if (countTotalLikes>2999 && countTotalVideos>199 && countTotalVideos<300){
+                db.collection("users").document(userUid).update("GamifyTitle","Veteran");
+
+            } else if (countTotalLikes>4999 && countTotalVideos>299 && countTotalVideos<400){
+                db.collection("users").document(userUid).update("GamifyTitle","Legend");
+
+            } else if (countTotalLikes>7999 && countTotalVideos>399){
+                db.collection("users").document(userUid).update("GamifyTitle","ClipMaster");
             }
         });
 
         // Document reference of user data that will be read to the fields in profile
         documentReference = db.collection("users").document(userUid);
 
-        long tStart = System.currentTimeMillis();
         // Load of data
         documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            String dataName = documentSnapshot.getString("Name");
-                            String dataBio = documentSnapshot.getString("Bio");
-                            String dataTitle = documentSnapshot.getString("GamifyTitle");
-                            String steamName = documentSnapshot.getString("Steam");
-                            String originName = documentSnapshot.getString("Origin");
-                            String psnName = documentSnapshot.getString("Psn");
-                            String xBoxName = documentSnapshot.getString("Xbox");
-                            String nintendoName = documentSnapshot.getString("Nintendo");
-                            String dataFollowingNumber = documentSnapshot.getString("Following");
-                            String dataFollowersNumber = documentSnapshot.getString("Followers");
-                            realName.setText(dataName);
-                            bio.setText(dataBio);
-                            title.setText(dataTitle);
-                            followingNumber.setText(dataFollowingNumber);
-                            followersNumber.setText(dataFollowersNumber);
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String dataName = documentSnapshot.getString("Name");
+                        String dataBio = documentSnapshot.getString("Bio");
+                        String dataTitle = documentSnapshot.getString("GamifyTitle");
+                        String steamName = documentSnapshot.getString("Steam");
+                        String originName = documentSnapshot.getString("Origin");
+                        String psnName = documentSnapshot.getString("Psn");
+                        String xBoxName = documentSnapshot.getString("Xbox");
+                        String nintendoName = documentSnapshot.getString("Nintendo");
+                        String dataFollowingNumber = documentSnapshot.getString("Following");
+                        String dataFollowersNumber = documentSnapshot.getString("Followers");
+                        realName.setText(dataName);
+                        bio.setText(dataBio);
+                        title.setText(dataTitle);
+                        followingNumber.setText(dataFollowingNumber);
+                        followersNumber.setText(dataFollowersNumber);
 
+                        // If user has some nickname in some platform the opacity of that platform will be 1
+                        if (!Objects.equals(documentSnapshot.getString("Steam"), "")) {
 
-                            long tEnd = System.currentTimeMillis();
-                            long tDelta = tEnd - tStart;
-                            double elapsedSeconds = tDelta / 1000.0;
-                            Log.d("TAG", String.valueOf(elapsedSeconds));
-
-                            //If user has some nickname in some platform the opacity of that platform will be 1
-                            if (!documentSnapshot.getString("Steam").equals("")) {
-
-                                steamIcon.setAlpha((float) 1.0);
-                            }
-                            if (!documentSnapshot.getString("Origin").equals("")) {
-
-                                originIcon.setAlpha((float) 1.0);
-                            }
-                            if (!documentSnapshot.getString("Psn").equals("")) {
-
-                                psnIcon.setAlpha((float) 1.0);
-                            }
-                            if (!documentSnapshot.getString("Xbox").equals("")) {
-
-                                xboxIcon.setAlpha((float) 1.0);
-                            }
-                            if (!documentSnapshot.getString("Nintendo").equals("")) {
-
-                                nintendoIcon.setAlpha((float) 1.0);
-                            }
-
-                            //Listeners to show toast with platform id if user has some nickname introduced in database for that platform
-                            steamIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!steamName.equals("")) {
-                                        Toast.makeText(getContext(),"Steam ID: "+ steamName, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-                            originIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!originName.equals("")) {
-                                        Toast.makeText(getContext(),"Origin ID: "+ originName, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                            psnIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!psnName.equals("")) {
-                                        Toast.makeText(getContext(),"PSN ID: " + psnName, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                            xboxIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!xBoxName.equals("")) {
-                                        Toast.makeText(getContext(),"Xbox ID: "+ xBoxName, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                            nintendoIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!nintendoName.equals("")) {
-                                        Toast.makeText(getContext(),"Switch ID: "+ nintendoName, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        } else {
-                            Log.d("TAG", "doesnt exist");
+                            steamIcon.setAlpha((float) 1.0);
                         }
+                        if (!Objects.equals(documentSnapshot.getString("Origin"), "")) {
+
+                            originIcon.setAlpha((float) 1.0);
+                        }
+                        if (!Objects.equals(documentSnapshot.getString("Psn"), "")) {
+
+                            psnIcon.setAlpha((float) 1.0);
+                        }
+                        if (!Objects.equals(documentSnapshot.getString("Xbox"), "")) {
+
+                            xboxIcon.setAlpha((float) 1.0);
+                        }
+                        if (!Objects.equals(documentSnapshot.getString("Nintendo"), "")) {
+
+                            nintendoIcon.setAlpha((float) 1.0);
+                        }
+
+                        // Listeners to show toast with platform id if user has some nickname introduced in database for that platform
+                        steamIcon.setOnClickListener(v -> {
+                            assert steamName != null;
+                            if (!steamName.equals("")) {
+                                Toast.makeText(getContext(),"Steam ID: "+ steamName, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        originIcon.setOnClickListener(v -> {
+                            assert originName != null;
+                            if (!originName.equals("")) {
+                                Toast.makeText(getContext(),"Origin ID: "+ originName, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        psnIcon.setOnClickListener(v -> {
+                            assert psnName != null;
+                            if (!psnName.equals("")) {
+                                Toast.makeText(getContext(),"PSN ID: " + psnName, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        xboxIcon.setOnClickListener(v -> {
+                            assert xBoxName != null;
+                            if (!xBoxName.equals("")) {
+                                Toast.makeText(getContext(),"Xbox ID: "+ xBoxName, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        nintendoIcon.setOnClickListener(v -> {
+                            assert nintendoName != null;
+                            if (!nintendoName.equals("")) {
+                                Toast.makeText(getContext(),"Switch ID: "+ nintendoName, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure:" + e);
-            }
-        });
+                }).addOnFailureListener(e -> Log.d("TAG", "onFailure:" + e));
 
         // Download uri from user image folder using the storageReference inicialized at top of document
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
+        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                // Load the image using Glide
-                Glide.with(container).load(uri).into(img);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Glide.with(getContext()).load(R.drawable.default_avatar).into(img);
-                Log.d("TAG", "onFailure: error "+ exception);
-            }
+            // Load the image using Glide
+            Glide.with(container).load(uri).into(img);
+
+        }).addOnFailureListener(exception -> {
+
+            // When image can't load, app loads default avatar
+            Glide.with(Objects.requireNonNull(getContext())).load(R.drawable.default_avatar).into(img);
         });
 
-
-
+        // Query to order users videos by released time
         Query query = db.collection("videos").whereEqualTo("UserID",userUid).orderBy("ReleasedTime", Query.Direction.DESCENDING);
+
+        // Configuration for RecyclerView adapter
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
                 .build();
 
-
         FirestorePagingOptions<ProfileVideos> options = new FirestorePagingOptions.Builder<ProfileVideos>()
                 .setQuery(query,config, ProfileVideos.class)
                 .build();
-
 
         adapter = new FirestorePagingAdapter<ProfileVideos, ProfileVideosHolder>(options) {
             @NonNull
@@ -352,135 +288,106 @@ public class ProfileFragment extends Fragment {
             protected void onBindViewHolder(@NonNull ProfileVideosHolder holder, int position, @NonNull ProfileVideos model) {
 
                 // Download uri from user image folder using the storageReference inicialized at top of document
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                        // Load the image using Glide
-                        Glide.with(container).load(uri).into(holder.listUserImage);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
-                        Log.d("TAG", "onFailure: error "+ exception);
-                    }
+                    // Load the image using Glide
+                    Glide.with(container).load(uri).into(holder.listUserImage);
+
+                }).addOnFailureListener(exception -> {
+
+                    // When image can't load, app loads default avatar
+                    Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                 });
 
-
+                // Gets username
                 documentReference = db.collection("users").document(model.getUserID());
-
                 documentReference.get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    String dataUser = documentSnapshot.getString("Username");
-                                    holder.listUsername.setText(dataUser);
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
 
-                                }
+                                // Places username
+                                String dataUser = documentSnapshot.getString("Username");
+                                holder.listUsername.setText(dataUser);
                             }
                         });
 
+                // Gets and places likes on user's videos
+                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(task -> {
 
-                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        List<String> group = (List<String>) document.get("UsersThatLiked");
-                        assert group != null;
-                        if (group.contains(userUid)){
-                            //Log.d("TAG", "onComplete: existe ");
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
-                        }
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("UsersThatLiked");
+
+                    assert group != null;
+                    if (group.contains(userUid)){
+
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
                     }
                 });
 
+                // Places text in holder (video descripion, gameName, Likes) for RecyclerView
                 holder.listDescription.setText(model.getDescription());
-                holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
-                holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
 
-                        if (holder.listLikesIcon.getTag().toString().equals("liked"))
-                        {
+                if (model.getGameName().length() > 34) {
 
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone= Integer.parseInt(likesCount)-1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
-                            holder.listLikesIcon.setTag("noLike");
+                    holder.listGameName.setText(model.getGameName().substring(0, 34) + "...");
+                } else {
 
+                    holder.listGameName.setText(model.getGameName());
+                }
 
+                // Allows user to like / dislike and changes value of like in DB
+                holder.listLikesIcon.setOnClickListener(v -> {
 
-                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
-                        }
-                        else
-                        {
+                    if (holder.listLikesIcon.getTag().toString().equals("liked")) {
 
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone= Integer.parseInt(likesCount)+1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone= Integer.parseInt(likesCount)-1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
+                        holder.listLikesIcon.setTag("noLike");
 
+                        db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
+                    } else {
 
-                            db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
-                        }
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone= Integer.parseInt(likesCount)+1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
 
-
-
-
-
-
-
-
+                        db.collection("videos").document(model.getDocumentName()).update("Likes",holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
                     }
                 });
 
+                // Places Google's loading circle
                 holder.progressBar.setVisibility(View.VISIBLE);
+
+                // Gets and loads video in RecyclerView
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo( 1);
-                holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        holder.progressBar.setVisibility(View.INVISIBLE);
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 140, 0, 0);
-                        holder.listVideo.setLayoutParams(layoutParams);
-                        holder.listVideo.setBackgroundResource(0);
+                holder.listVideo.setOnPreparedListener(mp -> {
 
-                        holder.listVideo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                holder.listVideo.start();
-                            }
-                        });
+                    holder.progressBar.setVisibility(View.INVISIBLE);
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 140, 0, 0);
+                    holder.listVideo.setLayoutParams(layoutParams);
+                    holder.listVideo.setBackgroundResource(0);
 
-                        holder.listVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
+                    // Onclick that visually starts video for user
+                    holder.listVideo.setOnClickListener(v -> holder.listVideo.start());
 
-                                holder.listVideo.seekTo( 1);
-                            }
-                        });
-
-                    }
-
+                    // Gives each video a "thumbnail" (always the 1st frame of video)
+                    holder.listVideo.setOnCompletionListener(mp1 -> holder.listVideo.seekTo( 1));
                 });
-
             }
-
-
         };
 
-        // profileVideos.setHasFixedSize(true);
+        // Set the adapter the the RecyclerView
         profileVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         profileVideos.setAdapter(adapter);
         profileVideos.setNestedScrollingEnabled(false);
@@ -489,14 +396,13 @@ public class ProfileFragment extends Fragment {
         return returnView;
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
     }
 
-    private class ProfileVideosHolder extends  RecyclerView.ViewHolder{
+    // profile_videos_layout Variables
+    private static class ProfileVideosHolder extends  RecyclerView.ViewHolder{
 
         private  ImageView listUserImage;
         private  TextView listGameName;
@@ -519,9 +425,9 @@ public class ProfileFragment extends Fragment {
             listLikesIcon=itemView.findViewById(R.id.videosLikeIcon);
             progressBar =itemView.findViewById(R.id.progress_circular);
         }
-
     }
 
+    // Allows adapter to start and stop recieving data
     @Override
     public void onStart() {
         super.onStart();
@@ -533,7 +439,4 @@ public class ProfileFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
-
-
-
 }

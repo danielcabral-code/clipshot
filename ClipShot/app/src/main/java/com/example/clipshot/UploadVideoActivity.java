@@ -1,48 +1,34 @@
 package com.example.clipshot;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.service.autofill.UserData;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.firebase.ui.auth.data.model.User;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import org.json.JSONArray;
@@ -52,11 +38,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.cert.Extension;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,6 +56,7 @@ import java.util.UUID;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
+    // Global Variables
     Uri videoUri;
     StorageReference storageReference;
     String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
@@ -88,7 +72,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     ProgressBar progressBar;
     TextView uploadLabel;
 
-
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +79,14 @@ public class UploadVideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_upload_video);
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        assert acct != null;
         email= acct.getEmail();
 
         // Call Upload TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.upload_action_bar);
 
-        //AppCompatImageView iconDone = findViewById(R.id.iconDoneUpload);
+        // AppCompatImageView iconDone = findViewById(R.id.iconDoneUpload);
         EditText description = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
         spinner = findViewById(R.id.spinner);
@@ -110,17 +94,14 @@ public class UploadVideoActivity extends AppCompatActivity {
         iconDone = findViewById(R.id.iconDoneUpload);
         progressBar=findViewById(R.id.progress_circular);
 
-
-
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
 
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy  HH:mm:ss");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy  HH:mm:ss");
         String formattedDate = df.format(c);
         Log.d("TAG", "onCreate: "+ formattedDate);
 
-
-        //Get extras from Main Activity
+        // Get extras from Main Activity
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             videoUri = Uri.parse(bundle.getString("video"));
@@ -129,45 +110,29 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        //use one of overloaded setDataSource() functions to set your data source
+
+        // Use one of overloaded setDataSource() functions to set your data source
         retriever.setDataSource(this, Uri.parse(String.valueOf(videoUri)));
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         long timeInMillisec = Long.parseLong(time);
         retriever.release();
-        Log.d("TAG", "tempo: "+ timeInMillisec);
 
         if (timeInMillisec > 60000){
 
             Toast.makeText(this,"Your Clip exceeds the 60s max permitted!" , Toast.LENGTH_LONG).show();
             Intent goToFeed = new Intent(UploadVideoActivity.this,MainActivity.class);
             startActivity(goToFeed);
-
-
         }
         else {
 
             videoSelected.setVideoURI(videoUri);
-            videoSelected.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    layoutParams.setMargins(0, 20, 0, 0);
-                    videoSelected.setLayoutParams(layoutParams);
-                    videoSelected.start();
-                }
-
+            videoSelected.setOnPreparedListener(mp -> {
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(0, 20, 0, 0);
+                videoSelected.setLayoutParams(layoutParams);
+                videoSelected.start();
             });
-
-            videoSelected.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-
-                    videoSelected.seekTo(1);
-                }
-            });
-
-
-
+            videoSelected.setOnCompletionListener(mp -> videoSelected.seekTo(1));
 
             // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
             description.addTextChangedListener(new TextWatcher() {
@@ -179,13 +144,13 @@ public class UploadVideoActivity extends AppCompatActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     Log.d("TAG", "onTextChanged: mudou");
 
-                    if (s.toString().trim().length()==0){
+                    if (s.toString().trim().length() ==0 ){
 
-                        descriptionIsEmpty=1;
+                        descriptionIsEmpty = 1;
 
 
                     }
-                    else descriptionIsEmpty=0;
+                    else descriptionIsEmpty = 0;
 
                     // limit to 3 lines
                     if (description.getLayout().getLineCount() > 3)
@@ -198,21 +163,16 @@ public class UploadVideoActivity extends AppCompatActivity {
                 }
             });
 
-            iconDone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    iconDone.setVisibility(View.INVISIBLE);
-                    uploadVideo();
-                }
+            iconDone.setOnClickListener(v -> {
+                progressBar.setVisibility(View.VISIBLE);
+                iconDone.setVisibility(View.INVISIBLE);
+                uploadVideo();
             });
 
             // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
             gameName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-
                 }
 
                 @Override
@@ -231,8 +191,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                                             .appendPath("games")
                                             .appendQueryParameter("ordering", "-rating")
                                             .appendQueryParameter("search", s.toString());
-                                    Log.d("TAG", "afterTextChanged: " + s.toString());
-
 
                                     myUrl = builder.build().toString();
                                     new GetIp().execute(myUrl);
@@ -240,37 +198,25 @@ public class UploadVideoActivity extends AppCompatActivity {
                             },
                             DELAY
                     );
-
-
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    //showIconDone();
-
-
                 }
-
-
             });
 
             spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
                 @Override
                 public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                    Log.d("TAG", "onItemSelected: " + item);
+
                     game = item;
                     gameName.setText(item);
-
                     gameNameIsEmpty=0;
                     showIconDone();
                 }
             });
         }
-
-
-
-
     }
 
     public void uploadVideo() {
@@ -280,82 +226,57 @@ public class UploadVideoActivity extends AppCompatActivity {
             // Firestore instance
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
-
             EditText descrtiption = findViewById(R.id.description);
+
             // Declaring variables that will be inserted in Firestore
             String videoDescription = descrtiption.getText().toString();
-
             String randomUUID = UUID.randomUUID().toString();
-
 
             // Add video to folder videos in Firebase Storage and after upload it create a file in database with video details
             storageReference = FirebaseStorage.getInstance().getReference("videos/" + randomUUID);
             storageReference.putFile(videoUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    final String[][] arrayFollowers = {new String[0]};
-                                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    .addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                Log.d("TAG", document.getId() + " => " + document.getData());
-                                                List<String> group = (List<String>) document.get("UsersFollowers");
+                        final String[][] arrayFollowers = {new String[0]};
 
-                                                Log.d("TAG", document.getId() + " => " + group);
+                        db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(task -> {
 
-                                                arrayFollowers[0] = group.toArray(new String[0]);
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
-                                                Log.d("TAG", "array: "+ Arrays.asList(arrayFollowers[0]).toString());
-                                                //db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
-                                            }
+                                List<String> group = (List<String>) document.get("UsersFollowers");
 
-                                            Log.d("TAG", "array fora do query: " + Arrays.asList(arrayFollowers[0]).toString());
-                                            Date date = new Date();
-                                            // Map that will fill our database with values
-                                            Map<String, Object> Userdata = new HashMap<>();
-                                            Userdata.put("GameName", game);
-                                            Userdata.put("Description", videoDescription);
-                                            Userdata.put("UserID", userUid);
-                                            Userdata.put("Url", uri.toString());
-                                            Userdata.put("Likes","0");
-                                            String[] arrayLikes = new String[0];
-                                            Userdata.put("UsersThatLiked", Arrays.asList(arrayLikes));
-                                            Userdata.put("UsersFollowers", Arrays.asList(arrayFollowers[0]));
-                                            Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
-                                            Userdata.put("DocumentName",randomUUID);
-                                            Userdata.put ("Email", email);
+                                assert group != null;
+                                arrayFollowers[0] = group.toArray(new String[0]);
+                            }
 
+                            Date date = new Date();
 
-                                            db.collection("videos").document(randomUUID).set(Userdata);
-                                            Intent goToFeed = new Intent(UploadVideoActivity.this, MainActivity.class);
-                                            startActivity(goToFeed);
-                                        }
-                                    });
+                            // Map that will fill our database with values
+                            Map<String, Object> Userdata = new HashMap<>();
+                            Userdata.put("GameName", game);
+                            Userdata.put("Description", videoDescription);
+                            Userdata.put("UserID", userUid);
+                            Userdata.put("Url", uri.toString());
+                            Userdata.put("Likes","0");
+                            String[] arrayLikes = new String[0];
+                            Userdata.put("UsersThatLiked", Arrays.asList(arrayLikes));
+                            Userdata.put("UsersFollowers", Arrays.asList(arrayFollowers[0]));
+                            Userdata.put("ReleasedTime", new Timestamp(date.getTime()).toString());
+                            Userdata.put("DocumentName",randomUUID);
+                            Userdata.put ("Email", email);
 
-
-
-
-
-                                }
-                            });
-
-
-                        }
-                    });
+                            db.collection("videos").document(randomUUID).set(Userdata);
+                            Intent goToFeed = new Intent(UploadVideoActivity.this, MainActivity.class);
+                            startActivity(goToFeed);
+                        });
+                    }));
         }
-
-
     }
 
+    @SuppressLint("StaticFieldLeak")
     class GetIp extends AsyncTask<String, String, String> {
-        @Override
 
+        @Override
         protected String doInBackground(String... fileUrl) {
             StringBuilder stringBuilder = new StringBuilder();
             try {
@@ -367,17 +288,16 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                 stringBuilder = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
                 String line;
+
                 while ((line = reader.readLine()) != null) {
                     stringBuilder.append(line);
                 }
-
             } catch (Exception e) {
                 Log.e("ERROR", "onCreate" + e);
             }
             return stringBuilder.toString();
-
-
         }
 
         @Override
@@ -385,11 +305,9 @@ public class UploadVideoActivity extends AppCompatActivity {
             super.onPostExecute(result);
             gameNameArray.clear();
 
-
             try {
                 JSONObject jsonResponse = new JSONObject(result);
                 JSONArray results = jsonResponse.getJSONArray("results");
-
 
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject c = results.getJSONObject(i);
@@ -397,10 +315,8 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                     if (!gameNameArray.contains(name)) {
                         gameNameArray.add(name);
-
                     }
                 }
-                Log.d("TAG", "onPostExecute: " + gameNameArray);
 
                 String[] array = new String[gameNameArray.size()];
                 array = (String[]) gameNameArray.toArray(array);
@@ -408,28 +324,21 @@ public class UploadVideoActivity extends AppCompatActivity {
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(UploadVideoActivity.this, R.layout.spinner_layout, array);
                 spinner.setAdapter(adapter);
 
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
         }
-
-
-
-
     }
 
     public void showIconDone(){
 
-        if (descriptionIsEmpty ==0 && gameNameIsEmpty==0){
+        if (descriptionIsEmpty == 0 && gameNameIsEmpty == 0) {
+
             iconDone.setVisibility(View.VISIBLE);
-            Log.d("TAG", "showIconDone:visivel ");
+
+        } else {
+
+            iconDone.setVisibility(View.INVISIBLE);
         }
-        else{ iconDone.setVisibility(View.INVISIBLE);
-            Log.d("TAG", "showIconDone:visivel ");}
     }
-
-
 }

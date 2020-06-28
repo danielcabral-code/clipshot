@@ -1,10 +1,7 @@
 package com.example.clipshot;
 
-
-import java.util.ArrayList;
-
+// Declaring Variables which will recieve DB data
 public class FollowersUsers {
-
 
     String Username;
     String UserUID;
@@ -12,10 +9,10 @@ public class FollowersUsers {
     String Following;
     String Followers;
 
-
     public FollowersUsers() {
     }
 
+    // Gives other variables the data
     public FollowersUsers(String username, String userUID, String email, String following, String followers) {
         this.Username = username;
         this.UserUID = userUID;
@@ -24,6 +21,7 @@ public class FollowersUsers {
         this.Followers = followers;
     }
 
+    // Will be used to fill in data in RecyclerView
     public String getUsername() {
         return Username;
     }
@@ -44,5 +42,3 @@ public class FollowersUsers {
         return Followers;
     }
 }
-
-

@@ -45,22 +45,25 @@ import java.util.UUID;
 import static android.app.PendingIntent.getActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    // Global Variables
     private static final int PICK_VIDEO =2;
     Uri videoUri;
     String email;
     String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
 
     @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // Google variable to detect the user that is signed
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
         // Variables that will get the email and userId value from the user google account
-         email = acct.getEmail().toString();
+        assert acct != null;
+        email = acct.getEmail();
 
         // Call Feed TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -109,13 +112,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Access user document and if it exists set the topbar name with the user nickname
         documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()){
-                            String userName  =documentSnapshot.getString("Username");
-                            profileNameBar.setText(userName);
-                        }
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+
+                        String userName  =documentSnapshot.getString("Username");
+                        profileNameBar.setText(userName);
                     }
                 });
     }
@@ -140,13 +141,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Access user document and if it exists set the topbar name with the user nickname
         documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()){
-                            String userName  =documentSnapshot.getString("Username");
-                            profileNameBar.setText(userName);
-                        }
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+                        String userName  =documentSnapshot.getString("Username");
+                        profileNameBar.setText(userName);
                     }
                 });
     }
@@ -182,11 +180,10 @@ public class MainActivity extends AppCompatActivity {
         DocumentReference documentReference;
 
         // Variables that will get the userId value from the user google account
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Document reference of user data that will read user data
         documentReference = db.collection("users").document(userUid);
-
 
         // Call Profile TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -202,13 +199,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Access user document and if it exists set the topbar name with the user nickname
         documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()){
-                            String userName  =documentSnapshot.getString("Username");
-                            profileNameBar.setText(userName);
-                        }
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+                        String userName = documentSnapshot.getString("Username");
+                        profileNameBar.setText(userName);
                     }
                 });
     }
@@ -243,11 +237,9 @@ public class MainActivity extends AppCompatActivity {
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("video/*");
         startActivityForResult(gallery, PICK_VIDEO);
-
-
-
     }
 
+    // Recieves video from gallery and sends data to UploadActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -260,5 +252,11 @@ public class MainActivity extends AppCompatActivity {
             upload.putExtra("userID",userUid);
             startActivity(upload);
         }
+    }
+
+    // Not calling **super**, disables back button in current screen.
+    @Override
+    public void onBackPressed() {
+    // super.onBackPressed();
     }
 }

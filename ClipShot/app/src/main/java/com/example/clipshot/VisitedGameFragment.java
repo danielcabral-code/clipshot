@@ -45,14 +45,14 @@ import java.util.Objects;
 
 public class VisitedGameFragment extends Fragment {
 
+    // Global Variables
     private String pickedGameName;
     private FirebaseFirestore db;
-    StorageReference storageReference;
     private FirestorePagingAdapter adapter;
     private DocumentReference documentReference;
 
     // Variables that will get the email and userId value from the user google account
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
     public VisitedGameFragment() {
         // Required empty public constructor
@@ -75,23 +75,19 @@ public class VisitedGameFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //Get extras from bundle that will be used to get the visted user image and videos
+        // Get extras from bundle that will be used to get the visted user image and videos
         Bundle bundle = this.getArguments();
         assert bundle != null;
         pickedGameName = bundle.getString("pickedGameName");
-        /*docID = bundle.getString("docID");
-        visitedEmail=bundle.getString("email");*/
         assert pickedGameName != null;
-        Log.d("checkItem", pickedGameName);
-
 
         View returnView = inflater.inflate(R.layout.fragment_visited_game, container, false);
         RecyclerView VisitedGameVideos = returnView.findViewById(R.id.recyclerView);
 
-
         db = FirebaseFirestore.getInstance();
 
         Query query = db.collection("videos").whereEqualTo("GameName",pickedGameName).orderBy("ReleasedTime", Query.Direction.DESCENDING);
+
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
@@ -110,87 +106,79 @@ public class VisitedGameFragment extends Fragment {
                 return new GameVideosHolder(view);
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             protected void onBindViewHolder(@NonNull GameVideosHolder holder, int position, @NonNull VisitedGameVideos model) {
 
                 // Storage reference to the user avatar image
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(model.getEmail() + "/" + model.getUserID());
-                Log.d("TAG", "onBindViewHolder: " + model.getEmail());
 
                 // Download uri from user image folder using the storageReference inicialized at top of document
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                        // Load the image using Glide
-                        Glide.with(container).load(uri).into(holder.listUserImage);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
-                        Log.d("TAG", "onFailure: error " + exception);
-                    }
+                    // Load the image using Glide
+                    Glide.with(container).load(uri).into(holder.listUserImage);
+
+                }).addOnFailureListener(exception -> {
+
+                    // Loads default avatar if none are found
+                    Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                 });
 
                 documentReference = db.collection("users").document(model.getUserID());
 
                 documentReference.get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    String dataUser = documentSnapshot.getString("Username");
-                                    holder.listUsername.setText(dataUser);
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String dataUser = documentSnapshot.getString("Username");
+                                holder.listUsername.setText(dataUser);
 
-                                }
                             }
                         });
 
-                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        List<String> group = (List<String>) document.get("UsersThatLiked");
-                        assert group != null;
-                        if (group.contains(userUid)) {
-                            //Log.d("TAG", "onComplete: existe ");
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
-                        }
+                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(task -> {
+                    DocumentSnapshot document = task.getResult();
+                    List<String> group = (List<String>) document.get("UsersThatLiked");
+                    assert group != null;
+                    if (group.contains(userUid)) {
+
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
                     }
                 });
 
+                if (model.getGameName().length() > 34) {
+
+                    holder.listGameName.setText(model.getGameName().substring(0, 34) + "...");
+                } else {
+
+                    holder.listGameName.setText(model.getGameName());
+                }
+
                 holder.listDescription.setText(model.getDescription());
-                holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
-                holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
+                holder.listLikesIcon.setOnClickListener(v -> {
 
-                    @Override
-                    public void onClick(View v) {
+                    if (holder.listLikesIcon.getTag().toString().equals("liked")) {
 
-                        if (holder.listLikesIcon.getTag().toString().equals("liked")) {
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone = Integer.parseInt(likesCount) - 1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
+                        holder.listLikesIcon.setTag("noLike");
 
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone = Integer.parseInt(likesCount) - 1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
-                            holder.listLikesIcon.setTag("noLike");
+                        db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
+                    } else {
 
-                            db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
-                        } else {
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone = Integer.parseInt(likesCount) + 1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
 
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone = Integer.parseInt(likesCount) + 1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
-
-                            db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
-                        }
+                        db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
                     }
                 });
 
@@ -199,32 +187,15 @@ public class VisitedGameFragment extends Fragment {
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo(1);
-                holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        holder.progressBar.setVisibility(View.INVISIBLE);
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 140, 0, 0);
-                        holder.listVideo.setLayoutParams(layoutParams);
-                        holder.listVideo.setBackgroundResource(0);
+                holder.listVideo.setOnPreparedListener(mp -> {
 
-                        holder.listVideo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                holder.listVideo.start();
-                            }
-                        });
-
-                        holder.listVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-
-                                holder.listVideo.seekTo(1);
-                            }
-                        });
-
-                    }
-
+                    holder.progressBar.setVisibility(View.INVISIBLE);
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 140, 0, 0);
+                    holder.listVideo.setLayoutParams(layoutParams);
+                    holder.listVideo.setBackgroundResource(0);
+                    holder.listVideo.setOnClickListener(v -> holder.listVideo.start());
+                    holder.listVideo.setOnCompletionListener(mp1 -> holder.listVideo.seekTo(1));
                 });
             }
         };
@@ -232,7 +203,6 @@ public class VisitedGameFragment extends Fragment {
         VisitedGameVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         VisitedGameVideos.setAdapter(adapter);
         VisitedGameVideos.setNestedScrollingEnabled(false);
-
 
         return returnView;
     }
@@ -253,7 +223,7 @@ public class VisitedGameFragment extends Fragment {
         }
     }
 
-    private class GameVideosHolder extends  RecyclerView.ViewHolder{
+    private static class GameVideosHolder extends  RecyclerView.ViewHolder {
 
         private ImageView listUserImage;
         private  TextView listGameName;

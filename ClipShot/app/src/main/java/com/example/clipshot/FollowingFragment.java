@@ -37,8 +37,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.Objects;
+
 public class FollowingFragment extends Fragment {
 
+    // Global Variables
     private FirestorePagingAdapter adapter;
     private FirebaseFirestore db;
     private DocumentReference documentReference;
@@ -61,30 +64,32 @@ public class FollowingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Gets current user
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
 
         // Variables that will get the email and userId value from the user google account
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String email = acct.getEmail();
+        String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        assert acct != null;
 
-
+        // Layout variables
         View returnView = inflater.inflate(R.layout.fragment_following, container, false);
         RecyclerView usersList = returnView.findViewById(R.id.recyclerViewFollowing);
 
+        // FireStore Instance
         db = FirebaseFirestore.getInstance();
 
+        // Query that gets users that user follows
         Query query = db.collection("users").whereArrayContains("UsersFollowers", userUid);
 
+        // Configuration for RecyclerView adapter
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
                 .build();
 
-
         FirestorePagingOptions<FollowersUsers> options = new FirestorePagingOptions.Builder<FollowersUsers>()
                 .setQuery(query,config, FollowersUsers.class)
                 .build();
-
 
         adapter = new FirestorePagingAdapter<FollowersUsers, FollowingHolder>(options) {
 
@@ -94,109 +99,78 @@ public class FollowingFragment extends Fragment {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.following_layout,parent,false);
                 return new FollowingHolder(view);
             }
+
             @Override
             protected void onBindViewHolder(@NonNull FollowingHolder holder, int position, @NonNull FollowersUsers model) {
 
-
-
-
-               documentReference = db.collection("users").document(model.getUserUID());
-                Log.d("TAG", "onBindViewHolder: "+ model.UserUID);
-
+                // Gets UserID from users collection and places username in following list
+                documentReference = db.collection("users").document(model.getUserUID());
                 documentReference.get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    String dataUser = documentSnapshot.getString("Username");
-                                    Log.d("TAG", "onSuccess: "+ dataUser);
-                                    holder.listUsername.setText(dataUser);
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
 
-
-
-                                }
+                                String dataUser = documentSnapshot.getString("Username");
+                                holder.listUsername.setText(dataUser);
                             }
                         });
-
 
                 // Storage reference to the user avatar image
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference().child(model.getEmail() + "/" + model.getUserUID());
 
                 // Download uri from user image folder using the storageReference inicialized at top of document
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                        // Load the image using Glide
-                        Glide.with(container).load(uri).into(holder.listUserImage);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
-                        Log.d("TAG", "onFailure: error " + exception);
-                    }
+                    // Load the image using Glide
+                    Glide.with(container).load(uri).into(holder.listUserImage);
+
+                }).addOnFailureListener(exception -> {
+
+                    // When image can't load, app loads default avatar
+                    Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                 });
 
+                // Button to unfollow
+                holder.listButton.setOnClickListener(view -> {
 
-                holder.listButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    // Modal confirmation message for user
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle("Are you sure you want to UNFOLLOW " + model.getUsername() + "?");
 
+                    // If removed, changes data in DB
+                    alert.setPositiveButton("UNFOLLOW", (dialog, whichButton) -> {
 
-                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-                        alert.setTitle("Are you sure you want to UNFOLLOW " + model.getUsername() + "?");
-                        // alert.setMessage("Message");
+                        db.collection("users").document(userUid).get().addOnCompleteListener(task -> {
+                            task.getResult();
 
-                        alert.setPositiveButton("UNFOLLOW", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                //Your action here
+                            // Counts users following
+                            int followingCount;
+                            followingCount= Integer.parseInt(Objects.requireNonNull(task.getResult().getString("Following")));
+                            followingCount = followingCount -1;
 
+                            // Counts followers of user that is being unfollowed
+                            int followersCount = Integer.parseInt(model.getFollowers());
+                            followersCount = followersCount-1;
 
-                                Task<DocumentSnapshot> myFollowing = db.collection("users").document(userUid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        task.getResult();
-                                        int followingCount;
-                                        Log.d("TAG", "meus following: "+ task.getResult().getString("Following"));
-                                        followingCount= Integer.parseInt(task.getResult().getString("Following"));
-                                        Log.d("TAG", "ver following: " + String.valueOf(followingCount));
-                                        followingCount = followingCount -1;
-                                        Log.d("TAG", "ver following depois de deixar de sguir " + String.valueOf(followingCount));
-
-                                        int followersCount = Integer.parseInt(model.getFollowers());
-                                        Log.d("TAG", "ver followers: "+ String.valueOf(followersCount));
-                                        followersCount = followersCount-1;
-                                        Log.d("TAG", "followers depois de deixar de seguir: "+ String.valueOf(followingCount));
-
-                                        db.collection("users").document(userUid).update("Following",String.valueOf(followingCount) );
-                                        db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(model.getUserUID()));
-                                        db.collection("users").document(model.getUserUID()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
-                                        db.collection("users").document(model.getUserUID()).update("Followers",String.valueOf(followersCount) );
-
-                                        adapter.refresh();
-                                    }
-                                });
-
-                            }
+                            // Where data is altered and refreshes RecyclerView
+                            db.collection("users").document(userUid).update("Following",String.valueOf(followingCount) );
+                            db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(model.getUserUID()));
+                            db.collection("users").document(model.getUserUID()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                            db.collection("users").document(model.getUserUID()).update("Followers",String.valueOf(followersCount) );
+                            adapter.refresh();
                         });
 
-                        alert.setNegativeButton("Cancel",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                    }
-                                });
+                    });
 
-                        alert.show();
-
-
-                    }
+                    // Sets the negative (cancel) action of the modal
+                    alert.setNegativeButton("Cancel",
+                            (dialog, whichButton) -> {
+                            });
+                    alert.show();
                 });
-
             }
         };
 
+        // Set the adapter the the RecyclerView
         usersList.setLayoutManager(new LinearLayoutManager(getContext()));
         usersList.setAdapter(adapter);
         usersList.setNestedScrollingEnabled(false);
@@ -204,13 +178,12 @@ public class FollowingFragment extends Fragment {
         return returnView;
     }
 
-
-    private class FollowingHolder extends  RecyclerView.ViewHolder{
+    // following_layout Variables
+    private static class FollowingHolder extends  RecyclerView.ViewHolder{
 
         private ImageView listUserImage;
         private  TextView listUsername;
         private Button listButton;
-
 
         public FollowingHolder(@NonNull View itemView) {
             super(itemView);
@@ -218,11 +191,10 @@ public class FollowingFragment extends Fragment {
             listUsername =itemView.findViewById(R.id.username);
             listUserImage= itemView.findViewById(R.id.userImage);
             listButton =itemView.findViewById(R.id.removeUser);
-
         }
-
     }
 
+    // Allows adapter to start and stop recieving data
     @Override
     public void onStart() {
         super.onStart();
@@ -234,6 +206,4 @@ public class FollowingFragment extends Fragment {
         super.onStop();
         adapter.stopListening();
     }
-
-
 }

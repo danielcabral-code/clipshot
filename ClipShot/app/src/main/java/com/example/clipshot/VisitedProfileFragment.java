@@ -132,6 +132,7 @@ public class VisitedProfileFragment extends Fragment {
                 return new VisitedProfileHolder(view);
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             protected void onBindViewHolder(@NonNull VisitedProfileHolder holder, int position, @NonNull VisitedProfileVideos model) {
                 // Storage reference to the user avatar image
@@ -182,9 +183,16 @@ public class VisitedProfileFragment extends Fragment {
                     }
                 });
 
-                //Fill description, game name, likes and icon likes in the adapter
+                // Fill description, game name, likes and icon likes in the adapter
+                if (model.getGameName().length() > 34) {
+
+                    holder.listGameName.setText(model.getGameName().substring(0, 34) + "...");
+                } else {
+
+                    holder.listGameName.setText(model.getGameName());
+                }
+
                 holder.listDescription.setText(model.getDescription());
-                holder.listGameName.setText(model.getGameName());
                 holder.listLikes.setText(model.getLikes());
 
                 holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {

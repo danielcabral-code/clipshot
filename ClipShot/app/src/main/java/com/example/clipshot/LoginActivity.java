@@ -50,8 +50,8 @@ public class LoginActivity extends AppCompatActivity implements
         getSupportActionBar().setElevation(20f); // Float == px
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-        mAuth=FirebaseAuth.getInstance();
-        progressBar=findViewById(R.id.progress_circular);
+        mAuth = FirebaseAuth.getInstance();
+        progressBar = findViewById(R.id.progress_circular);
 
         // Configure sign-in to request the user's ID, email address, and basic profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -91,16 +91,15 @@ public class LoginActivity extends AppCompatActivity implements
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
-                //Firebase Authentication with Google Account
+                // Firebase Authentication with Google Account
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+
                 if (account != null) {
                     firebaseAuthWithGoogle(account);
                 } else{
-                    Log.w("AUTH", "Account is NULL");
                     Toast.makeText(LoginActivity.this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
                 }
             } catch (ApiException e) {
-                Log.w("AUTH", "Google sign in failed", e);
                 Toast.makeText(LoginActivity.this, "Sign-in failed, try again later.", Toast.LENGTH_LONG).show();
             }
         }
@@ -109,34 +108,30 @@ public class LoginActivity extends AppCompatActivity implements
     // Firebase Google Authentication Method
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
-        Log.d("TAG", "firebaseAuthWithGoogle: " + account.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
         mAuth.signInWithCredential(credential).addOnCompleteListener(this,task -> {
 
             if (task.isSuccessful()) {
                 progressBar.setVisibility(View.INVISIBLE);
 
-                Log.d("TAG", "SignIn sucess");
                 boolean newuser = Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getAdditionalUserInfo()).isNewUser();
 
                 if (newuser) {
-                    //If it is a new user it will appear the Welcome Page
-                    Log.d("TAG", "new");
+
+                    // If it is a new user it will appear the Welcome Page
                     Intent intent = new Intent(LoginActivity.this, WelcomeActivity.class);
                     startActivity(intent);
 
                 }else {
-                    //If it is an existing user it will appear the Feed Page
-                    Log.d("TAG", "welcome back");
+
+                    // If it is an existing user it will appear the Feed Page
                     FirebaseUser user = mAuth.getCurrentUser();
                     updateUI(user);
                 }
             }
             else {
-                //If Login fails it will appear an toast
+                // If Login fails it will appear an toast
                 progressBar.setVisibility(View.INVISIBLE);
-                Log.w("TAG", "failure ", task.getException());
                 Toast.makeText(this, "SignIn Failed!", Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
@@ -149,9 +144,6 @@ public class LoginActivity extends AppCompatActivity implements
         if (user != null) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-        }
-        else {
-            Log.d("TAG", "updateUI:");
         }
     }
 
@@ -170,11 +162,12 @@ public class LoginActivity extends AppCompatActivity implements
         // Firebase sign out
         mAuth.signOut();
         mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        updateUI(null);
-                    }
-                });
+                task -> updateUI(null));
+    }
+
+    // Not calling **super**, disables back button in current screen.
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
     }
 }

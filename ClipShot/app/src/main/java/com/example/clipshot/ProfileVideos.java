@@ -1,7 +1,6 @@
 package com.example.clipshot;
 
-import android.net.Uri;
-
+// Declaring Variables which will recieve DB data
 public class ProfileVideos {
 
     private String Description;
@@ -14,6 +13,7 @@ public class ProfileVideos {
     public ProfileVideos() {
     }
 
+    // Gives other variables the data
     public ProfileVideos(String description, String url, String gameName, String userId, String likes, String documentName) {
 
         this.Description = description;
@@ -24,7 +24,7 @@ public class ProfileVideos {
         this.DocumentName=documentName;
     }
 
-
+    // Will be used to fill in data in RecyclerView
     public String getDescription() {
         return Description;
     }

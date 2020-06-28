@@ -263,4 +263,10 @@ public class WelcomeActivity extends AppCompatActivity {
                     });
         }
     }
+
+    // Not calling **super**, disables back button in current screen.
+    @Override
+    public void onBackPressed() {
+        // super.onBackPressed();
+    }
 }

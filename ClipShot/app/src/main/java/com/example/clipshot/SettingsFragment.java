@@ -57,21 +57,19 @@ import static android.app.Activity.RESULT_OK;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
+    // Global Variables
     private static final int PICK_IMAGE = 1;
-    private int usernameChanged =0;
-
+    private int usernameChanged = 0;
     Uri imageUri;
     FirebaseStorage imageStorage;
     StorageReference storageReference;
     GoogleSignInAccount acct;
     String email;
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
     ImageView profileImage;
     private String dataUsername,dataName,dataBio,steamName,originName,psnName,xBoxName,nintendoName,followers,following;
     String[] followersArray = new String[0];
     String[] followingArray = new String[0];
-
     AppCompatImageView iconDoneSettings;
     ProgressBar progressBar;
 
@@ -111,85 +109,65 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         EditText nintendo = returnView.findViewById(R.id.switchInput);
 
         // Retrieving Firebase FireStore data
-        String email = acct.getEmail().toString();
-        String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String email = acct.getEmail();
+        String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Storage reference to the user avatar image
         StorageReference storageReference  = FirebaseStorage.getInstance().getReference().child(email+"/"+userUid);
 
+        // Gets user's data and displays in settingsFragment
         documentReference = db.collection("users").document(userUid);
-
         documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
 
-                            dataUsername = documentSnapshot.getString("Username");
-                            dataName = documentSnapshot.getString("Name");
-                            dataBio = documentSnapshot.getString("Bio");
-                            steamName = documentSnapshot.getString("Steam");
-                            originName = documentSnapshot.getString("Origin");
-                            psnName = documentSnapshot.getString("Psn");
-                            xBoxName = documentSnapshot.getString("Xbox");
-                            nintendoName = documentSnapshot.getString("Nintendo");
-                            followers=documentSnapshot.getString("Followers");
-                            following=documentSnapshot.getString("Following");
-                            Log.d("TAG", "onSuccess: "+ following + followers);
+                        dataUsername = documentSnapshot.getString("Username");
+                        dataName = documentSnapshot.getString("Name");
+                        dataBio = documentSnapshot.getString("Bio");
+                        steamName = documentSnapshot.getString("Steam");
+                        originName = documentSnapshot.getString("Origin");
+                        psnName = documentSnapshot.getString("Psn");
+                        xBoxName = documentSnapshot.getString("Xbox");
+                        nintendoName = documentSnapshot.getString("Nintendo");
+                        followers=documentSnapshot.getString("Followers");
+                        following=documentSnapshot.getString("Following");
 
+                        displayName.setText(dataUsername);
+                        realName.setText(dataName);
+                        bio.setText(dataBio);
+                        steam.setText(steamName);
+                        origin.setText(originName);
+                        psn.setText(psnName);
+                        xbox.setText(xBoxName);
+                        nintendo.setText(nintendoName);
 
-
-                            displayName.setText(dataUsername);
-                            realName.setText(dataName);
-                            bio.setText(dataBio);
-                            steam.setText(steamName);
-                            origin.setText(originName);
-                            psn.setText(psnName);
-                            xbox.setText(xBoxName);
-                            nintendo.setText(nintendoName);
-
-                        } else {
-                            Log.d("TAG", "doesnt exist");
-                        }
+                    } else {
+                        Log.d("TAG", "doesnt exist");
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure:" + e);
-            }
+                }).addOnFailureListener(e -> Log.d("TAG", "onFailure:" + e));
+
+        // Download uri from user image folder using the storageReference inicialized at top of document
+        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+
+            // Load the image using Glide
+            Glide.with(container).load(uri).into(img);
+
+        }).addOnFailureListener(exception -> {
+
+            // Handle any errors
+            Log.d("TAG", "onFailure: error "+ exception);
         });
 
         // Download uri from user image folder using the storageReference inicialized at top of document
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
+        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                // Load the image using Glide
-                Glide.with(container).load(uri).into(img);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Log.d("TAG", "onFailure: error "+ exception);
-            }
-        });
+            // Load the image using Glide
+            Glide.with(container).load(uri).into(img);
 
-        // Download uri from user image folder using the storageReference inicialized at top of document
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
+        }).addOnFailureListener(exception -> {
 
-                // Load the image using Glide
-                Glide.with(container).load(uri).into(img);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-
-                Glide.with(container).load(R.drawable.default_avatar).into(img);
-            }
+            // When image can't load, app loads default avatar
+            Glide.with(container).load(R.drawable.default_avatar).into(img);
         });
 
         // Inflate the layout for this fragment
@@ -235,155 +213,102 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         progressBar= Objects.requireNonNull(getActivity()).findViewById(R.id.progress_circular);
 
         // Listener to call method to pick an image from gallery
-        profileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        profileImage.setOnClickListener(v -> pickImageFromGallery());
 
-                pickImageFromGallery();
-            }
-        });
+        // Button to accept changes and update FireStore
+        iconDoneSettings.setOnClickListener(v -> {
 
-        iconDoneSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            progressBar.setVisibility(View.VISIBLE);
+            iconDoneSettings.setVisibility(View.INVISIBLE);
 
-                progressBar.setVisibility(View.VISIBLE);
-                iconDoneSettings.setVisibility(View.INVISIBLE);
+            String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo, email;
+            FirebaseFirestore db;
 
-                String dataName, dataUsername,dataBio,dataSteam,dataOrigin,dataPsn,dataXbox,dataNintendo, email;
-                FirebaseFirestore db;
+            // Email gets the user google email that will create a collection with that email
+            email = acct.getEmail();
 
-                // Email gets the user google email that will create a collection with that email
-                email = acct.getEmail();
+            // Firestore instance
+            db = FirebaseFirestore.getInstance();
+            imageStorage = FirebaseStorage.getInstance();
+            storageReference = imageStorage.getReference();
 
-                // Firestore instance
-                db = FirebaseFirestore.getInstance();
-                imageStorage = FirebaseStorage.getInstance();
-                storageReference = imageStorage.getReference();
+            // Declaring variables that will be inserted in Firestore
+            dataUsername = displayName.getText().toString().toLowerCase();
+            dataName = realName.getText().toString();
+            dataBio = bio.getText().toString();
+            dataSteam = steamInput.getText().toString();
+            dataOrigin = originInput.getText().toString();
+            dataPsn = psnInput.getText().toString();
+            dataXbox = xboxInput.getText().toString();
+            dataNintendo = switchInput.getText().toString();
 
-                // Declaring variables that will be inserted in Firestore
-                dataUsername = displayName.getText().toString().toLowerCase();
-                dataName = realName.getText().toString();
-                dataBio = bio.getText().toString();
-                dataSteam = steamInput.getText().toString();
-                dataOrigin = originInput.getText().toString();
-                dataPsn = psnInput.getText().toString();
-                dataXbox = xboxInput.getText().toString();
-                dataNintendo = switchInput.getText().toString();
+            // Update FireStore
+            CollectionReference usersRef = db.collection("users");
 
+            Query query = usersRef.whereEqualTo("Username", dataUsername);
 
-                CollectionReference usersRef = db.collection("users");
-                Query query = usersRef.whereEqualTo("Username", dataUsername);
-                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        Log.d("TAG", String.valueOf(usernameChanged));
-                        Log.d("TAG", String.valueOf(task.getResult().size()));
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
 
-                        if (task.isSuccessful()) {
+                    for (DocumentSnapshot documentSnapshot : Objects.requireNonNull(task.getResult())) {
+                        String user = documentSnapshot.getString("Username");
 
-                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                String user = documentSnapshot.getString("Username");
+                        assert user != null;
+                        if (user.equals(dataUsername) && usernameChanged == 1) {
 
-
-
-                                if (user.equals(dataUsername) && usernameChanged == 1) {
-                                    Log.d("TAG", "User Exists");
-
-                                    errorUsername.setVisibility(View.VISIBLE);
-
-                                }
-
-                                if (user.equals(dataUsername) && usernameChanged == 0) {
-                                    Log.d("TAG", "User not Exists");
-                                    errorUsername.setVisibility(View.INVISIBLE);
-
-
-
-
-                                    db.collection("users").document(userUid).update("Username", dataUsername);
-                                    db.collection("users").document(userUid).update("Name", dataName);
-                                    db.collection("users").document(userUid).update("Bio", dataBio);
-                                    db.collection("users").document(userUid).update("Steam", dataSteam);
-                                    db.collection("users").document(userUid).update("Origin", dataOrigin);
-                                    db.collection("users").document(userUid).update("Psn", dataPsn);
-                                    db.collection("users").document(userUid).update("Xbox", dataXbox);
-                                    db.collection("users").document(userUid).update("Nintendo", dataNintendo);
-                                    db.collection("users").document(userUid).update("Email", email);
-                                    db.collection("users").document(userUid).update("UserUID", userUid);
-                                    db.collection("users").document(userUid).update("Followers", followers);
-                                    db.collection("users").document(userUid).update("Following", following);
-
-                                    // Call the method to upload image
-                                    uploadImage(email);
-
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
-
-                                        }
-                                    }, 5000);
-
-                                    Log.d("TAG", "onComplete: chegou aqui");
-
-
-                                }
-
-                            }
-
-                            if (task.getResult().size() == 0) {
-
-
-                                    Log.d("TAG", "User not Exists");
-                                    errorUsername.setVisibility(View.INVISIBLE);
-
-
-
-
-                                    db.collection("users").document(userUid).update("Username", dataUsername);
-                                    db.collection("users").document(userUid).update("Name", dataName);
-                                    db.collection("users").document(userUid).update("Bio", dataBio);
-                                    db.collection("users").document(userUid).update("Steam", dataSteam);
-                                    db.collection("users").document(userUid).update("Origin", dataOrigin);
-                                    db.collection("users").document(userUid).update("Psn", dataPsn);
-                                    db.collection("users").document(userUid).update("Xbox", dataXbox);
-                                    db.collection("users").document(userUid).update("Nintendo", dataNintendo);
-
-                                    db.collection("users").document(userUid).update("Email", email);
-                                    db.collection("users").document(userUid).update("Followers", followers);
-                                    db.collection("users").document(userUid).update("Following", following);
-
-                                    // Call the method to upload image
-                                    uploadImage(email);
-
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-
-                                        ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view);
-
-                                    }
-                                }, 5000);
-
-
-                                Log.d("TAG", "onComplete: chegou aqui");
-
-
-                            }
+                            errorUsername.setVisibility(View.VISIBLE);
                         }
 
+                        if (user.equals(dataUsername) && usernameChanged == 0) {
 
+                            errorUsername.setVisibility(View.INVISIBLE);
 
+                            db.collection("users").document(userUid).update("Username", dataUsername);
+                            db.collection("users").document(userUid).update("Name", dataName);
+                            db.collection("users").document(userUid).update("Bio", dataBio);
+                            db.collection("users").document(userUid).update("Steam", dataSteam);
+                            db.collection("users").document(userUid).update("Origin", dataOrigin);
+                            db.collection("users").document(userUid).update("Psn", dataPsn);
+                            db.collection("users").document(userUid).update("Xbox", dataXbox);
+                            db.collection("users").document(userUid).update("Nintendo", dataNintendo);
+                            db.collection("users").document(userUid).update("Email", email);
+                            db.collection("users").document(userUid).update("UserUID", userUid);
+                            db.collection("users").document(userUid).update("Followers", followers);
+                            db.collection("users").document(userUid).update("Following", following);
+
+                            // Call the method to upload image
+                            uploadImage(email);
+
+                            new Handler().postDelayed(() -> ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view), 5000);
+                        }
                     }
 
-                });
+                    if (task.getResult().size() == 0) {
 
-            }
+                        errorUsername.setVisibility(View.INVISIBLE);
+
+                        db.collection("users").document(userUid).update("Username", dataUsername);
+                        db.collection("users").document(userUid).update("Name", dataName);
+                        db.collection("users").document(userUid).update("Bio", dataBio);
+                        db.collection("users").document(userUid).update("Steam", dataSteam);
+                        db.collection("users").document(userUid).update("Origin", dataOrigin);
+                        db.collection("users").document(userUid).update("Psn", dataPsn);
+                        db.collection("users").document(userUid).update("Xbox", dataXbox);
+                        db.collection("users").document(userUid).update("Nintendo", dataNintendo);
+                        db.collection("users").document(userUid).update("Email", email);
+                        db.collection("users").document(userUid).update("Followers", followers);
+                        db.collection("users").document(userUid).update("Following", following);
+
+                        // Call the method to upload image
+                        uploadImage(email);
+
+                        new Handler().postDelayed(() -> ((MainActivity) Objects.requireNonNull(getActivity())).goToProfile(view), 5000);
+                    }
+                }
+            });
         });
 
-        // Listener that will check if displayName has been altered, and make check icon visible is so
+        // Listener that will check if displayName has been altered, and makes checkIcon visible
         displayName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -391,13 +316,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(dataUsername)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
                 }
                 else {
-
                     iconDoneSettings.setVisibility(View.VISIBLE);
                     usernameChanged = 1;
                 }
@@ -408,7 +331,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if realName has been altered, and make check icon visible is so
+        // Listener that will check if realName has been altered, and makes checkIcon visible
         realName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -416,7 +339,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(dataName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -429,7 +351,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if bio has been altered, and make check icon visible is so
+        // Listener that will check if bio has been altered, and makes checkIcon visible
         bio.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -437,7 +359,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(dataBio)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -450,7 +371,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if steamInput has been altered, and make check icon visible is so
+        // Listener that will check if steamInput has been altered, and makes checkIcon visible
         steamInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -458,7 +379,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(steamName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -471,7 +391,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if originInput has been altered, and make check icon visible is so
+        // Listener that will check if originInput has been altered, and makes checkIcon visible
         originInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -479,7 +399,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(originName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -492,7 +411,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if psnInput has been altered, and make check icon visible is so
+        // Listener that will check if psnInput has been altered, and makes checkIcon visible
         psnInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -500,7 +419,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(psnName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -513,7 +431,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if xboxInput has been altered, and make check icon visible is so
+        // Listener that will check if xboxInput has been altered, and makes checkIcon visible
         xboxInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -521,7 +439,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(xBoxName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -534,7 +451,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        // Listener that will check if switchInput has been altered, and make check icon visible is so
+        // Listener that will check if switchInput has been altered, and makes checkIcon visible
         switchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -542,7 +459,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().equals(nintendoName)) {
                     iconDoneSettings.setVisibility(View.INVISIBLE);
@@ -607,10 +523,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         if (imageUri != null){
             StorageReference ref = storageReference.child(email+"/" + userUid);
             ref.putFile(imageUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        }
+                    .addOnSuccessListener(taskSnapshot -> {
                     });
         }
     }
