@@ -14,6 +14,7 @@ public class FollowersUsers {
 
     // Gives other variables the data
     public FollowersUsers(String username, String userUID, String email, String following, String followers) {
+
         this.Username = username;
         this.UserUID = userUID;
         this.Email =email;

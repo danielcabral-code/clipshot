@@ -81,7 +81,6 @@ public class FollowersFragment extends Fragment {
         // Variables that will get the email and userId value from the user google account
         String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         assert acct != null;
-        String email = acct.getEmail();
 
         // Layout Variables
         View returnView = inflater.inflate(R.layout.fragment_followers, container, false);
@@ -166,17 +165,13 @@ public class FollowersFragment extends Fragment {
                         db.collection("users").document(model.getUserUID()).update("UsersFollowing", FieldValue.arrayRemove(userUid));
                         db.collection("users").document(userUid).update("UsersFollowers", FieldValue.arrayRemove(model.getUserUID()));
                         db.collection("users").document(userUid).update("Followers",String.valueOf(followersCount) );
-                        Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        db.collection("videos").whereEqualTo("UserID", userUid).get().addOnCompleteListener(task1 -> {
 
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d("TAG", document.getId() + " => " + document.getData());
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task1.getResult())) {
 
-                                    db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(model.getUserUID()));
-                                }
-
+                                db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(model.getUserUID()));
                             }
+
                         });
                         adapter.refresh();
                     }));

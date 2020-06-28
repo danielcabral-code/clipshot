@@ -5,61 +5,61 @@
     android:layout_height="match_parent"
     tools:context=".FollowersFragment">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-     <RelativeLayout
-        android:id="@+id/followersFragment"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:elevation="4dp"
-        android:background="@color/colorPrimary">
-
+        <!-- Under TopBar Section (switch page buttons) -->
         <RelativeLayout
-            android:id="@+id/centerFollowBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            tools:ignore="UselessParent">
+            android:id="@+id/followersFragment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:elevation="4dp"
+            android:background="@color/colorPrimary">
 
-            <TextView
-                android:id="@+id/followers"
+            <RelativeLayout
+                android:id="@+id/centerFollowBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_marginHorizontal="20dp"
-                android:paddingBottom="6dp"
-                android:text="@string/following"
-                android:textColor="@color/colorWhite"
-                android:alpha="0.65"
-                android:textSize="18sp"
-                android:fontFamily="@font/open_sans"
-                android:onClick="goToFollowing"
-                tools:ignore="OnClick"/>
+                tools:ignore="UselessParent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="@string/followers"
-                android:paddingBottom="6dp"
-                android:layout_toEndOf="@+id/followers"
-                android:layout_marginHorizontal="20dp"
-                android:textColor="@color/colorWhite"
-                android:textSize="18sp"
-                android:fontFamily="@font/open_sans_bold"/>
+                <!-- Following Button -->
+                <TextView
+                    android:id="@+id/followers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginHorizontal="20dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/following"
+                    android:textColor="@color/colorWhite"
+                    android:alpha="0.65"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/open_sans"
+                    android:onClick="goToFollowing"
+                    tools:ignore="OnClick"/>
+
+                <!-- Followers Button -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/followers"
+                    android:paddingBottom="6dp"
+                    android:layout_toEndOf="@+id/followers"
+                    android:layout_marginHorizontal="20dp"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="18sp"
+                    android:fontFamily="@font/open_sans_bold"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
-        </RelativeLayout>
-
+        <!-- Followers RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewFollowers"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:descendantFocusability="blocksDescendants"
-        android:layout_marginTop="50dp"/>
+            android:id="@+id/recyclerViewFollowers"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:descendantFocusability="blocksDescendants"
+            android:layout_marginTop="50dp"/>
 
 </RelativeLayout>

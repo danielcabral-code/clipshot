@@ -70,7 +70,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     int gameNameIsEmpty = 1;
     AppCompatImageView iconDone;
     ProgressBar progressBar;
-    TextView uploadLabel;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -80,33 +79,24 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         assert acct != null;
-        email= acct.getEmail();
+        email = acct.getEmail();
 
         // Call Upload TopBar
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.upload_action_bar);
 
-        // AppCompatImageView iconDone = findViewById(R.id.iconDoneUpload);
         EditText description = findViewById(R.id.description);
         EditText gameName = findViewById(R.id.gameName);
         spinner = findViewById(R.id.spinner);
         VideoView videoSelected = findViewById(R.id.videoToBeUploaded);
         iconDone = findViewById(R.id.iconDoneUpload);
-        progressBar=findViewById(R.id.progress_circular);
-
-        Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
-
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy  HH:mm:ss");
-        String formattedDate = df.format(c);
-        Log.d("TAG", "onCreate: "+ formattedDate);
+        progressBar  =findViewById(R.id.progress_circular);
 
         // Get extras from Main Activity
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             videoUri = Uri.parse(bundle.getString("video"));
             String id = bundle.getString("userID");
-            Log.d("RES", "onCreate: " + videoUri + "/" + id);
         }
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -117,6 +107,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         long timeInMillisec = Long.parseLong(time);
         retriever.release();
 
+        // If video is over 60secs long it rejects it
         if (timeInMillisec > 60000){
 
             Toast.makeText(this,"Your Clip exceeds the 60s max permitted!" , Toast.LENGTH_LONG).show();
@@ -125,6 +116,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
         else {
 
+            // Otherwise, the video is selected and shown in app
             videoSelected.setVideoURI(videoUri);
             videoSelected.setOnPreparedListener(mp -> {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -134,7 +126,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             });
             videoSelected.setOnCompletionListener(mp -> videoSelected.seekTo(1));
 
-            // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+            // Listener that will check if caption is not empty
             description.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -142,13 +134,10 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.d("TAG", "onTextChanged: mudou");
 
                     if (s.toString().trim().length() ==0 ){
 
                         descriptionIsEmpty = 1;
-
-
                     }
                     else descriptionIsEmpty = 0;
 
@@ -163,13 +152,14 @@ public class UploadVideoActivity extends AppCompatActivity {
                 }
             });
 
+            // Upload Video
             iconDone.setOnClickListener(v -> {
                 progressBar.setVisibility(View.VISIBLE);
                 iconDone.setVisibility(View.INVISIBLE);
                 uploadVideo();
             });
 
-            // Listener that will check if username is not empty, if not the check button will appear and allow user go to feed page
+            // Listener that will check if game name is not empty
             gameName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -184,6 +174,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                             new TimerTask() {
                                 @Override
                                 public void run() {
+                                    // Searching the API
                                     Uri.Builder builder = new Uri.Builder();
                                     builder.scheme("https")
                                             .authority("api.rawg.io")
@@ -205,20 +196,18 @@ public class UploadVideoActivity extends AppCompatActivity {
                 }
             });
 
-            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+            // Fills spinner with game names
+            spinner.setOnItemSelectedListener((MaterialSpinner.OnItemSelectedListener<String>) (view, position, id, item) -> {
 
-                @Override
-                public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-
-                    game = item;
-                    gameName.setText(item);
-                    gameNameIsEmpty=0;
-                    showIconDone();
-                }
+                game = item;
+                gameName.setText(item);
+                gameNameIsEmpty = 0;
+                showIconDone();
             });
         }
     }
 
+    // Upload Video Method
     public void uploadVideo() {
 
         if (videoUri != null) {
@@ -247,7 +236,6 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                                 assert group != null;
                                 arrayFollowers[0] = group.toArray(new String[0]);
-                                Log.d("TAG", "uploadVideo: " + arrayFollowers.toString());
                             }
 
                             Date date = new Date();
@@ -274,6 +262,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Fetch API Method
     @SuppressLint("StaticFieldLeak")
     class GetIp extends AsyncTask<String, String, String> {
 
@@ -301,6 +290,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             return stringBuilder.toString();
         }
 
+        // Fills list of game names while searching
         @Override
         protected void onPostExecute(final String result) {
             super.onPostExecute(result);
@@ -331,6 +321,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // When both requirments are complete, iconDone appears
     public void showIconDone(){
 
         if (descriptionIsEmpty == 0 && gameNameIsEmpty == 0) {

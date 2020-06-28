@@ -8,6 +8,7 @@
     android:background="@drawable/app_background"
     android:theme="@android:style/Theme.NoTitleBar">
 
+    <!-- Main Container -->
     <RelativeLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
@@ -47,7 +48,6 @@
                     app:layout_constraintVertical_bias="0.0"
                     app:layout_constraintWidth_percent="0.4"
                     android:onClick="goToFeed">
-
 
                     <!-- Home Button Icon -->
                     <androidx.appcompat.widget.AppCompatImageView
@@ -97,8 +97,6 @@
             app:layout_anchor="@id/navigation"
             app:tint="@android:color/white"
             android:src="@drawable/ic_add"/>
-
-
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     <!-- NavBar -->

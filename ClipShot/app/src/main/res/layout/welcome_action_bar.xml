@@ -28,6 +28,7 @@
         android:src="@drawable/ic_done"
         android:visibility="invisible"/>
 
+    <!-- Google Progress Bar -->
     <ProgressBar
         android:id="@+id/progress_circular"
         android:layout_width="24dp"

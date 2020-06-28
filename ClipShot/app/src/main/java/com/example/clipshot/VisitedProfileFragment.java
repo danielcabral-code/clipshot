@@ -54,15 +54,14 @@ import java.util.Objects;
 
 public class VisitedProfileFragment extends Fragment {
 
+    // Global Variables
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String pickedProfile, docID, visitedEmail;
     private FirestorePagingAdapter adapter;
     private DocumentReference documentReference;
-    String userVisitedUid;
-    CollectionReference usersRef;
     StorageReference storageReference;
     int count;
-    String userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
     public VisitedProfileFragment() {
         // Required empty public constructor
@@ -82,46 +81,37 @@ public class VisitedProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
+        // Calls TopBar
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setElevation(20f); // Float == px
         Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setCustomView(R.layout.visited_profile_action_bar_layout);
-
-
-        /*// Google variable to detect the user that is signed
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(container.getContext());
-        Log.d("TAG", "onCreateView: "+ acct.getEmail());*/
-
-        /*String email = acct.getEmail().toString();*/
-
 
         View returnView = inflater.inflate(R.layout.fragment_visited_profile, container, false);
         RecyclerView visitedVideos = returnView.findViewById(R.id.recyclerView);
 
+        // FireStore Instance
         db = FirebaseFirestore.getInstance();
 
-        //Get extras from bundle that will be used to get the visted user image and videos
+        // Get extras from bundle that will be used to get the visted user
         Bundle bundle = this.getArguments();
         assert bundle != null;
         pickedProfile = bundle.getString("pickedProfile");
         docID = bundle.getString("docID");
-        visitedEmail=bundle.getString("email");
+        visitedEmail = bundle.getString("email");
         assert pickedProfile != null;
-        Log.d("TAG", pickedProfile);
 
-
-        //Query to get all videos where the user id equals the variable from bundle and order the videos from the most recent to older
+        // Query to get all videos where the user id equals the variable from bundle and order the videos from the most recent to older
         Query queryVideo = db.collection("videos").whereEqualTo("UserID", docID).orderBy("ReleasedTime", Query.Direction.DESCENDING);
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
                 .build();
 
-        //Applying query to options of FirestorePagingAdapter
+        // Applying query to options of FirestorePagingAdapter
         FirestorePagingOptions<VisitedProfileVideos> options = new FirestorePagingOptions.Builder<VisitedProfileVideos>()
                 .setQuery(queryVideo, config, VisitedProfileVideos.class)
                 .build();
 
-        //Setting the options applied before to FirestorePaginAdapter
+        // Setting the options applied before to FirestorePagingAdapter
         adapter = new FirestorePagingAdapter<VisitedProfileVideos, VisitedProfileHolder>(options) {
             @NonNull
             @Override
@@ -135,51 +125,43 @@ public class VisitedProfileFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             protected void onBindViewHolder(@NonNull VisitedProfileHolder holder, int position, @NonNull VisitedProfileVideos model) {
+
                 // Storage reference to the user avatar image
                 storageReference  = FirebaseStorage.getInstance().getReference().child(model.getEmail()+"/"+model.getUserID());
 
                 // Download uri from user image folder using the storageReference inicialized at top of document
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                        // Load the image using Glide
-                        Glide.with(container).load(uri).into(holder.listUserImage);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle any errors
-                        Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
-                        Log.d("TAG", "onFailure: error "+ exception);
-                    }
+                    // Load the image using Glide
+                    Glide.with(container).load(uri).into(holder.listUserImage);
+
+                }).addOnFailureListener(exception -> {
+
+                    // Adds default image if none are found
+                    Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                 });
 
-                //Setting the visited user username in all videos that he got
+                // Setting the visited user username in all videos that he has
                 documentReference = db.collection("users").document(model.getUserID());
                 documentReference.get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    String dataUser = documentSnapshot.getString("Username");
-                                    holder.listUsername.setText(dataUser);
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
 
-                                }
+                                String dataUser = documentSnapshot.getString("Username");
+                                holder.listUsername.setText(dataUser);
                             }
                         });
 
-                //Check if "we" already liked the visited user video
-                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        List<String> group = (List<String>) document.get("UsersThatLiked");
-                        assert group != null;
-                        if (group.contains(userUid)) {
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
-                        }
+                // Check if current user already liked the visited user video
+                FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(task -> {
+                    DocumentSnapshot document = task.getResult();
+
+                    List<String> group = (List<String>) document.get("UsersThatLiked");
+
+                    assert group != null;
+                    if (group.contains(userUid)) {
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
                     }
                 });
 
@@ -195,96 +177,76 @@ public class VisitedProfileFragment extends Fragment {
                 holder.listDescription.setText(model.getDescription());
                 holder.listLikes.setText(model.getLikes());
 
-                holder.listLikesIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                holder.listLikesIcon.setOnClickListener(v -> {
 
-                        if (holder.listLikesIcon.getTag().toString().equals("liked")) {
+                    if (holder.listLikesIcon.getTag().toString().equals("liked")) {
 
-                            //If the icon tag equals "liked", when we press the icon the like will be removed or if the tag equals "noLike" the like will be added
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone = Integer.parseInt(likesCount) - 1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
-                            holder.listLikesIcon.setTag("noLike");
+                        // If the icon tag equals "liked", when we press the icon the like will be removed or if the tag equals "noLike" the like will be added
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone = Integer.parseInt(likesCount) - 1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion_outline);
+                        holder.listLikesIcon.setTag("noLike");
 
 
-                            db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
-                        } else {
+                        db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayRemove(userUid));
+                    } else {
 
-                            String likesCount = (String) holder.listLikes.getText();
-                            int likeDone = Integer.parseInt(likesCount) + 1;
-                            holder.listLikes.setText(String.valueOf(likeDone));
-                            holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
-                            holder.listLikesIcon.setTag("liked");
-
-
-                            db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
-                            db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
-                        }
+                        String likesCount = (String) holder.listLikes.getText();
+                        int likeDone = Integer.parseInt(likesCount) + 1;
+                        holder.listLikes.setText(String.valueOf(likeDone));
+                        holder.listLikesIcon.setImageResource(R.drawable.ic_explosion);
+                        holder.listLikesIcon.setTag("liked");
 
 
+                        db.collection("videos").document(model.getDocumentName()).update("Likes", holder.listLikes.getText());
+                        db.collection("videos").document(model.getDocumentName()).update("UsersThatLiked", FieldValue.arrayUnion(userUid));
                     }
                 });
 
-                //Showing the loading progress bar when the video isnt completed
+                // Showing the loading progress bar when the video isn't completed
                 holder.progressBar.setVisibility(View.VISIBLE);
 
-                //Filling the video uri from the model class that return the videos url and putting the video image with the 1st frame
+                // Filling the video uri from the model class that return the videos url and putting the video image with the 1st frame
                 Uri uri = Uri.parse(model.getUrl());
+
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo(1);
-                holder.listVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        //When the video is fully loaded the loading disappear, the heigth is setted to wrap content and the video frame background its removed too
-                        holder.progressBar.setVisibility(View.INVISIBLE);
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 140, 0, 0);
-                        holder.listVideo.setLayoutParams(layoutParams);
-                        holder.listVideo.setBackgroundResource(0);
 
-                        //Clicking in the video it will start it
-                        holder.listVideo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                holder.listVideo.start();
-                            }
-                        });
+                holder.listVideo.setOnPreparedListener(mp -> {
 
-                        //When video ends it will show the 1st frame again
-                        holder.listVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
+                    // When the video is fully loaded the loading disappear, the heigth is setted to wrap content and the video frame background its removed too
+                    holder.progressBar.setVisibility(View.INVISIBLE);
+                    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 140, 0, 0);
+                    holder.listVideo.setLayoutParams(layoutParams);
+                    holder.listVideo.setBackgroundResource(0);
 
-                                holder.listVideo.seekTo(1);
-                            }
-                        });
+                    // Clicking in the video it will start it
+                    holder.listVideo.setOnClickListener(v -> holder.listVideo.start());
 
-                    }
-
+                    // When video ends it will show the 1st frame again
+                    holder.listVideo.setOnCompletionListener(mp1 -> holder.listVideo.seekTo(1));
                 });
-
             }
-
-
-
         };
 
-        //setting the videos in adapter
+        // Setting the videos in adapter
         visitedVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         visitedVideos.setAdapter(adapter);
         visitedVideos.setNestedScrollingEnabled(false);
 
-      return  returnView;
+        return returnView;
     }
 
+
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        // Declaring Layout Variables
         ImageView img = Objects.requireNonNull(getActivity()).findViewById(R.id.image);
         TextView realName = getActivity().findViewById(R.id.realName);
         TextView bio = getActivity().findViewById(R.id.bio);
@@ -300,168 +262,131 @@ public class VisitedProfileFragment extends Fragment {
         TextView followerNumber = getActivity().findViewById(R.id.followerNumber);
         TextView followingNumber =  getActivity().findViewById(R.id.followingNumber);
 
+        // Checks if user is following this user
+        FirebaseFirestore.getInstance().collection("users").document(docID).get().addOnCompleteListener(task -> {
+            DocumentSnapshot document = task.getResult();
 
+            List<String> group = (List<String>) document.get("UsersFollowers");
 
+            assert group != null;
+            if (group.contains(userUid)) {
 
-        FirebaseFirestore.getInstance().collection("users").document(docID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot document = task.getResult();
-                List<String> group = (List<String>) document.get("UsersFollowers");
-                assert group != null;
-                if (group.contains(userUid)) {
-                    btnFollow.setText("Unfollow");
-                    btnFollow.setTextSize(6);
-                    btnFollow.setElevation(0);
-                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    btnFollow.setTag("following");
-                }
+                btnFollow.setText("Unfollow");
+                btnFollow.setTextSize(6);
+                btnFollow.setElevation(0);
+                btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                btnFollow.setTag("following");
             }
         });
 
-        btnFollow.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View v) {
+        // Follow and Unfollow button
+        btnFollow.setOnClickListener(v -> {
 
-                if (btnFollow.getTag().toString().equals("following")) {
+            if (btnFollow.getTag().toString().equals("following")) {
 
+                String followingCount = (String) followerNumber.getText();
+                int followDone = Integer.parseInt(followingCount) - 1;
+                followerNumber.setText(String.valueOf(followDone));
+                btnFollow.setTag("noFollow");
+                btnFollow.setText("Follow");
+                btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPurple));
 
-                   String followingCount = (String) followerNumber.getText();
-                    int followDone = Integer.parseInt(followingCount) - 1;
-                    followerNumber.setText(String.valueOf(followDone));
-                    btnFollow.setTag("noFollow");
-                    btnFollow.setText("Follow");
-                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPurple));
+                db.collection("users").document(docID).update("Followers", followerNumber.getText());
+                db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayRemove(userUid));
 
+                db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(task -> {
 
-                    db.collection("users").document(docID).update("Followers", followerNumber.getText());
-                    db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayRemove(userUid));
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
-                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("TAG", document.getId() + " => " + document.getData());
-
-                                db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
-                            }
-
-                        }
-                    });
-
-                    //Setting the visited user username in all videos that he got
-                    documentReference = db.collection("users").document(userUid);
-                    documentReference.get()
-                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    if (documentSnapshot.exists()) {
-                                        String userFollowing = documentSnapshot.getString("Following");
-                                        int addFollowing = Integer.parseInt(userFollowing) -1;
-                                        db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
-                                        db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(docID));
-                                    }
-                                }
-                            });
-
-
-                } else {
-
-                    String followingCount = (String) followerNumber.getText();
-                    int followDone = Integer.parseInt(followingCount) + 1;
-                    followerNumber.setText(String.valueOf(followDone));
-                    btnFollow.setText("Unfollow");
-                    btnFollow.setTag("following");
-                    btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    btnFollow.setTextSize(6);
-                    btnFollow.setElevation(0);
-
-
-                    db.collection("users").document(docID).update("Followers", followerNumber.getText());
-                    db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayUnion(userUid));
-
-                    Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("TAG", document.getId() + " => " + document.getData());
-
-                                db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayUnion(userUid));
-                            }
-
-                        }
-                    });
-
-                    //Setting the visited user username in all videos that he got
-                    documentReference = db.collection("users").document(userUid);
-                    documentReference.get()
-                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    if (documentSnapshot.exists()) {
-                                        String userFollowing = documentSnapshot.getString("Following");
-                                        int addFollowing = Integer.parseInt(userFollowing) +1;
-                                        db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
-                                        db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayUnion(docID));
-
-                                    }
-                                }
-                            });
-
-                  ;
-                }
-
-
-            }
-        });
-
-
-        db.collection("videos").whereEqualTo("UserID",docID)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            count = 0;
-                            for (DocumentSnapshot document : task.getResult()) {
-
-                                count++;
-                                Log.d("TAG", "onComplete: " + count);
-                                Log.d("TAG", "onComplete: "+ task.getResult().toString());
-
-
-                            }
-                            numberOfVideos.setText(String.valueOf(count));
-
-                            TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
-                            if (count == 0) {
-                                noVideosMessage.setText("This user hasn't shared any Clips yet...");
-                            }
-
-                        } else {
-
-                            Log.d("TAG", "Error getting documents: ", task.getException());
-                        }
-
-
-
+                        db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
                     }
                 });
 
+                // Setting the visited user username in all videos that he has
+                documentReference = db.collection("users").document(userUid);
+                documentReference.get()
+                        .addOnSuccessListener(documentSnapshot -> {
 
+                            if (documentSnapshot.exists()) {
+                                String userFollowing = documentSnapshot.getString("Following");
+
+                                assert userFollowing != null;
+                                int addFollowing = Integer.parseInt(userFollowing) -1;
+                                db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
+                                db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(docID));
+                            }
+                        });
+            } else {
+
+                String followingCount = (String) followerNumber.getText();
+                int followDone = Integer.parseInt(followingCount) + 1;
+                followerNumber.setText(String.valueOf(followDone));
+                btnFollow.setText("Unfollow");
+                btnFollow.setTag("following");
+                btnFollow.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                btnFollow.setTextSize(6);
+                btnFollow.setElevation(0);
+
+                db.collection("users").document(docID).update("Followers", followerNumber.getText());
+                db.collection("users").document(docID).update("UsersFollowers", FieldValue.arrayUnion(userUid));
+
+                db.collection("videos").whereEqualTo("UserID", docID).get().addOnCompleteListener(task -> {
+
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+
+                        db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayUnion(userUid));
+                    }
+                });
+
+                // Setting the visited user username in all videos that he has
+                documentReference = db.collection("users").document(userUid);
+                documentReference.get()
+                        .addOnSuccessListener(documentSnapshot -> {
+
+                            if (documentSnapshot.exists()) {
+                                String userFollowing = documentSnapshot.getString("Following");
+                                assert userFollowing != null;
+                                int addFollowing = Integer.parseInt(userFollowing) + 1;
+                                db.collection("users").document(userUid).update("Following", String.valueOf(addFollowing));
+                                db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayUnion(docID));
+                            }
+                        });
+            }
+        });
+
+        // Count amount of clips
+        db.collection("videos").whereEqualTo("UserID",docID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        count = 0;
+                        for (DocumentSnapshot ignored : Objects.requireNonNull(task.getResult())) {
+
+                            count++;
+                        }
+                        numberOfVideos.setText(String.valueOf(count));
+
+                        // If there are no videos to be shown, displays a message for user
+                        TextView noVideosMessage = Objects.requireNonNull(getActivity()).findViewById(R.id.noVideosMessage);
+
+                        if (count == 0) {
+                            noVideosMessage.setText("This user hasn't shared any Clips yet...");
+                        }
+
+                    } else {
+                        Log.d("TAG", "Error getting documents: ", task.getException());
+                    }
+                });
+
+        // Recieves data from DB for profile section
         db.collection("users")
                 .whereEqualTo("Username", pickedProfile)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
 
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
 
                             // Map that will fill our database with values
                             Map<String, Object> Userdata = document.getData();
@@ -477,8 +402,6 @@ public class VisitedProfileFragment extends Fragment {
                             String dataNintendo = (String) Userdata.get("Nintendo");
                             String dataFollower = (String) Userdata.get("Followers");
                             String dataFollowing = (String) Userdata.get("Following");
-
-
 
                             realName.setText(dataName);
                             bio.setText(dataBio);
@@ -514,46 +437,31 @@ public class VisitedProfileFragment extends Fragment {
                                 nintendoIcon.setAlpha((float) 1.0);
                             }
 
-                            //Listeners to show toast with platform id if user has some nickname introduced in database for that platform
-                            steamIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!dataSteam.equals("")) {
-                                        Toast.makeText(getContext(), "Steam ID: " + dataSteam, Toast.LENGTH_SHORT).show();
-                                    }
+                            // Listeners to show toast with platform id if user has some nickname introduced in database for that platform
+                            steamIcon.setOnClickListener(v -> {
+                                if (!dataSteam.equals("")) {
+                                    Toast.makeText(getContext(), "Steam ID: " + dataSteam, Toast.LENGTH_SHORT).show();
                                 }
                             });
 
-                            originIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!dataOrigin.equals("")) {
-                                        Toast.makeText(getContext(), "Origin ID: " + dataOrigin, Toast.LENGTH_SHORT).show();
-                                    }
+                            originIcon.setOnClickListener(v -> {
+                                if (!dataOrigin.equals("")) {
+                                    Toast.makeText(getContext(), "Origin ID: " + dataOrigin, Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            psnIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!dataPsn.equals("")) {
-                                        Toast.makeText(getContext(), "PSN ID: " + dataPsn, Toast.LENGTH_SHORT).show();
-                                    }
+                            psnIcon.setOnClickListener(v -> {
+                                if (!dataPsn.equals("")) {
+                                    Toast.makeText(getContext(), "PSN ID: " + dataPsn, Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            xboxIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!dataXbox.equals("")) {
-                                        Toast.makeText(getContext(), "Xbox ID: " + dataXbox, Toast.LENGTH_SHORT).show();
-                                    }
+                            xboxIcon.setOnClickListener(v -> {
+                                if (!dataXbox.equals("")) {
+                                    Toast.makeText(getContext(), "Xbox ID: " + dataXbox, Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            nintendoIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (!dataNintendo.equals("")) {
-                                        Toast.makeText(getContext(), "Switch ID: " + dataNintendo, Toast.LENGTH_SHORT).show();
-                                    }
+                            nintendoIcon.setOnClickListener(v -> {
+                                if (!dataNintendo.equals("")) {
+                                    Toast.makeText(getContext(), "Switch ID: " + dataNintendo, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -562,31 +470,23 @@ public class VisitedProfileFragment extends Fragment {
                     }
                 });
 
-
-
-        storageReference  = FirebaseStorage.getInstance().getReference().child(visitedEmail+"/"+ docID);
         // Download uri from user image folder using the storageReference inicialized at top of document
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
+        storageReference  = FirebaseStorage.getInstance().getReference().child(visitedEmail+"/"+ docID);
 
-                // Load the image using Glide
-                Glide.with(getContext()).load(uri).into(img);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Glide.with(getContext()).load(R.drawable.default_avatar).into(img);
-                Log.d("TAG", "onFailure: error imagem grande "+ exception);
-            }
+        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+
+            // Load the image using Glide
+            Glide.with(Objects.requireNonNull(getContext())).load(uri).into(img);
+
+        }).addOnFailureListener(exception -> {
+
+            // Adds default image if none are found
+            Glide.with(Objects.requireNonNull(getContext())).load(R.drawable.default_avatar).into(img);
         });
-
-
     }
 
-
-    private class VisitedProfileHolder extends RecyclerView.ViewHolder {
+    // visited_profile_videos_layout Variables
+    private static class VisitedProfileHolder extends RecyclerView.ViewHolder {
 
         private ImageView listUserImage;
         private TextView listGameName;
@@ -611,6 +511,7 @@ public class VisitedProfileFragment extends Fragment {
         }
     }
 
+    // Allows adapter to start and stop recieving data
     @Override
     public void onStart() {
         super.onStart();
@@ -623,5 +524,3 @@ public class VisitedProfileFragment extends Fragment {
         adapter.stopListening();
     }
 }
-
-

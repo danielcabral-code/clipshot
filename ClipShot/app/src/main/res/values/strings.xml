@@ -2,13 +2,9 @@
     <string name="app_name">ClipShot</string>
     <string name="clipshot">ClipShot</string>
     <string name="welcome">Welcome!</string>
-    <string name="testprofilename">testProfileName</string>
     <string name="username">Username</string>
     <string name="real_name">Real Name</string>
     <string name="bio">Bio</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="platforms">Platforms</string>
     <string name="displayName">Display Name</string>
     <string name="realName">Real Name</string>
@@ -16,16 +12,13 @@
     <string name="logout">Logout</string>
     <string name="settings">Settings</string>
     <string name="mandatoryInput">*</string>
-    <string name="testGamifyTitle">Expert</string>
     <string name="following">Following</string>
     <string name="followers">Followers</string>
     <string name="clips">Clips</string>
     <string name="upload_video">Upload Clip</string>
     <string name="description">Description</string>
     <string name="search"><font size="18"><i>Search</i></font></string>
-    <string name="select_game_name">Select game name</string>
     <string name="games">Games</string>
-    <string name="testFeedString">hello</string>
     <string name="username_already_exists_choose_another">Username already exists, try again!</string>
     <string name="uploading_video">Uploading video</string>
     <string name="likeicon">likeIcon</string>
@@ -36,6 +29,4 @@
     <string name="game">Game:</string>
     <string name="caption">Caption:</string>
     <string name="Message_feed_no_videos">Start following people to watch new Clips!</string>
-
-
 </resources>

@@ -1,5 +1,6 @@
 package com.example.clipshot;
 
+// Declaring Variables which will recieve DB data
 public class VisitedGameVideos {
     private String Description;
     private String Url;
@@ -12,7 +13,9 @@ public class VisitedGameVideos {
     public VisitedGameVideos() {
     }
 
+    // Gives other variables the data
     public VisitedGameVideos(String description, String url, String gameName, String userID, String likes, String documentName , String email) {
+
         Description = description;
         Url = url;
         GameName = gameName;
@@ -22,6 +25,7 @@ public class VisitedGameVideos {
         Email=email;
     }
 
+    // Will be used to fill in data in RecyclerView
     public String getDescription() {
         return Description;
     }

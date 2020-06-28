@@ -108,8 +108,6 @@ public class FollowingFragment extends Fragment {
 
                 // Gets UserID from users collection and places username in following list
                 documentReference = db.collection("users").document(model.getUserUID());
-                Log.d("TAG", "d"+ model.getUserUID());
-
                 documentReference.get()
                         .addOnSuccessListener(documentSnapshot -> {
                             if (documentSnapshot.exists()) {
@@ -149,28 +147,23 @@ public class FollowingFragment extends Fragment {
 
                             // Counts users following
                             int followingCount;
-                            followingCount= Integer.parseInt(Objects.requireNonNull(task.getResult().getString("Following")));
+                            followingCount= Integer.parseInt(Objects.requireNonNull(Objects.requireNonNull(task.getResult()).getString("Following")));
                             followingCount = followingCount -1;
 
                             // Counts followers of user that is being unfollowed
                             int followersCount = Integer.parseInt(model.getFollowers());
-                            followersCount = followersCount-1;
+                            followersCount = followersCount -1;
 
                             // Where data is altered and refreshes RecyclerView
                             db.collection("users").document(userUid).update("Following",String.valueOf(followingCount) );
                             db.collection("users").document(userUid).update("UsersFollowing", FieldValue.arrayRemove(model.getUserUID()));
                             db.collection("users").document(model.getUserUID()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
                             db.collection("users").document(model.getUserUID()).update("Followers",String.valueOf(followersCount) );
-                            Task<QuerySnapshot> querySnapshot = db.collection("videos").whereEqualTo("UserID", model.getUserUID()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            db.collection("videos").whereEqualTo("UserID", model.getUserUID()).get().addOnCompleteListener(task1 -> {
 
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d("TAG", document.getId() + " => " + document.getData());
+                                for (QueryDocumentSnapshot document : Objects.requireNonNull(task1.getResult())) {
 
-                                        db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
-                                    }
-
+                                    db.collection("videos").document(document.getId()).update("UsersFollowers", FieldValue.arrayRemove(userUid));
                                 }
                             });
                             adapter.refresh();

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".VisitedProfileFragment">
 
+    <!-- Scroll View for visited profile -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,9 +14,9 @@
         <RelativeLayout
             android:id="@+id/bioAndRecyclerContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
 
+            <!-- Profile Section -->
             <RelativeLayout
                 android:id="@+id/biogr"
                 android:layout_width="match_parent"
@@ -80,7 +81,6 @@
                         android:fontFamily="@font/open_sans_light_italic"
                         android:inputType=""
                         android:singleLine="true"
-                        android:text="@string/testGamifyTitle"
                         android:textColor="@color/colorWhite"
                         android:textSize="15sp"
                         tools:ignore="LabelFor" />

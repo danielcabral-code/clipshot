@@ -120,19 +120,14 @@ public class SearchFragment extends Fragment {
 
                                     Map<String, Object> findUsernames = document.getData();
 
-
                                     // Allows user to search with Caps or non-Caps and still shows all results
                                     if (Objects.requireNonNull(findUsernames.get("Username")).toString().toLowerCase().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
-
-                                        Log.d("checkMe", String.valueOf(Objects.requireNonNull(findUsernames.get("Username")).toString().contains(s.toString().toLowerCase())));
 
                                         // Permits a max of 4 usernames per search to account for layout separation for GameSearch
                                         if (usernames.size() < 4) {
 
                                             usernames.add((String) findUsernames.get("Username"));
                                         }
-
-                                        Log.d("checkMe", String.valueOf(usernames));
 
                                         // Removes ability to search for yourself
                                         if (currentUsername.contains(s.toString().toLowerCase())) {

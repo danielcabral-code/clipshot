@@ -154,18 +154,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
         }).addOnFailureListener(exception -> {
 
-            // Handle any errors
-            Log.d("TAG", "onFailure: error "+ exception);
-        });
-
-        // Download uri from user image folder using the storageReference inicialized at top of document
-        storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-
-            // Load the image using Glide
-            Glide.with(container).load(uri).into(img);
-
-        }).addOnFailureListener(exception -> {
-
             // When image can't load, app loads default avatar
             Glide.with(container).load(R.drawable.default_avatar).into(img);
         });

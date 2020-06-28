@@ -67,6 +67,7 @@ public class VisitedGameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Calls TopBar
         Objects.requireNonNull(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar()).setElevation(20f); // Float == px
         Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setCustomView(R.layout.visited_game_action_bar_layout);
     }
@@ -75,7 +76,7 @@ public class VisitedGameFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Get extras from bundle that will be used to get the visted user image and videos
+        // Get extras from bundle that sends the selectedGameName
         Bundle bundle = this.getArguments();
         assert bundle != null;
         pickedGameName = bundle.getString("pickedGameName");
@@ -84,10 +85,13 @@ public class VisitedGameFragment extends Fragment {
         View returnView = inflater.inflate(R.layout.fragment_visited_game, container, false);
         RecyclerView VisitedGameVideos = returnView.findViewById(R.id.recyclerView);
 
+        // FireStore instance
         db = FirebaseFirestore.getInstance();
 
+        // Query for Recycler View for searched Game videos (gets videos from game that user searched)
         Query query = db.collection("videos").whereEqualTo("GameName",pickedGameName).orderBy("ReleasedTime", Query.Direction.DESCENDING);
 
+        // Configuration for RecyclerView adapter
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
                 .setPageSize(3)
@@ -125,8 +129,8 @@ public class VisitedGameFragment extends Fragment {
                     Glide.with(container).load(R.drawable.default_avatar).into(holder.listUserImage);
                 });
 
+                // Gets username from user that that video belongs to
                 documentReference = db.collection("users").document(model.getUserID());
-
                 documentReference.get()
                         .addOnSuccessListener(documentSnapshot -> {
                             if (documentSnapshot.exists()) {
@@ -136,6 +140,7 @@ public class VisitedGameFragment extends Fragment {
                             }
                         });
 
+                // Checks if current user has liked video or not
                 FirebaseFirestore.getInstance().collection("videos").document(model.getDocumentName()).get().addOnCompleteListener(task -> {
                     DocumentSnapshot document = task.getResult();
                     List<String> group = (List<String>) document.get("UsersThatLiked");
@@ -147,6 +152,7 @@ public class VisitedGameFragment extends Fragment {
                     }
                 });
 
+                // Places text in holder (video descripion, gameName, Likes) for RecyclerView
                 if (model.getGameName().length() > 34) {
 
                     holder.listGameName.setText(model.getGameName().substring(0, 34) + "...");
@@ -159,6 +165,7 @@ public class VisitedGameFragment extends Fragment {
                 holder.listLikes.setText(model.getLikes());
                 holder.listLikesIcon.setOnClickListener(v -> {
 
+                    // Allows user to like/dislike and changes value of like in DB
                     if (holder.listLikesIcon.getTag().toString().equals("liked")) {
 
                         String likesCount = (String) holder.listLikes.getText();
@@ -182,8 +189,10 @@ public class VisitedGameFragment extends Fragment {
                     }
                 });
 
+                // Places Google's loading circle
                 holder.progressBar.setVisibility(View.VISIBLE);
 
+                // Gets and loads video in RecyclerView
                 Uri uri = Uri.parse(model.getUrl());
                 holder.listVideo.setVideoURI(uri);
                 holder.listVideo.seekTo(1);
@@ -200,6 +209,7 @@ public class VisitedGameFragment extends Fragment {
             }
         };
 
+        // Set the adapter the the RecyclerView
         VisitedGameVideos.setLayoutManager(new LinearLayoutManager(getContext()));
         VisitedGameVideos.setAdapter(adapter);
         VisitedGameVideos.setNestedScrollingEnabled(false);
@@ -214,6 +224,7 @@ public class VisitedGameFragment extends Fragment {
 
         TextView appBarTitle = Objects.requireNonNull(getActivity()).findViewById(R.id.appBarTitle);
 
+        // Sets name of game in the TopBar
         if (pickedGameName.length() > 20) {
 
             appBarTitle.setText(pickedGameName.substring(0, 18) + "...");
@@ -223,6 +234,7 @@ public class VisitedGameFragment extends Fragment {
         }
     }
 
+    // visited_game_videos_layout Variables
     private static class GameVideosHolder extends  RecyclerView.ViewHolder {
 
         private ImageView listUserImage;
@@ -248,6 +260,7 @@ public class VisitedGameFragment extends Fragment {
         }
     }
 
+    // Allows adapter to start and stop recieving data
     @Override
     public void onStart() {
         super.onStart();

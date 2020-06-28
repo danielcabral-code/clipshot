@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
+    <!-- Back Button -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iconBack"
         android:layout_width="wrap_content"
@@ -16,6 +17,7 @@
         android:src="@drawable/ic_back"
         android:onClick="goToFeed"/>
 
+    <!-- Name of Visited Game -->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appBarTitle"
         style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"

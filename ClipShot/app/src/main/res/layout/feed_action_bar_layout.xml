@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
+    <!-- ClipShot Logo -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iconClipShot"
         android:layout_width="wrap_content"
@@ -14,6 +16,7 @@
         android:layout_centerVertical="true"
         android:src="@drawable/ic_clipshoticonv1" />
 
+    <!-- ClipShot App Name -->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appBarTitle"
         style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
@@ -23,8 +26,10 @@
         android:fontFamily="@font/righteous"
         android:text="@string/app_name"
         android:textSize="28sp"
-        android:textColor="@color/colorWhite" />
+        android:textColor="@color/colorWhite"
+        tools:ignore="RelativeOverlap" />
 
+    <!-- Icon Search -->
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iconSearch"
         android:layout_width="wrap_content"

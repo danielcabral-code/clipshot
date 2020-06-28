@@ -87,7 +87,6 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText nintendoInput = findViewById(R.id.switchInput);
         TextView errorUsername = findViewById(R.id.labelErrorUsername);
 
-
         // Only allows user to input 3 lines into bio
         bio.addTextChangedListener(new TextWatcher() {
             @Override
@@ -126,7 +125,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("TAG", "onTextChanged: mudou");
 
                 if (s.toString().trim().length()==0){
 
@@ -142,7 +140,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Listener to call method to pick an image from gallery
         img.setOnClickListener(v -> pickImageFromGallery());
-        progressBar= findViewById(R.id.progress_circular);
+        progressBar = findViewById(R.id.progress_circular);
 
         // Listener that inserts data into database and changes to the Main Activity
         iconDone.setOnClickListener(v -> {
@@ -150,7 +148,6 @@ public class WelcomeActivity extends AppCompatActivity {
             // Declaring variables
             String dataName, dataUsername, dataBio, dataSteam, dataOrigin, dataPsn, dataXbox, dataNintendo, dataGamifyTitle, email;
             FirebaseFirestore db;
-
 
             // Gets the user google email that will create a collection with that email
             assert acct != null;
@@ -181,7 +178,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
                         assert user != null;
                         if (user.equals(dataUsername)) {
-                            Log.d("TAG", "User Exists");
 
                             errorUsername.setVisibility(View.VISIBLE);
 
@@ -194,7 +190,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     }
 
                     if (task.getResult().size() == 0) {
-                        Log.d("TAG", "User not Exists");
+
                         errorUsername.setVisibility(View.INVISIBLE);
                         progressBar.setVisibility(View.VISIBLE);
                         iconDone.setVisibility(View.INVISIBLE);
@@ -234,7 +230,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     // Method to go to gallery
-     private void pickImageFromGallery(){
+    private void pickImageFromGallery(){
 
         Intent gallery = new Intent(Intent.ACTION_PICK);
         gallery.setType("image/*");

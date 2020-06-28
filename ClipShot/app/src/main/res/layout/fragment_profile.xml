@@ -6,15 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
+    <!-- ScrollView for Profile Page -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Profile Section and Recycler Container -->
         <RelativeLayout
             android:id="@+id/bioAndRecyclerContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Profile Section -->
             <RelativeLayout
                 android:id="@+id/biogr"
                 android:layout_width="match_parent"
@@ -300,6 +303,7 @@
 
             </RelativeLayout>
 
+            <!-- No Videos Message -->
             <TextView
                 android:id="@+id/noVideosMessage"
                 android:layout_width="wrap_content"
