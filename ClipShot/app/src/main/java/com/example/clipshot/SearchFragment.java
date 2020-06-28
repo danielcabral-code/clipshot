@@ -27,6 +27,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
@@ -123,6 +124,7 @@ public class SearchFragment extends Fragment {
 
                                     Map<String, Object> findUsernames = document.getData();
 
+
                                     // Allows user to search with Caps or non-Caps and still shows all results
                                     if (Objects.requireNonNull(findUsernames.get("Username")).toString().toLowerCase().contains(s.toString().toLowerCase()) && s.toString().toLowerCase().length() > 0) {
 
@@ -140,6 +142,7 @@ public class SearchFragment extends Fragment {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.list_view_items, usernames);
                                         ListView lvData = Objects.requireNonNull(getActivity()).findViewById(R.id.lvData);
                                         lvData.setAdapter(adapter);
+
 
                                         // Visually change margins depending on amount of search results
                                         int newHeightNormal = 670; // New height in pixels

@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class WelcomeActivity extends AppCompatActivity {
     FirebaseStorage imageStorage;
     StorageReference storageReference;
     String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+    ProgressBar progressBar;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -84,6 +86,7 @@ public class WelcomeActivity extends AppCompatActivity {
         EditText xboxInput = findViewById(R.id.xboxInput);
         EditText nintendoInput = findViewById(R.id.switchInput);
         TextView errorUsername = findViewById(R.id.labelErrorUsername);
+
 
         // Only allows user to input 3 lines into bio
         bio.addTextChangedListener(new TextWatcher() {
@@ -139,6 +142,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Listener to call method to pick an image from gallery
         img.setOnClickListener(v -> pickImageFromGallery());
+        progressBar= findViewById(R.id.progress_circular);
 
         // Listener that inserts data into database and changes to the Main Activity
         iconDone.setOnClickListener(v -> {
@@ -192,6 +196,8 @@ public class WelcomeActivity extends AppCompatActivity {
                     if (task.getResult().size() == 0) {
                         Log.d("TAG", "User not Exists");
                         errorUsername.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                        iconDone.setVisibility(View.INVISIBLE);
 
                         // Map that will fill our database with values
                         Map<String, Object> Userdata = new HashMap<>();
