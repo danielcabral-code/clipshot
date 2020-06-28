@@ -28,4 +28,12 @@
         android:src="@drawable/ic_done"
         android:visibility="invisible"/>
 
+    <ProgressBar
+        android:id="@+id/progress_circular"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"/>
+
 </RelativeLayout>
