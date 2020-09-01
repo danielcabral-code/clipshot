@@ -61,6 +61,7 @@ public class VisitedProfileFragment extends Fragment {
     private DocumentReference documentReference;
     StorageReference storageReference;
     int count;
+    int countTotalVideos;
     String userUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
     public VisitedProfileFragment() {
@@ -378,6 +379,44 @@ public class VisitedProfileFragment extends Fragment {
                         Log.d("TAG", "Error getting documents: ", task.getException());
                     }
                 });
+
+        // Gamification System (checks amount of user videos uploaded and likes recieved)
+        db.collection("videos").whereEqualTo("UserID",userUid).get().addOnCompleteListener(task -> {
+            int countTotalLikes =0;
+
+            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+
+                countTotalLikes = countTotalLikes + Integer.parseInt(Objects.requireNonNull(document.getString("Likes")));
+            }
+
+            if (countTotalLikes>-1   && countTotalVideos>0 && countTotalVideos<10){
+                db.collection("users").document(userUid).update("GamifyTitle","Beginner");
+
+            } else if (countTotalLikes>99  && countTotalVideos>9 && countTotalVideos<25){
+                db.collection("users").document(userUid).update("GamifyTitle","Rookie");
+
+            } else if (countTotalLikes>249 && countTotalVideos>24 && countTotalVideos<50){
+                db.collection("users").document(userUid).update("GamifyTitle","Intermediate");
+
+            } else if (countTotalLikes>499 && countTotalVideos>49 && countTotalVideos<100){
+                db.collection("users").document(userUid).update("GamifyTitle","Trained");
+
+            } else if (countTotalLikes>999 && countTotalVideos>99 && countTotalVideos<150){
+                db.collection("users").document(userUid).update("GamifyTitle","Gamer");
+
+            } else if (countTotalLikes>1999 && countTotalVideos>149 && countTotalVideos<200){
+                db.collection("users").document(userUid).update("GamifyTitle","Expert");
+
+            } else if (countTotalLikes>2999 && countTotalVideos>199 && countTotalVideos<300){
+                db.collection("users").document(userUid).update("GamifyTitle","Veteran");
+
+            } else if (countTotalLikes>4999 && countTotalVideos>299 && countTotalVideos<400){
+                db.collection("users").document(userUid).update("GamifyTitle","Legend");
+
+            } else if (countTotalLikes>7999 && countTotalVideos>399){
+                db.collection("users").document(userUid).update("GamifyTitle","ClipMaster");
+            }
+        });
 
         // Recieves data from DB for profile section
         db.collection("users")
