@@ -2,7 +2,7 @@
 
 Social Media for Gamers
 
-Android Studio w/ Java
+Android Studio w/ Java, Firebase
 
 O presente projeto foi elaborado no âmbito do Curso Técnico Superior de Design e Tecnologias para Aplicações Móveis, 1º ano, 2º semestre, na Escola Superior de Media Artes e Design, do Instituto Politécnico do Porto.
 
