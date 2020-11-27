@@ -1,5 +1,9 @@
 # g1-clipshot-app
 
+Social Media for Gamers
+
+Android Studio w/ Java
+
 O presente projeto foi elaborado no âmbito do Curso Técnico Superior de Design e Tecnologias para Aplicações Móveis, 1º ano, 2º semestre, na Escola Superior de Media Artes e Design, do Instituto Politécnico do Porto.
 
 Atualmente, existem inúmeras redes sociais que permitem a comunicação entre indivíduos por toda a parte do mundo, mas existe um espaço aberto no que toca a uma aplicação que o faça especificamente para gaming. Plataformas como o Instagram permitem a publicação de pequenos vídeos, nos quais o foco não tem necessariamente de ser gaming. Já a Twitch.TV, por exemplo, é uma plataforma streaming para gaming onde não é possível colocar highlights num formato parecido ao do Instagram.
