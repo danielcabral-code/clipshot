@@ -1,4 +1,4 @@
-# g1-clipshot-app
+# ClipShot
 
 Social Media for Gamers
 
