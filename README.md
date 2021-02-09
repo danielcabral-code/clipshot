@@ -11,3 +11,9 @@ Atualmente, existem inúmeras redes sociais que permitem a comunicação entre i
 O nosso projeto visa criar uma plataforma de comunicação entre indivíduos, especificamente pertencentes ao mundo gaming, a partir da partilha de vídeos. De certo modo, queremos encontrar o ponto de encontro entre aplicações onde é habitual ver conteúdo de gaming mais longo, e aplicações onde o conteúdo é de consumo mais rápido, isto tudo, focado em videojogos.
 
 Aplicação testada nos sdk 28 e 29.
+
+![clipshot1](https://user-images.githubusercontent.com/57807464/107390006-2d059280-6aef-11eb-9b7c-aaf1143d3e12.PNG)
+![clipshot2](https://user-images.githubusercontent.com/57807464/107390010-2e36bf80-6aef-11eb-9553-e3b69d7f8a03.PNG)
+![clipshot3](https://user-images.githubusercontent.com/57807464/107390018-2ecf5600-6aef-11eb-9ff4-2c87a9813a0b.PNG)
+![clipshot4](https://user-images.githubusercontent.com/57807464/107390030-30008300-6aef-11eb-81d1-173859dd57e9.PNG)
+![clipshot5](https://user-images.githubusercontent.com/57807464/107390038-31ca4680-6aef-11eb-8b8b-f52d2f0e8770.PNG)
