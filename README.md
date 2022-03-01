@@ -1,3 +1,3 @@
-# clipshot
+# ClipShot
 
-social media app for gamers w/ Android (Java) & Firebase.
+Social Media for Gamers w/ Android (Java) & Firebase.
